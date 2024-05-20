@@ -1,57 +1,40 @@
-import javax.swing.JComboBox;
-import java.awt.Color;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import javax.swing.*;
 
-public class PlaceholderComboBox<E> extends JComboBox<E> {
-    private String placeholder;
+public class PlaceholderComboBox extends JComboBox<String> {
     private boolean placeholderVisible;
+    private String placeholder;
 
-    public PlaceholderComboBox(String placeholder, E[] categories) {
-        super(categories);
+    public PlaceholderComboBox(String placeholder, String[] items) {
+        super(items);
         this.placeholder = placeholder;
         this.placeholderVisible = true;
-        setForeground(Color.GRAY);
+        setSelectedItem(placeholder);
 
-        // Add a focus listener to handle the placeholder behavior
-        addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (placeholderVisible) {
-                    // Clear the placeholder text when the combo box gains focus
-                    setSelectedIndex(-1);
-                    placeholderVisible = false;
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (getSelectedIndex() == -1) {
-                    // Show the placeholder text if no item is selected
-                    setPlaceholder();
-                }
+        // Add a listener to hide the placeholder when an item is selected
+        addActionListener(e -> {
+            if (placeholderVisible) {
+                placeholderVisible = false;
+                removeItem(placeholder);
             }
         });
-
-        // Show the placeholder text initially
-        setPlaceholder();
-    }
-
-    private void setPlaceholder() {
-        setSelectedIndex(0); // Select the placeholder item
-        setForeground(Color.GRAY);
-        placeholderVisible = true;
     }
 
     @Override
-    public void setSelectedIndex(int index) {
-        // Override setSelectedIndex to prevent selecting the placeholder as the item
-        if (index != 0) {
-            super.setSelectedIndex(index);
+    public String getSelectedItem() {
+        String selectedItem = (String) super.getSelectedItem();
+        if (placeholderVisible) {
+            return placeholder; // Return placeholder if it is visible
         }
+        return selectedItem;
     }
 
-    public boolean isPlaceholderVisible() {
-        return placeholderVisible;
+    public void setPlaceholderVisible(boolean placeholderVisible) {
+        this.placeholderVisible = placeholderVisible;
+        if (placeholderVisible) {
+            insertItemAt(placeholder, 0);
+            setSelectedItem(placeholder);
+        } else {
+            removeItem(placeholder);
+        }
     }
 }

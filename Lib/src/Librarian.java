@@ -1,5 +1,6 @@
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -12,6 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -33,11 +37,34 @@ public class Librarian extends javax.swing.JFrame {
         
         dbData();
        populateBooksTableFromDatabase();
+       
+       bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                if (!event.getValueIsAdjusting() && bookTable.getSelectedRow() != -1) {
+                    // Get selected row index
+                    int selectedRow = bookTable.getSelectedRow();
+
+                    // Get the values from the selected row and columns
+                    String title = (String) bookTable.getValueAt(selectedRow, 0);
+                    String author = (String) bookTable.getValueAt(selectedRow, 1);
+                    String isbn = (String) bookTable.getValueAt(selectedRow, 2);
+                    String category = (String) bookTable.getValueAt(selectedRow, 3);
+
+                    // Set the values to the text fields and combo box
+                    titleUpdate.setText(title);
+                    authorUpdate.setText(author);
+                    isbnUpdate.setText(isbn);
+                    categoryUpdate.setSelectedItem(category);
+                }
+            }
+        });
+
+              bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
+
   private void dbData(){
-       
-                 
+         
 try {
     dbConnection con = new dbConnection();
     Connection connection = con.getConnection();
@@ -156,29 +183,18 @@ try {
         jButton30 = new javax.swing.JButton();
         jComboBox3 = new javax.swing.JComboBox<>();
         jTextField22 = new javax.swing.JTextField();
-        jTextField23 = new javax.swing.JTextField();
-        updatePanel = new javax.swing.JPanel();
-        jTextField13 = new javax.swing.JTextField();
-        jTextField14 = new javax.swing.JTextField();
-        jTextField16 = new javax.swing.JTextField();
-        jTextField17 = new javax.swing.JTextField();
-        jTextField18 = new javax.swing.JTextField();
-        jTextField19 = new javax.swing.JTextField();
-        jTextField20 = new javax.swing.JTextField();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jButton21 = new javax.swing.JButton();
-        jTextField27 = new javax.swing.JTextField();
+        holdsSearch = new javax.swing.JTextField();
         addBookPanel = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
         jTextField6 = new javax.swing.JTextField();
         jTextField7 = new javax.swing.JTextField();
         jTextField8 = new javax.swing.JTextField();
-        categoryComboBox = new javax.swing.JComboBox<>();
         titleField = new javax.swing.JTextField();
         jTextField10 = new javax.swing.JTextField();
         authorAdd = new javax.swing.JTextField();
         isbnAdd = new javax.swing.JTextField();
+        categoryComboBox = new javax.swing.JComboBox<>();
         requestPanel = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
@@ -199,6 +215,19 @@ try {
         jTextField25 = new javax.swing.JTextField();
         settingsPanel = new javax.swing.JPanel();
         jButton16 = new javax.swing.JButton();
+        updatePanel = new javax.swing.JPanel();
+        jTextField13 = new javax.swing.JTextField();
+        jTextField14 = new javax.swing.JTextField();
+        jTextField16 = new javax.swing.JTextField();
+        authorUpdate = new javax.swing.JTextField();
+        jTextField18 = new javax.swing.JTextField();
+        isbnUpdate = new javax.swing.JTextField();
+        jTextField20 = new javax.swing.JTextField();
+        categoryUpdate = new javax.swing.JComboBox<>();
+        jButton21 = new javax.swing.JButton();
+        titleUpdate = new javax.swing.JTextField();
+        jButton23 = new javax.swing.JButton();
+        jButton24 = new javax.swing.JButton();
         rightmostPanel = new javax.swing.JPanel();
         borrowsButton = new javax.swing.JButton();
         addBooksButton = new javax.swing.JButton();
@@ -540,8 +569,9 @@ try {
             }
         });
 
-        jTextField23.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField23.setText("Search");
+        holdsSearch.setBackground(new java.awt.Color(255, 255, 255));
+        holdsSearch.setText("Search");
+        holdsSearch = new PlaceholderTextField("Search");
 
         javax.swing.GroupLayout holdsPanelLayout = new javax.swing.GroupLayout(holdsPanel);
         holdsPanel.setLayout(holdsPanelLayout);
@@ -563,7 +593,7 @@ try {
             .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(holdsPanelLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jTextField23)
+                    .addComponent(holdsSearch)
                     .addContainerGap()))
         );
         holdsPanelLayout.setVerticalGroup(
@@ -583,166 +613,11 @@ try {
             .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(holdsPanelLayout.createSequentialGroup()
                     .addGap(16, 16, 16)
-                    .addComponent(jTextField23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(holdsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(607, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("tab3", holdsPanel);
-
-        updatePanel.setBackground(new java.awt.Color(28, 52, 62));
-
-        jTextField13.setEditable(false);
-        jTextField13.setBackground(new java.awt.Color(131, 157, 167));
-        jTextField13.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField13.setForeground(new java.awt.Color(71, 54, 155));
-        jTextField13.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField13.setText("UPDATE BOOK");
-        jTextField13.setAutoscrolls(false);
-        jTextField13.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 2, true));
-        jTextField13.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTextField13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField13ActionPerformed(evt);
-            }
-        });
-
-        jTextField14.setEditable(false);
-        jTextField14.setBackground(new java.awt.Color(131, 157, 167));
-        jTextField14.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField14.setForeground(new java.awt.Color(71, 54, 155));
-        jTextField14.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField14.setText("TITLE");
-        jTextField14.setAutoscrolls(false);
-        jTextField14.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-        jTextField14.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-
-        jTextField16.setEditable(false);
-        jTextField16.setBackground(new java.awt.Color(131, 157, 167));
-        jTextField16.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField16.setForeground(new java.awt.Color(71, 54, 155));
-        jTextField16.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField16.setText("AUTHOR");
-        jTextField16.setAutoscrolls(false);
-        jTextField16.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-        jTextField16.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-
-        jTextField17.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
-        jTextField17.setText("Author");
-        jTextField17.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField17ActionPerformed(evt);
-            }
-        });
-
-        jTextField18.setEditable(false);
-        jTextField18.setBackground(new java.awt.Color(131, 157, 167));
-        jTextField18.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField18.setForeground(new java.awt.Color(71, 54, 155));
-        jTextField18.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField18.setText("ISBN");
-        jTextField18.setAutoscrolls(false);
-        jTextField18.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-        jTextField18.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTextField18.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField18ActionPerformed(evt);
-            }
-        });
-
-        jTextField19.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
-        jTextField19.setText("ISBN");
-
-        jTextField20.setEditable(false);
-        jTextField20.setBackground(new java.awt.Color(131, 157, 167));
-        jTextField20.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField20.setForeground(new java.awt.Color(71, 54, 155));
-        jTextField20.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField20.setText("CATEGORY");
-        jTextField20.setAutoscrolls(false);
-        jTextField20.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-        jTextField20.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTextField20.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField20ActionPerformed(evt);
-            }
-        });
-
-        jComboBox2.setBackground(new java.awt.Color(156, 153, 255));
-        jComboBox2.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 14)); // NOI18N
-        jComboBox2.setForeground(new java.awt.Color(0, 0, 0));
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ENGLISH", "SCIENCE ", "MATH" }));
-
-        jButton21.setBackground(new java.awt.Color(49, 98, 103));
-        jButton21.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton21.setForeground(new java.awt.Color(0, 255, 255));
-        jButton21.setText("UPDATE");
-        jButton21.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jTextField27.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
-        jTextField27.setText("Title");
-        jTextField27.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField27ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout updatePanelLayout = new javax.swing.GroupLayout(updatePanel);
-        updatePanel.setLayout(updatePanelLayout);
-        updatePanelLayout.setHorizontalGroup(
-            updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(updatePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField13)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
-                        .addComponent(jTextField20, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
-                        .addComponent(jTextField14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField27, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(updatePanelLayout.createSequentialGroup()
-                        .addComponent(jTextField16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField17, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
-                        .addComponent(jTextField18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField19, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-            .addGroup(updatePanelLayout.createSequentialGroup()
-                .addGap(184, 184, 184)
-                .addComponent(jButton21, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        updatePanelLayout.setVerticalGroup(
-            updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(updatePanelLayout.createSequentialGroup()
-                .addGap(52, 52, 52)
-                .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(44, 44, 44)
-                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField27, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(52, 52, 52)
-                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField17, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(52, 52, 52)
-                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField18, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField19, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(52, 52, 52)
-                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField20, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
-                .addComponent(jButton21, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61))
-        );
-
-        jTabbedPane1.addTab("tab4", updatePanel);
 
         addBookPanel.setBackground(new java.awt.Color(28, 52, 62));
 
@@ -807,17 +682,6 @@ try {
             }
         });
 
-        categoryComboBox.setBackground(new java.awt.Color(176, 153, 255));
-        categoryComboBox.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 14)); // NOI18N
-        categoryComboBox.setForeground(new java.awt.Color(0, 0, 0));
-        String[] categories = {"Select a category", "ENGLISH", "SCIENCE", "MATH"};
-        PlaceholderComboBox<String> categoryComboBox = new PlaceholderComboBox<>("Select a category", categories);
-        categoryComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                categoryComboBoxActionPerformed(evt);
-            }
-        });
-
         titleField.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         titleField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -842,6 +706,14 @@ try {
         isbnAdd.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         isbnAdd = new PlaceholderTextField("Enter ISBN here");
 
+        categoryComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ENGLISH", "SCIENCE ", "MATH" }));
+        categoryComboBox.setSelectedItem(categoryComboBox.getSelectedItem());
+        categoryComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                categoryComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout addBookPanelLayout = new javax.swing.GroupLayout(addBookPanel);
         addBookPanel.setLayout(addBookPanelLayout);
         addBookPanelLayout.setHorizontalGroup(
@@ -852,18 +724,18 @@ try {
                     .addComponent(jTextField10)
                     .addGroup(addBookPanelLayout.createSequentialGroup()
                         .addGroup(addBookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField8)
+                            .addComponent(jTextField8, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
                             .addComponent(jTextField7, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextField6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
                             .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.LEADING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(addBookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(categoryComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(isbnAdd)
                             .addComponent(authorAdd)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addBookPanelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(titleField, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGap(0, 1, Short.MAX_VALUE)
+                                .addComponent(titleField, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(categoryComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
             .addGroup(addBookPanelLayout.createSequentialGroup()
                 .addGap(206, 206, 206)
@@ -888,10 +760,10 @@ try {
                     .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(isbnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(57, 57, 57)
-                .addGroup(addBookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(categoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 134, Short.MAX_VALUE)
+                .addGroup(addBookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTextField8, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                    .addComponent(categoryComboBox))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 135, Short.MAX_VALUE)
                 .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(44, 44, 44))
         );
@@ -1176,6 +1048,194 @@ try {
 
         jTabbedPane1.addTab("tab9", settingsPanel);
 
+        updatePanel.setBackground(new java.awt.Color(28, 52, 62));
+
+        jTextField13.setEditable(false);
+        jTextField13.setBackground(new java.awt.Color(131, 157, 167));
+        jTextField13.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jTextField13.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField13.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField13.setText("UPDATE BOOK");
+        jTextField13.setAutoscrolls(false);
+        jTextField13.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 2, true));
+        jTextField13.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField13ActionPerformed(evt);
+            }
+        });
+
+        jTextField14.setEditable(false);
+        jTextField14.setBackground(new java.awt.Color(131, 157, 167));
+        jTextField14.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jTextField14.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField14.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField14.setText("TITLE");
+        jTextField14.setAutoscrolls(false);
+        jTextField14.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
+        jTextField14.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        jTextField16.setEditable(false);
+        jTextField16.setBackground(new java.awt.Color(131, 157, 167));
+        jTextField16.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jTextField16.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField16.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField16.setText("AUTHOR");
+        jTextField16.setAutoscrolls(false);
+        jTextField16.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
+        jTextField16.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        authorUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
+        authorUpdate.setText("Author");
+        authorUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                authorUpdateActionPerformed(evt);
+            }
+        });
+
+        jTextField18.setEditable(false);
+        jTextField18.setBackground(new java.awt.Color(131, 157, 167));
+        jTextField18.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jTextField18.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField18.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField18.setText("ISBN");
+        jTextField18.setAutoscrolls(false);
+        jTextField18.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
+        jTextField18.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField18ActionPerformed(evt);
+            }
+        });
+
+        isbnUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
+        isbnUpdate.setText("ISBN");
+
+        jTextField20.setEditable(false);
+        jTextField20.setBackground(new java.awt.Color(131, 157, 167));
+        jTextField20.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jTextField20.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField20.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField20.setText("CATEGORY");
+        jTextField20.setAutoscrolls(false);
+        jTextField20.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
+        jTextField20.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField20ActionPerformed(evt);
+            }
+        });
+
+        categoryUpdate.setBackground(new java.awt.Color(156, 153, 255));
+        categoryUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 14)); // NOI18N
+        categoryUpdate.setForeground(new java.awt.Color(0, 0, 0));
+        categoryUpdate.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ENGLISH", "SCIENCE ", "MATH" }));
+        categoryUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                categoryUpdateActionPerformed(evt);
+            }
+        });
+
+        jButton21.setBackground(new java.awt.Color(49, 98, 103));
+        jButton21.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jButton21.setForeground(new java.awt.Color(0, 255, 255));
+        jButton21.setText("UPDATE");
+        jButton21.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton21ActionPerformed(evt);
+            }
+        });
+
+        titleUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
+        titleUpdate.setText("Title");
+        titleUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                titleUpdateActionPerformed(evt);
+            }
+        });
+
+        jButton23.setBackground(new java.awt.Color(49, 98, 103));
+        jButton23.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jButton23.setForeground(new java.awt.Color(0, 255, 255));
+        jButton23.setText("EDIT");
+        jButton23.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        jButton24.setBackground(new java.awt.Color(49, 98, 103));
+        jButton24.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jButton24.setForeground(new java.awt.Color(0, 255, 255));
+        jButton24.setText("SAVE");
+        jButton24.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        javax.swing.GroupLayout updatePanelLayout = new javax.swing.GroupLayout(updatePanel);
+        updatePanel.setLayout(updatePanelLayout);
+        updatePanelLayout.setHorizontalGroup(
+            updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(updatePanelLayout.createSequentialGroup()
+                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(updatePanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField13)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
+                                .addComponent(jTextField20, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(categoryUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
+                                .addComponent(jTextField14)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(titleUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(updatePanelLayout.createSequentialGroup()
+                                .addComponent(jTextField16)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(authorUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
+                                .addComponent(jTextField18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(isbnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(updatePanelLayout.createSequentialGroup()
+                        .addGap(184, 184, 184)
+                        .addComponent(jButton21, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(updatePanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton23, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton24, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        updatePanelLayout.setVerticalGroup(
+            updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(updatePanelLayout.createSequentialGroup()
+                .addGap(52, 52, 52)
+                .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44)
+                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(titleUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(52, 52, 52)
+                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(authorUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(52, 52, 52)
+                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField18, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(isbnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(52, 52, 52)
+                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField20, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(categoryUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton23, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton24, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                .addComponent(jButton21, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(61, 61, 61))
+        );
+
+        jTabbedPane1.addTab("tab4", updatePanel);
+
         getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, 690, 680));
 
         rightmostPanel.setBackground(new java.awt.Color(10, 29, 36));
@@ -1379,7 +1439,7 @@ try {
     }//GEN-LAST:event_borrowsButtonActionPerformed
 
     private void addBooksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBooksButtonActionPerformed
-        jTabbedPane1.setSelectedIndex(4);
+        jTabbedPane1.setSelectedIndex(3);
     }//GEN-LAST:event_addBooksButtonActionPerformed
 
     
@@ -1394,7 +1454,7 @@ try {
     }//GEN-LAST:event_loansButtonActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        jTabbedPane1.setSelectedIndex(8);
+        jTabbedPane1.setSelectedIndex(7);
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
@@ -1410,11 +1470,10 @@ try {
     }//GEN-LAST:event_jButton14ActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        jTabbedPane1.setSelectedIndex(3);
-        
+        jTabbedPane1.setSelectedIndex(8);
         
     }//GEN-LAST:event_updateButtonActionPerformed
-
+ 
     private void jTextField7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField7ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField7ActionPerformed
@@ -1447,13 +1506,13 @@ try {
         jTabbedPane1.setSelectedIndex(7);
     }//GEN-LAST:event_jButton27ActionPerformed
 
-    private void jTextField17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField17ActionPerformed
+    private void authorUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_authorUpdateActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField17ActionPerformed
+    }//GEN-LAST:event_authorUpdateActionPerformed
 
-    private void jTextField27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField27ActionPerformed
+    private void titleUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleUpdateActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField27ActionPerformed
+    }//GEN-LAST:event_titleUpdateActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         populateBooksTableFromDatabase();
@@ -1510,21 +1569,64 @@ try {
                 String title = titleField.getText();
                 String author = authorAdd.getText();
                 String isbn = isbnAdd.getText();
-                String category = (String) categoryComboBox.getSelectedItem();
+                String selectedCategory = (String) categoryComboBox.getSelectedItem();
                 
+                if (selectedCategory == null) {
+        // Handle the case where no valid category is selected
+        JOptionPane.showMessageDialog(this, "Please select a valid category.");
+        return;
+    }
+                if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
+            return;
+        }
                 // Add the data to the database
-                addBookToDatabase(title, author, isbn, category);
+                addBookToDatabase(title, author, isbn, selectedCategory);
                 
+                //clear the textfields
+                titleField.setText("Enter title here");
+                authorAdd.setText("Enter author here");
+                isbnAdd.setText("Enter ISBN here");
     }//GEN-LAST:event_addButtonActionPerformed
-
-    private void categoryComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryComboBoxActionPerformed
-    String selectedCategory = (String) categoryComboBox.getSelectedItem();
-        System.out.println("Selected category: " + selectedCategory);
-    }//GEN-LAST:event_categoryComboBoxActionPerformed
 
     private void holdsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_holdsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(2);
     }//GEN-LAST:event_holdsButtonActionPerformed
+
+    private void categoryComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryComboBoxActionPerformed
+        String selectedCategory = (String) categoryComboBox.getSelectedItem();
+        System.out.println(selectedCategory);
+    }//GEN-LAST:event_categoryComboBoxActionPerformed
+
+    private void categoryUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryUpdateActionPerformed
+        String selectedCategory = (String) categoryComboBox.getSelectedItem();
+    }//GEN-LAST:event_categoryUpdateActionPerformed
+
+    private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
+        
+        //pass values from selected row to the text fields
+        bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+           public void actionPerformed(ActionEvent e) {
+                // Get selected row index
+                int selectedRow = bookTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Get values from text fields and combo box
+                    String title = titleUpdate.getText();
+                    String author = authorUpdate.getText();
+                    String isbn = isbnUpdate.getText();
+                    String category = (String) categoryUpdate.getSelectedItem();
+                    
+                    updateDatabase(title, author, isbn, category);
+
+                }
+            }
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+        });
+    }//GEN-LAST:event_jButton21ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1568,6 +1670,7 @@ try {
     private javax.swing.JButton addBooksButton;
     private javax.swing.JButton addButton;
     private javax.swing.JTextField authorAdd;
+    private javax.swing.JTextField authorUpdate;
     private javax.swing.JTable bookTable;
     private javax.swing.JButton booksButton;
     private javax.swing.JPanel booksPanel;
@@ -1575,9 +1678,12 @@ try {
     private javax.swing.JPanel borrowsPanel;
     private javax.swing.JTextField borrowsSearch;
     private javax.swing.JComboBox<String> categoryComboBox;
+    private javax.swing.JComboBox<String> categoryUpdate;
     private javax.swing.JButton holdsButton;
     private javax.swing.JPanel holdsPanel;
+    private javax.swing.JTextField holdsSearch;
     private javax.swing.JTextField isbnAdd;
+    private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
@@ -1589,13 +1695,14 @@ try {
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;
+    private javax.swing.JButton jButton23;
+    private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton30;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -1617,16 +1724,12 @@ try {
     private javax.swing.JTextField jTextField14;
     private javax.swing.JTextField jTextField15;
     private javax.swing.JTextField jTextField16;
-    private javax.swing.JTextField jTextField17;
     private javax.swing.JTextField jTextField18;
-    private javax.swing.JTextField jTextField19;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField20;
     private javax.swing.JTextField jTextField21;
     private javax.swing.JTextField jTextField22;
-    private javax.swing.JTextField jTextField23;
     private javax.swing.JTextField jTextField25;
-    private javax.swing.JTextField jTextField27;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
@@ -1644,6 +1747,7 @@ try {
     private javax.swing.JTextField searchBooks;
     private javax.swing.JPanel settingsPanel;
     private javax.swing.JTextField titleField;
+    private javax.swing.JTextField titleUpdate;
     private javax.swing.JButton updateButton;
     private javax.swing.JPanel updatePanel;
     // End of variables declaration//GEN-END:variables
@@ -1679,5 +1783,37 @@ try {
             JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
         }
     }
+    private void updateDatabase(String title, String author, String isbn, String category) {
+        
+try {
+            // Establish a connection to your database
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            // Create a PreparedStatement to execute the INSERT query
+            String query = "UPDATE books SET (Title, Author, ISBN, Category) VALUES (?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, title);
+            statement.setString(2, author);
+            statement.setString(3, isbn);
+            statement.setString(4, category);
+            
+            
+            // Execute the INSERT query
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(null, "Book added successfully!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Failed to add book.");
+            }
+            
+            // Close the connection and statement
+            statement.close();
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
+        }
     }
+}
 
