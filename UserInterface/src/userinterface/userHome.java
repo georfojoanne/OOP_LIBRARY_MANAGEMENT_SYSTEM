@@ -1,53 +1,332 @@
-
 package userinterface;
 
+import static java.awt.Color.BLACK;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
+import javax.swing.JOptionPane;
 import java.awt.Color;
-import static java.awt.Color.CYAN;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JButton;
+import java.sql.PreparedStatement;
 
-public class userHome extends javax.swing.JFrame {
 
-   
+
+
+
+public class userHome extends javax.swing.JFrame  {
+         
     public userHome() {
-        initComponents();
-         addMouseEnterListener(englishButton);
-         addMouseEnterListener(scienceButton);
-         addMouseEnterListener(mathButton);
-        
        
+         
+        initComponents();
+              
+              dbData();
+               getTextFromNameColumn();
+              
+               
+              
+              populateBorrowsTableFromDatabase();
+              populateReservationTableFromDatabase();
+              
+              fillHistoryTableFromDatabase(userName.getText());
+           
+               
+               retrieveUserInfo(userName.getText());
+               checkForOverdueAndUpdateUserInfo(userName.getText());
+               
+             
+               
+                
+              
+           
+          
     }
     
     
     
-    private static void addMouseEnterListener(JButton button) {
-     Color defaultColor = new Color(221, 221, 221);
-    button.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            button.setBackground(new Color(86, 86, 86)); // Brown color
+    
+    
+    
+    // Method to check for overdue borrows and update userinfo table
+private static void checkForOverdueAndUpdateUserInfo(String username) {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Step 1: Count the number of overdue borrows
+        String countQuery = "SELECT COUNT(*) AS overdue_count FROM borrows WHERE name = ? AND dor < ?";
+        PreparedStatement countStatement = connection.prepareStatement(countQuery);
+        countStatement.setString(1, username);
+        countStatement.setDate(2, Date.valueOf(LocalDate.now()));
+        ResultSet countResult = countStatement.executeQuery();
+
+        int overdueCount = 0;
+        if (countResult.next()) {
+            overdueCount = countResult.getInt("overdue_count");
         }
 
-        @Override
-        public void mouseExited(MouseEvent e) {
-              button.setBackground(defaultColor);
+        // Step 2: Update userinfo table
+        String updateQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
+        PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+        updateStatement.setInt(1, overdueCount * 10);
+        updateStatement.setString(2, username);
+        updateStatement.executeUpdate();
+
+        // Step 3: Check for overdue borrows for the user
+        String borrowQuery = "SELECT dor FROM borrows WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(borrowQuery);
+        preparedStatement.setString(1, username);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            Date dueDate = resultSet.getDate("dor");
+            LocalDate currentDate = LocalDate.now();
+
+            if (dueDate.toLocalDate().isBefore(currentDate)) {
+                int choice = JOptionPane.showConfirmDialog(null, "You have overdue borrows. Do you want to pay now?", "Overdue Borrows", JOptionPane.YES_NO_OPTION);
+                if (choice == JOptionPane.YES_OPTION) {
+                    new userHome().setVisible(false);
+                    new Payment().setVisible(true);
+                } 
+                else {
+                    new userHome().setVisible(false);
+                    new LogIn().setVisible(true);
+        
+                }
+            }
         }
-    });
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
 }
-    
-    
-    
-     
-    
-    
-    
-                
 
-           
     
+    
+    
+    
+    
+    
+    
+    
+// Method to fill out the rows in the historyTable from the database
+
+    // Method to fill out the rows in the historyTable from the database
+    public void fillHistoryTableFromDatabase(String name) {
+        try {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+
+            if (connection != null) {
+                // Prepare and execute a query to retrieve rows from the "history" table where name matches
+                PreparedStatement statement = connection.prepareStatement("SELECT title, date, status FROM history WHERE name = ?");
+                statement.setString(1, name); // Set the parameter for the name
+                ResultSet resultSet = statement.executeQuery();
+
+                // Create a custom table model for historyTable
+                DefaultTableModel model = new DefaultTableModel(
+                        new Object[]{"Title", "Date", "Status"}, 0); // 0 for initial row count
+
+                // Add fetched data to historyTable
+                while (resultSet.next()) {
+                    String title = resultSet.getString("title");
+                    String date = resultSet.getString("date");
+                    String status = resultSet.getString("status");
+
+                    // Insert each row at index 0 to reverse the order
+                    model.insertRow(0, new Object[]{title, date, status});
+                }
+
+                // Set the model to historyTable
+                historyTable.setModel(model);
+
+                // Close the connection
+                connection.close();
+            } else {
+                System.out.println("Database connection failed.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            System.out.println("Error: " + ex.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    public void retrieveUserInfo(String name) {
+        try {
+            // Get the database connection
+            dbConnection conn = new dbConnection();
+            Connection connection = conn.getConnection();
+            
+         
+            
+            if (connection == null) {
+                System.out.println("Failed to connect to the database.");
+                return;
+            }
+            
+           
+            
+            String sql = "SELECT * FROM userinfo WHERE name = ?";
+            
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setString(1, name);
+                ResultSet rs = pstmt.executeQuery();
+                
+                // If a row with the given name exists
+                if (rs.next()) {
+                     String Name = rs.getString("name");
+                    String role = rs.getString("role");
+                    String id = rs.getString("id");
+                    String email = rs.getString("email");
+                    String contact = rs.getString("Contact");
+                    
+                    // Assuming setRole, setId, setEmail, and setContact are methods to set text fields
+                    setName.setText(Name);
+                    setRole.setText(role); // Assuming setRole is a JTextField
+                    setId.setText(id); // Assuming setId is a JTextField
+                    setEmail.setText(email); // Assuming setEmail is a JTextField
+                    setContact.setText(contact); // Assuming setContact is a JTextField
+                } else {
+                    // Handle case where no row with the given name exists
+                    System.out.println("No user found with the name: " + name);
+                }
+            } catch (SQLException e) {
+                System.out.println("Error retrieving user info: " + e.getMessage());
+            } finally {
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Error closing connection: " + e.getMessage());
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    
+    
+   
+    
+ // Method to set the username to the actual username and update the "number" column to '1' for all rows
+public String getTextFromNameColumn() {
+    String name = null;
+
+    Connection connection = null;
+    Statement statement = null;
+    ResultSet resultSet = null;
+
+    try {
+        // Get the database connection
+        dbConnection conn = new dbConnection();
+        connection = conn.getConnection();
+
+        // Create a statement
+        statement = connection.createStatement();
+
+        // Execute the query to retrieve the text from the "name" column where "number" is equal to '2'
+        resultSet = statement.executeQuery("SELECT name FROM userinfo WHERE number = '2'");
+
+        // If a row with "number" equal to '2' is found, retrieve the text from the "name" column
+        if (resultSet.next()) {
+            name = resultSet.getString("name");
+           
+
+            // Update the "number" to '1' for all rows
+            String updateQuery = "UPDATE userinfo SET number = '1' WHERE number = '2'";
+            
+            
+            int rowsUpdated = statement.executeUpdate(updateQuery);
+           
+        } else {
+            System.out.println("No row found with 'number' equal to '2'.");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    userName.setText(name);
+
+    return name;
+}
+
+    
+    
+    
+    
+
+// Method to fetch data from the database and populate the JTable
+     private void dbData(){
+       
+                 
+                     try {
+    dbConnection con = new dbConnection();
+    Connection connection = con.getConnection();
+
+    PreparedStatement ps1 = null;
+    ResultSet rs = null;
+
+    try {
+        String query1 = "SELECT * FROM books";
+        ps1 = connection.prepareStatement(query1);
+        rs = ps1.executeQuery();
+
+        DefaultTableModel tblModel = (DefaultTableModel) searchBookTable.getModel();
+         tblModel.setRowCount(0);
+
+        while (rs.next()) {
+            String Title = rs.getString("Title");
+            String Author = rs.getString("Author");
+            String ISBN = rs.getString("ISBN");
+            String Category = rs.getString("Category");
+               String Status = rs.getString("Status");
+                String nr = rs.getString("nr");
+
+            String[] bookData = {Title, Author, ISBN, Category,Status,nr };
+            tblModel.addRow(bookData);
+        }
+    } finally {
+        // Close ResultSet, PreparedStatement, and Connection in a finally block
+        if (rs != null) {
+            rs.close();
+        }
+        if (ps1 != null) {
+            ps1.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+    }
+} catch (SQLException ex) {
+    Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+}                
+        
+        
+                    
+                     
+    }
+    
+   
+    
+    
+   
     
     
 
@@ -63,6 +342,7 @@ public class userHome extends javax.swing.JFrame {
         jPanel9 = new javax.swing.JPanel();
         jColorChooser1 = new javax.swing.JColorChooser();
         panel2 = new java.awt.Panel();
+        xsuerButton = new javax.swing.JButton();
         leftPanel = new java.awt.Panel();
         profile = new javax.swing.JLabel();
         borrowsButton = new javax.swing.JButton();
@@ -75,23 +355,30 @@ public class userHome extends javax.swing.JFrame {
         userName = new javax.swing.JLabel();
         tabs = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        englishButton = new javax.swing.JButton();
-        scienceButton = new javax.swing.JButton();
-        mathButton = new javax.swing.JButton();
+        borrowButton = new javax.swing.JButton();
+        searchBook = new javax.swing.JTextField();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        searchBookTable = new javax.swing.JTable();
+        searchButton = new javax.swing.JButton();
+        reserveButton = new javax.swing.JButton();
+        updateButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        borrowTable = new javax.swing.JTable();
+        borrowsTable = new javax.swing.JTable();
+        returnButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        reservationTable = new javax.swing.JTable();
+        cancelButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         historyTable = new javax.swing.JTable();
         jPanel10 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
         jPanel11 = new javax.swing.JPanel();
-        helpButton = new javax.swing.JButton();
         logOutButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         name = new javax.swing.JLabel();
@@ -100,13 +387,13 @@ public class userHome extends javax.swing.JFrame {
         id = new javax.swing.JLabel();
         email = new javax.swing.JLabel();
         contact = new javax.swing.JLabel();
-        contact1 = new javax.swing.JLabel();
         setName = new javax.swing.JTextField();
         setRole = new javax.swing.JTextField();
         setId = new javax.swing.JTextField();
         setEmail = new javax.swing.JTextField();
         setContact = new javax.swing.JTextField();
         editButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -166,21 +453,35 @@ public class userHome extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         setPreferredSize(new java.awt.Dimension(900, 700));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panel2.setBackground(new java.awt.Color(26, 27, 27));
+        panel2.setBackground(new java.awt.Color(10, 29, 36));
         panel2.setPreferredSize(new java.awt.Dimension(1400, 20));
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 1140, 40));
 
-        leftPanel.setBackground(new java.awt.Color(26, 27, 27));
+        xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
+        xsuerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\Xicon.png")); // NOI18N
+        xsuerButton.setToolTipText("");
+        xsuerButton.setBorderPainted(false);
+        xsuerButton.setContentAreaFilled(false);
+        xsuerButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xsuerButtonActionPerformed(evt);
+            }
+        });
+        panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 10, -1, -1));
+
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 1140, 30));
+
+        leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
         leftPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         profile.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\whiteIcon.png")); // NOI18N
-        leftPanel.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, -1, -1));
+        leftPanel.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 66, -1, 90));
 
         borrowsButton.setBackground(new java.awt.Color(26, 27, 27));
         borrowsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -189,12 +490,14 @@ public class userHome extends javax.swing.JFrame {
         borrowsButton.setActionCommand("");
         borrowsButton.setBorder(null);
         borrowsButton.setBorderPainted(false);
+        borrowsButton.setContentAreaFilled(false);
+        borrowsButton.setFocusPainted(false);
         borrowsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 borrowsButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(borrowsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 270, 110, -1));
+        leftPanel.add(borrowsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 330, 110, -1));
 
         reservationButton.setBackground(new java.awt.Color(26, 27, 27));
         reservationButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -202,39 +505,48 @@ public class userHome extends javax.swing.JFrame {
         reservationButton.setText("Reservation");
         reservationButton.setBorder(null);
         reservationButton.setBorderPainted(false);
+        reservationButton.setContentAreaFilled(false);
+        reservationButton.setFocusPainted(false);
         reservationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reservationButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(reservationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 330, -1, -1));
+        leftPanel.add(reservationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, -1, -1));
 
         settingsButton.setBackground(new java.awt.Color(26, 27, 27));
-        settingsButton.setFont(new java.awt.Font("Swis721 Lt BT", 1, 18)); // NOI18N
+        settingsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         settingsButton.setForeground(java.awt.Color.white);
         settingsButton.setText("Settings");
         settingsButton.setBorder(null);
+        settingsButton.setContentAreaFilled(false);
+        settingsButton.setFocusPainted(false);
+        settingsButton.setMinimumSize(new java.awt.Dimension(68, 22));
         settingsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 settingsButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(settingsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 540, -1, -1));
+        leftPanel.add(settingsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 570, -1, -1));
 
         jSeparator1.setBackground(java.awt.Color.white);
         jSeparator1.setPreferredSize(new java.awt.Dimension(70, 10));
-        leftPanel.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 90, -1));
+        leftPanel.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 220, 90, -1));
 
         historyButton.setBackground(new java.awt.Color(26, 27, 27));
         historyButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         historyButton.setForeground(java.awt.Color.white);
         historyButton.setText("History");
+        historyButton.setBorderPainted(false);
+        historyButton.setContentAreaFilled(false);
+        historyButton.setFocusPainted(false);
+        historyButton.setPreferredSize(new java.awt.Dimension(95, 22));
         historyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 historyButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(historyButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 380, -1, -1));
+        leftPanel.add(historyButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 450, -1, 20));
 
         notificationsButton.setBackground(new java.awt.Color(26, 27, 27));
         notificationsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -242,130 +554,257 @@ public class userHome extends javax.swing.JFrame {
         notificationsButton.setText("Notifications");
         notificationsButton.setBorder(null);
         notificationsButton.setBorderPainted(false);
+        notificationsButton.setContentAreaFilled(false);
+        notificationsButton.setFocusPainted(false);
         notificationsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 notificationsButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(notificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, -1, -1));
+        leftPanel.add(notificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 510, -1, -1));
 
         booksButton.setBackground(new java.awt.Color(26, 27, 27));
         booksButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        booksButton.setForeground(java.awt.Color.white);
+        booksButton.setForeground(new java.awt.Color(0, 255, 255));
         booksButton.setText("Books");
         booksButton.setActionCommand("Borrowing");
         booksButton.setBorder(null);
+        booksButton.setBorderPainted(false);
+        booksButton.setContentAreaFilled(false);
         booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         booksButton.setFocusPainted(false);
+        booksButton.setMaximumSize(null);
+        booksButton.setMinimumSize(null);
+        booksButton.setPreferredSize(new java.awt.Dimension(60, 20));
         booksButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 booksButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(booksButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 220, -1, 30));
+        leftPanel.add(booksButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 260, -1, 30));
 
         userName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         userName.setForeground(java.awt.Color.white);
         userName.setText("User Name");
-        leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, -1, -1));
+        leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 180, -1, -1));
 
-        getContentPane().add(leftPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 790));
+        getContentPane().add(leftPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 800));
 
-        jPanel1.setBackground(new java.awt.Color(202, 187, 187));
+        tabs.setBackground(new java.awt.Color(45, 4, 45));
 
-        englishButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        englishButton.setText("ENGLISH");
-        englishButton.addActionListener(new java.awt.event.ActionListener() {
+        jPanel1.setBackground(new java.awt.Color(28, 52, 62));
+
+        borrowButton.setBackground(new java.awt.Color(49, 98, 103));
+        borrowButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        borrowButton.setForeground(new java.awt.Color(0, 255, 255));
+        borrowButton.setText("Borrow");
+        borrowButton.setFocusPainted(false);
+        borrowButton.setVerifyInputWhenFocusTarget(false);
+        borrowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                englishButtonActionPerformed(evt);
+                borrowButtonActionPerformed(evt);
             }
         });
 
-        scienceButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        scienceButton.setText("SCIENCE");
+        searchBook.setBackground(new java.awt.Color(247, 247, 234));
+        searchBook.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
+        searchBook.setForeground(new java.awt.Color(0, 142, 142));
+        searchBook.setText("Search book title");
+        searchBook.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                searchBookFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                searchBookFocusLost(evt);
+            }
+        });
+        searchBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchBookActionPerformed(evt);
+            }
+        });
 
-        mathButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        mathButton.setText("MATHEMATICS");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(englishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(scienceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(mathButton, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(98, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(englishButton)
-                    .addComponent(scienceButton)
-                    .addComponent(mathButton))
-                .addContainerGap(553, Short.MAX_VALUE))
-        );
-
-        tabs.addTab("tab1", jPanel1);
-
-        jPanel12.setBackground(new java.awt.Color(204, 204, 204));
-
-        borrowTable.setBackground(new java.awt.Color(26, 27, 27));
-        borrowTable.setFont(new java.awt.Font("STFangsong", 1, 18)); // NOI18N
-        borrowTable.setForeground(java.awt.Color.white);
-        borrowTable.setModel(new javax.swing.table.DefaultTableModel(
+        searchBookTable.setBackground(new java.awt.Color(221, 221, 221));
+        searchBookTable.setForeground(new java.awt.Color(0, 0, 0));
+        searchBookTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Book Title", "Book #", "Date of Borrow", "Date of Return"
+                "Title", "Author", "ISBN", "Category", "Status", "#of Reservations"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        borrowTable.setGridColor(new java.awt.Color(255, 255, 255));
-        borrowTable.setSelectionBackground(new java.awt.Color(7, 7, 75));
-        borrowTable.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(borrowTable);
-        if (borrowTable.getColumnModel().getColumnCount() > 0) {
-            borrowTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-            borrowTable.getColumnModel().getColumn(1).setResizable(false);
-            borrowTable.getColumnModel().getColumn(1).setPreferredWidth(100);
-            borrowTable.getColumnModel().getColumn(2).setResizable(false);
-            borrowTable.getColumnModel().getColumn(2).setPreferredWidth(100);
-            borrowTable.getColumnModel().getColumn(3).setResizable(false);
-            borrowTable.getColumnModel().getColumn(3).setPreferredWidth(100);
+        searchBookTable.setGridColor(new java.awt.Color(0, 255, 255));
+        searchBookTable.setMaximumSize(null);
+        searchBookTable.setRequestFocusEnabled(false);
+        searchBookTable.setSelectionBackground(new java.awt.Color(191, 232, 232));
+        searchBookTable.setSelectionForeground(new java.awt.Color(0, 0, 0));
+        searchBookTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        searchBookTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane5.setViewportView(searchBookTable);
+        if (searchBookTable.getColumnModel().getColumnCount() > 0) {
+            searchBookTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+            searchBookTable.getColumnModel().getColumn(2).setPreferredWidth(60);
+            searchBookTable.getColumnModel().getColumn(3).setPreferredWidth(40);
+            searchBookTable.getColumnModel().getColumn(4).setPreferredWidth(50);
+            searchBookTable.getColumnModel().getColumn(5).setPreferredWidth(30);
         }
+
+        searchButton.setBackground(new java.awt.Color(49, 98, 103));
+        searchButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
+        searchButton.setForeground(new java.awt.Color(0, 255, 255));
+        searchButton.setText("s e a r c h");
+        searchButton.setFocusPainted(false);
+        searchButton.setVerifyInputWhenFocusTarget(false);
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
+
+        reserveButton.setBackground(new java.awt.Color(49, 98, 103));
+        reserveButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        reserveButton.setForeground(new java.awt.Color(0, 255, 255));
+        reserveButton.setText("Reserve");
+        reserveButton.setFocusPainted(false);
+        reserveButton.setVerifyInputWhenFocusTarget(false);
+        reserveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reserveButtonActionPerformed(evt);
+            }
+        });
+
+        updateButton.setBackground(new java.awt.Color(49, 98, 103));
+        updateButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        updateButton.setForeground(new java.awt.Color(0, 255, 255));
+        updateButton.setText("Update");
+        updateButton.setPreferredSize(new java.awt.Dimension(83, 28));
+        updateButton.setRequestFocusEnabled(false);
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(154, 154, 154)
+                        .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38)
+                        .addComponent(borrowButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(36, 36, 36)
+                        .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(searchBook, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+                                .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(39, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(searchBook, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchButton)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 473, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(borrowButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(82, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("tab1", jPanel1);
+
+        jPanel12.setBackground(new java.awt.Color(28, 52, 62));
+
+        borrowsTable.setAutoCreateRowSorter(true);
+        borrowsTable.setBackground(new java.awt.Color(221, 221, 221));
+        borrowsTable.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        borrowsTable.setForeground(new java.awt.Color(0, 0, 0));
+        borrowsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Book Title", "Date of Borrow", "Date of Return"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        borrowsTable.setFocusable(false);
+        borrowsTable.setGridColor(new java.awt.Color(0, 255, 255));
+        borrowsTable.setMaximumSize(null);
+        borrowsTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
+        borrowsTable.setSelectionForeground(new java.awt.Color(6, 43, 43));
+        borrowsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        borrowsTable.setShowGrid(true);
+        borrowsTable.setShowVerticalLines(false);
+        borrowsTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(borrowsTable);
+        if (borrowsTable.getColumnModel().getColumnCount() > 0) {
+            borrowsTable.getColumnModel().getColumn(0).setPreferredWidth(400);
+            borrowsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+            borrowsTable.getColumnModel().getColumn(2).setPreferredWidth(100);
+        }
+
+        returnButton.setBackground(new java.awt.Color(27, 137, 137));
+        returnButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        returnButton.setForeground(new java.awt.Color(0, 255, 255));
+        returnButton.setText("RETURN");
+        returnButton.setRequestFocusEnabled(false);
+        returnButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                returnButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
         jPanel12.setLayout(jPanel12Layout);
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 635, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(65, Short.MAX_VALUE))
+                .addGap(36, 36, 36)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(37, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(287, 287, 287))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 567, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(returnButton)
+                .addContainerGap(83, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -373,68 +812,84 @@ public class userHome extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 6, Short.MAX_VALUE))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         tabs.addTab("tab2", jPanel2);
 
-        jPanel13.setBackground(new java.awt.Color(202, 187, 187));
+        jPanel13.setBackground(new java.awt.Color(28, 52, 62));
 
-        jTable1.setBackground(new java.awt.Color(247, 247, 206));
-        jTable1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jTable1.setForeground(new java.awt.Color(0, 0, 0));
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        reservationTable.setBackground(new java.awt.Color(221, 221, 221));
+        reservationTable.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        reservationTable.setForeground(new java.awt.Color(0, 0, 0));
+        reservationTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Book Title", "Book #", "Date of Reservation", "Date Available"
+                "Book Title", "Date of Reservation", "Reservation #"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, true, false, true
+                false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setGridColor(new java.awt.Color(255, 204, 204));
-        jTable1.setSelectionBackground(new java.awt.Color(232, 210, 210));
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane2.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(100);
-            jTable1.getColumnModel().getColumn(1).setPreferredWidth(100);
-            jTable1.getColumnModel().getColumn(2).setPreferredWidth(100);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setPreferredWidth(100);
+        reservationTable.setGridColor(new java.awt.Color(0, 255, 255));
+        reservationTable.setSelectionBackground(new java.awt.Color(202, 248, 248));
+        reservationTable.setSelectionForeground(new java.awt.Color(4, 34, 34));
+        reservationTable.setShowGrid(true);
+        reservationTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane2.setViewportView(reservationTable);
+        if (reservationTable.getColumnModel().getColumnCount() > 0) {
+            reservationTable.getColumnModel().getColumn(0).setPreferredWidth(400);
+            reservationTable.getColumnModel().getColumn(1).setPreferredWidth(120);
+            reservationTable.getColumnModel().getColumn(2).setPreferredWidth(100);
         }
+
+        cancelButton.setBackground(new java.awt.Color(27, 137, 137));
+        cancelButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        cancelButton.setForeground(new java.awt.Color(0, 255, 255));
+        cancelButton.setText("Cancel");
+        cancelButton.setRequestFocusEnabled(false);
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 639, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addGap(32, 32, 32)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(41, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(293, 293, 293))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 576, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(80, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -447,76 +902,114 @@ public class userHome extends javax.swing.JFrame {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         tabs.addTab("tab3", jPanel3);
 
-        jPanel5.setBackground(new java.awt.Color(234, 212, 212));
+        jPanel5.setBackground(new java.awt.Color(28, 52, 62));
 
-        historyTable.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        historyTable.setBackground(new java.awt.Color(221, 221, 221));
         historyTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Book Title", "Book #", "Date of Borrow", "Date of Return"
+                "Book Title", "Date", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        historyTable.setGridColor(new java.awt.Color(51, 255, 255));
+        historyTable.setSelectionBackground(new java.awt.Color(201, 244, 244));
+        historyTable.setSelectionForeground(new java.awt.Color(7, 30, 30));
+        historyTable.setShowGrid(true);
+        historyTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane3.setViewportView(historyTable);
+        if (historyTable.getColumnModel().getColumnCount() > 0) {
+            historyTable.getColumnModel().getColumn(0).setPreferredWidth(350);
+            historyTable.getColumnModel().getColumn(1).setPreferredWidth(30);
+            historyTable.getColumnModel().getColumn(2).setPreferredWidth(30);
+        }
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 639, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addGap(42, 42, 42)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 625, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(53, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 560, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 609, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         tabs.addTab("tab4", jPanel5);
 
-        jPanel10.setBackground(new java.awt.Color(214, 214, 238));
+        jPanel10.setBackground(new java.awt.Color(28, 52, 62));
+
+        jTable2.setBackground(new java.awt.Color(221, 221, 221));
+        jTable2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jTable2.setForeground(new java.awt.Color(0, 0, 0));
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "NOTIFICATIONS"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable2.setGridColor(new java.awt.Color(153, 51, 255));
+        jTable2.setSelectionBackground(new java.awt.Color(255, 255, 204));
+        jTable2.setShowGrid(true);
+        jScrollPane4.setViewportView(jTable2);
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
         jPanel10Layout.setHorizontalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 740, Short.MAX_VALUE)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addGap(44, 44, 44)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(47, Short.MAX_VALUE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 595, Short.MAX_VALUE)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(76, Short.MAX_VALUE))
         );
 
         tabs.addTab("tab5", jPanel10);
 
-        jPanel11.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel11.setBackground(new java.awt.Color(28, 52, 62));
+        jPanel11.setPreferredSize(new java.awt.Dimension(800, 1000));
 
-        helpButton.setBackground(new java.awt.Color(255, 255, 255));
-        helpButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        helpButton.setForeground(new java.awt.Color(0, 0, 0));
-        helpButton.setText("Help");
-        helpButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                helpButtonActionPerformed(evt);
-            }
-        });
-
-        logOutButton.setBackground(new java.awt.Color(255, 255, 255));
+        logOutButton.setBackground(new java.awt.Color(49, 98, 103));
         logOutButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        logOutButton.setForeground(new java.awt.Color(0, 0, 0));
+        logOutButton.setForeground(new java.awt.Color(0, 255, 255));
         logOutButton.setText("Log Out");
         logOutButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -525,10 +1018,11 @@ public class userHome extends javax.swing.JFrame {
         });
 
         jLabel1.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 48)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Stylus BT", 1, 48)); // NOI18N
         jLabel1.setForeground(java.awt.Color.white);
         jLabel1.setText("Profile Information");
 
+        name.setBackground(new java.awt.Color(225, 225, 225));
         name.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         name.setForeground(java.awt.Color.white);
         name.setText("NAME         :");
@@ -536,43 +1030,80 @@ public class userHome extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setForeground(java.awt.Color.white);
 
+        role.setBackground(new java.awt.Color(221, 221, 221));
         role.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         role.setForeground(java.awt.Color.white);
         role.setText("ROLE           :");
 
+        id.setBackground(new java.awt.Color(225, 225, 225));
         id.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         id.setForeground(java.awt.Color.white);
         id.setText("ID #             :");
 
+        email.setBackground(new java.awt.Color(225, 225, 225));
         email.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         email.setForeground(java.awt.Color.white);
         email.setText("EMAIL         :");
 
+        contact.setBackground(new java.awt.Color(225, 225, 225));
         contact.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         contact.setForeground(java.awt.Color.white);
         contact.setText("CONTACT # :");
 
-        contact1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        contact1.setForeground(java.awt.Color.white);
-        contact1.setText("PASSWORD        :");
-
+        String t1 = "Jonna Bohol";
+        setName.setText(t1);
+        setName.setEditable(false);
         setName.setBackground(new java.awt.Color(204, 204, 204));
+        setName.setForeground(new java.awt.Color(0, 0, 0));
+        setName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setNameActionPerformed(evt);
+            }
+        });
 
+        String t2 = "Student";
+        setRole.setText(t2);
+        setRole.setEditable(false);
         setRole.setBackground(new java.awt.Color(204, 204, 204));
+        setRole.setForeground(new java.awt.Color(0, 0, 0));
 
+        String t3 = "1350442";
+        setId.setText(t3);
+        setId.setEditable(false);
         setId.setBackground(new java.awt.Color(204, 204, 204));
+        setId.setForeground(new java.awt.Color(0, 0, 0));
 
+        String t4 = "jonnabohol43@gmail.com";
+        setEmail.setText(t4);
+        setEmail.setEditable(false);
         setEmail.setBackground(new java.awt.Color(204, 204, 204));
+        setEmail.setForeground(new java.awt.Color(0, 0, 0));
 
+        String t5 = "09533869211";
+        setContact.setText(t5);
+        setContact.setEditable(false);
         setContact.setBackground(new java.awt.Color(204, 204, 204));
+        setContact.setForeground(new java.awt.Color(0, 0, 0));
 
-        editButton.setBackground(new java.awt.Color(255, 255, 255));
+        editButton.setBackground(new java.awt.Color(49, 98, 103));
         editButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        editButton.setForeground(new java.awt.Color(0, 0, 0));
+        editButton.setForeground(new java.awt.Color(0, 255, 255));
         editButton.setText("Edit");
+        editButton.setRequestFocusEnabled(false);
         editButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editButtonActionPerformed(evt);
+            }
+        });
+
+        saveButton.setBackground(new java.awt.Color(49, 98, 103));
+        saveButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        saveButton.setForeground(new java.awt.Color(0, 255, 255));
+        saveButton.setText("Save");
+        saveButton.setRequestFocusEnabled(false);
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
             }
         });
 
@@ -581,44 +1112,35 @@ public class userHome extends javax.swing.JFrame {
         jPanel11Layout.setHorizontalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel11Layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(contact1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(name, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(role, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                                        .addComponent(id, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(contact, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel11Layout.createSequentialGroup()
-                                        .addComponent(setName, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addGroup(jPanel11Layout.createSequentialGroup()
-                                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(setEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(setRole, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(setId, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(setContact, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(editButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
-                    .addGroup(jPanel11Layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-                        .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
-                .addComponent(logOutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(68, 68, 68))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(logOutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(85, 85, 85))
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 498, Short.MAX_VALUE))
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(role, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(name, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(id, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(contact, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(editButton, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(setRole, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(setName, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(setId, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(setEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(setContact, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -626,9 +1148,7 @@ public class userHome extends javax.swing.JFrame {
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addGap(16, 16, 16)
-                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(logOutButton)
-                            .addComponent(helpButton))
+                        .addComponent(logOutButton)
                         .addGap(71, 71, 71))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
                         .addContainerGap()
@@ -649,122 +1169,1063 @@ public class userHome extends javax.swing.JFrame {
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(setEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel11Layout.createSequentialGroup()
-                        .addGap(339, 339, 339)
-                        .addComponent(contact1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(99, 99, 99)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel11Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(contact, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(setContact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(28, 28, 28)
-                        .addComponent(editButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(26, 26, 26)
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(contact, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(setContact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(47, 47, 47)
+                .addComponent(editButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabs.addTab("tab6", jPanel11);
 
-        getContentPane().add(tabs, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 740, 630));
+        getContentPane().add(tabs, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 720, 760));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
    
     
     
     private void borrowsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowsButtonActionPerformed
-               tabs.setSelectedIndex(1);                                                  
+               tabs.setSelectedIndex(1); 
+                     borrowsButton.setForeground(new Color(0,225,225));                     
+                     reservationButton.setForeground(new Color(225,225,255));
+                     booksButton.setForeground(new Color(225,225,255));
+                     historyButton.setForeground(new Color(225,225,255));
+                     notificationsButton.setForeground(new Color(225,225,255));
+                     settingsButton.setForeground(new Color(225,225,255));
+                     
+                     
+                     checkForOverdueAndUpdateUserInfo(userName.getText());
+                     
+                     
+                   
     }//GEN-LAST:event_borrowsButtonActionPerformed
 
     private void historyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historyButtonActionPerformed
-                       tabs.setSelectedIndex(3);           // TODO add your handling code here:
+                       tabs.setSelectedIndex(3);
+                        historyButton.setForeground(new Color(0,225,225));
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     reservationButton.setForeground(new Color(225,225,255));                    
+                     booksButton.setForeground(new Color(225,225,255));
+                     notificationsButton.setForeground(new Color(225,225,255));
+                     settingsButton.setForeground(new Color(225,225,255));
+                  
     }//GEN-LAST:event_historyButtonActionPerformed
 
     private void booksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_booksButtonActionPerformed
-                     tabs.setSelectedIndex(0);         
+                     tabs.setSelectedIndex(0);
+                     booksButton.setForeground(new Color(0,225,225));
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     reservationButton.setForeground(new Color(225,225,255));                   
+                     historyButton.setForeground(new Color(225,225,255));
+                     notificationsButton.setForeground(new Color(225,225,255));
+                     settingsButton.setForeground(new Color(225,225,255));
+                  
+                     
+                   
     }//GEN-LAST:event_booksButtonActionPerformed
 
     private void reservationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservationButtonActionPerformed
-                  tabs.setSelectedIndex(2);                     
+                  tabs.setSelectedIndex(2);  
+                   reservationButton.setForeground(new Color(0,225,225));
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     booksButton.setForeground(new Color(225,225,255));                   
+                     historyButton.setForeground(new Color(225,225,255));
+                     notificationsButton.setForeground(new Color(225,225,255));
+                     settingsButton.setForeground(new Color(225,225,255));
+                   
       
-    // Refresh the layout of grayPanel
-    
+   
          
         
     }//GEN-LAST:event_reservationButtonActionPerformed
 
     private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
-                          tabs.setSelectedIndex(5);           // TODO add your handling code here:
+                          tabs.setSelectedIndex(5); 
+                           settingsButton.setForeground(new Color(0,225,225));                    
+                     reservationButton.setForeground(new Color(225,225,255));
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     historyButton.setForeground(new Color(225,225,255));
+                     notificationsButton.setForeground(new Color(225,225,255));
+                        booksButton.setForeground(new Color(225,225,255));
+                      
     }//GEN-LAST:event_settingsButtonActionPerformed
 
     private void notificationsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notificationsButtonActionPerformed
-                          tabs.setSelectedIndex(4);           // TODO add your handling code here:
+                        
+        tabs.setSelectedIndex(4);   
+                           notificationsButton.setForeground(new Color(0,225,225));
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     reservationButton.setForeground(new Color(225,225,255));
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     historyButton.setForeground(new Color(225,225,255));
+                     booksButton.setForeground(new Color(225,225,255));
+                     settingsButton.setForeground(new Color(225,225,255));
+                  
     }//GEN-LAST:event_notificationsButtonActionPerformed
 
-    private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_helpButtonActionPerformed
+    private void xsuerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xsuerButtonActionPerformed
+                        dispose();      
+    }//GEN-LAST:event_xsuerButtonActionPerformed
 
-    private void logOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logOutButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_logOutButtonActionPerformed
-
-    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_editButtonActionPerformed
-
-    private void englishButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_englishButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_englishButtonActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    
+    
+   
+    
+    
+    
+  
+public void populateReservationTableFromDatabase() {
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        if (connection != null) {
+            
+            String name = userName.getText();
+            // Prepare and execute a query to retrieve all rows from the "borrows" table
+            PreparedStatement statement = connection.prepareStatement("SELECT title, dor, rn FROM reservation WHERE name=?");
+             statement.setString(1, name); // Set the parameter for the name
+            ResultSet resultSet = statement.executeQuery();
+            
+            // Clear existing rows from borrowsTable
+            DefaultTableModel model = (DefaultTableModel) reservationTable.getModel();
+            model.setRowCount(0);
+            
+            // Add fetched data to borrowsTable
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String dor = resultSet.getString("dor");
+                String rn = resultSet.getString("rn");
+                
+                
+                // Add a row to the borrowsTable
+                model.addRow(new Object[]{title, dor, rn});
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(userHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(userHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(userHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(userHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            
+            // Close the connection
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        //</editor-fold>
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+    
+    
+    
+    
+    
+    
+   
+    
+    
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new userHome().setVisible(true);
+
+
+private void populateBorrowsTableFromDatabase() {
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        if (connection != null) {
+            String name = userName.getText(); // Assuming userName is the text field that holds the name
+            
+           
+            
+            // Prepare and execute a query to retrieve rows from the "borrows" table where name matches
+            PreparedStatement statement = connection.prepareStatement("SELECT title, dob, dor FROM borrows WHERE name = ?");
+            statement.setString(1, name); // Set the parameter for the name
+            ResultSet resultSet = statement.executeQuery();
+            
+            // Clear existing rows from borrowsTable
+            DefaultTableModel model = (DefaultTableModel) borrowsTable.getModel();
+            
+          
+            model.setRowCount(0);
+            
+            // Debugging: Print the result set
+            System.out.println("Result Set:");
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String dob = resultSet.getString("dob");
+                String dor = resultSet.getString("dor");
+                
+               
+                
+                // Add a row to the borrowsTable
+                model.addRow(new Object[]{title, dob, dor}
+                
+               );
+                
+                
+                
             }
-        });
+            
+            // Check if the result set has any data
+            if (!resultSet.isBeforeFirst()) {
+                System.out.println("No data found for the name: " + name);
+            }
+            
+            // Close result set, statement, and connection
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+
+    
+
+ private void removeBorrowsSelectedRowsFromDatabase() {
+    int[] selectedRows = borrowsTable.getSelectedRows();
+
+    if (selectedRows.length == 0) {
+        JOptionPane.showMessageDialog(null, "Please select a book to return.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
+        return;
     }
 
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        if (connection != null) {
+            // Iterate over the selected rows in borrowsTable
+            for (int rowIndex : selectedRows) {
+                String title = (String) borrowsTable.getValueAt(rowIndex, 0);
+                String name = userName.getText();
+
+                try {
+                    // Check if the title and name match in the "borrows" table
+                    PreparedStatement checkBorrow = connection.prepareStatement("SELECT * FROM borrows WHERE title = ? AND name = ?");
+                    checkBorrow.setString(1, title);
+                    checkBorrow.setString(2, name);
+                    ResultSet borrowResult = checkBorrow.executeQuery();
+
+                    if (borrowResult.next()) {
+                        // Remove the row from the "borrows" table
+                        PreparedStatement deleteBorrow = connection.prepareStatement("DELETE FROM borrows WHERE title = ? AND name = ?");
+                        deleteBorrow.setString(1, title);
+                        deleteBorrow.setString(2, name);
+                        deleteBorrow.executeUpdate();
+
+                        // Add to history as returned
+                        String status = "Returned";
+                        String date = LocalDate.now().toString();
+
+                        PreparedStatement pstmt = connection.prepareStatement("INSERT INTO history (title, date, status, name) VALUES (?, ?, ?, ?)");
+                        pstmt.setString(1, title);
+                        pstmt.setString(2, date);
+                        pstmt.setString(3, status);
+                        pstmt.setString(4, name);
+                        pstmt.executeUpdate();
+
+                        // Check the "reservation" table for the title
+                        PreparedStatement checkReservation = connection.prepareStatement("SELECT * FROM reservation WHERE title = ?");
+                        checkReservation.setString(1, title);
+                        ResultSet reservationResult = checkReservation.executeQuery();
+
+                        if (reservationResult.next()) {
+                            // Count the number of reservations for this title
+                            PreparedStatement countReservations = connection.prepareStatement("SELECT COUNT(*) AS count FROM reservation WHERE title = ?");
+                            countReservations.setString(1, title);
+                            ResultSet countResult = countReservations.executeQuery();
+
+                            if (countResult.next()) {
+                                int reservationCount = countResult.getInt("count");
+
+                              
+                                    // Get the data from the reservation row
+                                    String reservedTitle = reservationResult.getString("title");
+                                    String reservedName = reservationResult.getString("name");
+
+                                    // Add the reservation to the "borrows" table
+                                    String dob = LocalDate.now().toString();
+                                    String dor = LocalDate.now().plusDays(7).toString();
+
+                                    PreparedStatement addBorrow = connection.prepareStatement("INSERT INTO borrows (title, dob, dor, name) VALUES (?, ?, ?, ?)");
+                                    addBorrow.setString(1, reservedTitle);
+                                    addBorrow.setString(2, dob);
+                                    addBorrow.setString(3, dor);
+                                    addBorrow.setString(4, reservedName);
+                                    addBorrow.executeUpdate();
+                                    
+                                    
+
+                                    // Decrement the nr column value in the books table
+                                    PreparedStatement getNrStatement = connection.prepareStatement("SELECT nr FROM books WHERE Title = ?");
+                                    getNrStatement.setString(1, title);
+                                    ResultSet rsNr = getNrStatement.executeQuery();
+
+                                    if (rsNr.next()) {
+                                        String nrString = rsNr.getString("nr");
+                                        int nr = Integer.parseInt(nrString);
+
+                                        if (nr > 0) {
+                                            nr -= 1;
+                                            String updatedNrString = Integer.toString(nr);
+
+                                            PreparedStatement updateNrStatement = connection.prepareStatement("UPDATE books SET nr = ? WHERE Title = ?");
+                                            updateNrStatement.setString(1, updatedNrString);
+                                            updateNrStatement.setString(2, title);
+                                            updateNrStatement.executeUpdate();
+                                        }
+                                    }
+
+                                    // Remove the row from the "reservation" table
+                                    PreparedStatement deleteReservation = connection.prepareStatement("DELETE FROM reservation WHERE title = ? AND name = ?");
+                                    deleteReservation.setString(1, reservedTitle);
+                                    deleteReservation.setString(2, reservedName);
+                                    deleteReservation.executeUpdate();
+                                    
+                                    
+                                    if (reservationCount == 1) {
+                                    // If there's only one reservation left, set the book status to "Borrowed"
+                                    PreparedStatement updateBookStatus = connection.prepareStatement("UPDATE books SET status = 'Borrowed' WHERE title = ?");
+                                    updateBookStatus.setString(1, title);
+                                    updateBookStatus.executeUpdate();
+                                                                      
+                                    
+                                }
+                                    
+                                    
+                        // Decrement rn values in the reservation table for all matching titles
+                        PreparedStatement decrementRnStatement = connection.prepareStatement(
+                            "UPDATE reservation SET rn = rn - 1 WHERE title = ?"
+                        );
+                        
+                        
+                        
+                        decrementRnStatement.setString(1, title);
+                        decrementRnStatement.executeUpdate();
+                        
+
+                                    // Add to history as borrowed
+                                    String borrowedStatus = "Borrowed";
+                                    PreparedStatement addHistory = connection.prepareStatement("INSERT INTO history (title, date, status, name) VALUES (?, ?, ?, ?)");
+                                    addHistory.setString(1, reservedTitle);
+                                    addHistory.setString(2, dob);
+                                    addHistory.setString(3, borrowedStatus);
+                                    addHistory.setString(4, reservedName);
+                                    addHistory.executeUpdate();
+                                
+                            }
+                        } else
+                        
+                        {
+                            // If no match found in reservation table, update the book status to Available
+                            PreparedStatement updateBookStatus = connection.prepareStatement("UPDATE books SET status = 'Available' WHERE title = ?");
+                            updateBookStatus.setString(1, title);
+                            updateBookStatus.executeUpdate();
+                        }
+                    }
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            // Close the connection after all operations are done
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    // Show success message
+    JOptionPane.showMessageDialog(null, "Book returned successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+    // Clear the selection and update the tables
+    borrowsTable.clearSelection();
+    DefaultTableModel model = (DefaultTableModel) borrowsTable.getModel();
+    model.setRowCount(0);
+    dbData();
+    populateBorrowsTableFromDatabase();
+    fillHistoryTableFromDatabase(userName.getText());
+}
+
+  
+    
+
+
+
+  
+    
+    private void removeReservationSelectedRowsFromDatabase() {
+    int[] selectedRows = reservationTable.getSelectedRows();
+
+    if (selectedRows.length == 0) {
+        JOptionPane.showMessageDialog(null, "Please select a book to cancel reservation.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
+    } else {
+        try {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+
+            if (connection != null) {
+                // Iterate over the selected rows
+                for (int rowIndex : selectedRows) {
+                    // Get the title from the selected row
+                    String title = (String) reservationTable.getValueAt(rowIndex, 0);
+                    String name = userName.getText();
+
+                    try {
+                        // Remove the row from the "reservation" table
+                        PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM reservation WHERE title = ? AND name = ?");
+                        deleteStatement.setString(1, title);
+                        deleteStatement.setString(2, name);
+                        deleteStatement.executeUpdate();
+
+                        // Decrement the nr column value in the books table
+                        PreparedStatement getNrStatement = connection.prepareStatement("SELECT nr FROM books WHERE Title = ?");
+                        getNrStatement.setString(1, title);
+                        ResultSet rsNr = getNrStatement.executeQuery();
+
+                        if (rsNr.next()) {
+                            String nrString = rsNr.getString("nr");
+                            int nr = Integer.parseInt(nrString);
+
+                            if (nr > 0) {
+                                nr -= 1;
+                                String updatedNrString = Integer.toString(nr);
+
+                                PreparedStatement updateNrStatement = connection.prepareStatement("UPDATE books SET nr = ? WHERE Title = ?");
+                                updateNrStatement.setString(1, updatedNrString);
+                                updateNrStatement.setString(2, title);
+                                updateNrStatement.executeUpdate();
+                            }
+                        }
+
+                        // Decrement rn values in the reservation table for all matching titles
+                        PreparedStatement decrementRnStatement = connection.prepareStatement(
+                            "UPDATE reservation SET rn = rn - 1 WHERE title = ?"
+                        );
+                        
+                        
+                        
+                        decrementRnStatement.setString(1, title);
+                        decrementRnStatement.executeUpdate();
+                        
+
+                        // Insert cancellation into history table
+                        String status = "Reservation Cancelled";
+                        String date = LocalDate.now().toString();
+
+                        PreparedStatement pstmt = connection.prepareStatement("INSERT INTO history (title, date, status, name) VALUES (?, ?, ?, ?)");
+                        pstmt.setString(1, title);
+                        pstmt.setString(2, date);
+                        pstmt.setString(3, status);
+                        pstmt.setString(4, name);
+                        pstmt.executeUpdate();
+
+                        // Check if there are any remaining reservations for the same title
+                        PreparedStatement checkReservationStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM reservation WHERE title = ?");
+                        checkReservationStatement.setString(1, title);
+                        ResultSet rsReservationCount = checkReservationStatement.executeQuery();
+                        
+                        
+                        
+
+                        if (rsReservationCount.next()) {
+                            int count = rsReservationCount.getInt("count");
+                            String bookStatus = (count > 0) ? "Reserved" : "Borrowed";
+
+                            // Update the status in the books table
+                            PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE Title = ?");
+                            updateStatusStatement.setString(1, bookStatus);
+                            updateStatusStatement.setString(2, title);
+                            updateStatusStatement.executeUpdate();
+                        } 
+                        
+                        else {
+                            
+                            // If there are no remaining reservations, set status to "Borrowed"
+                            PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE Title = ?");
+                            updateStatusStatement.setString(1, "Available");
+                            updateStatusStatement.setString(2, title);
+                            updateStatusStatement.executeUpdate();
+                        }
+                        
+                
+                            
+   
+                        
+                        
+
+                        // Close result sets and statements
+                        rsNr.close();
+                        getNrStatement.close();
+                        rsReservationCount.close();
+                        checkReservationStatement.close();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                // Close the connection after all operations are done
+                connection.close();
+            } else {
+                JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        // Show success message
+        JOptionPane.showMessageDialog(null, "Reservation cancelled successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+}
+
+    
+    
+    
+    
+    
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        try {
+            setName.setEditable(false);
+            setRole.setEditable(false);
+            setId.setEditable(false);
+            setEmail.setEditable(false);
+            setContact.setEditable(false);
+
+           
+            logOutButton.setForeground(new Color(225,225,255));
+            editButton.setForeground(new Color(225,225,255));
+            saveButton.setForeground(new Color(0,225,255));
+
+            String name = setName.getText();
+            String role = setRole.getText();
+            String id = setId.getText();
+            String email =  setEmail.getText();
+            String contact =  setContact.getText();
+
+            // Get the database connection
+            dbConnection conn = new dbConnection();
+            Connection connection = conn.getConnection();
+
+            if (connection == null) {
+                System.out.println("Failed to connect to the database.");
+                return;
+            }
+
+            String sql = "UPDATE userinfo SET name = ?, role = ?, id = ?, email = ?, Contact = ? WHERE name = ?";
+
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setString(1, name);
+                pstmt.setString(2, role);
+                pstmt.setString(3, id);
+                pstmt.setString(4, email);
+                pstmt.setString(5, contact);
+                pstmt.setString(6, name);
+
+                int rowsAffected = pstmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("User information updated successfully.");
+                } else {
+                    System.out.println("No user found with the name: " + name);
+                }
+            } catch (SQLException e) {
+                System.out.println("Error updating user info: " + e.getMessage());
+            } finally {
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Error closing connection: " + e.getMessage());
+                }
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        setName.setEditable(false);
+        setRole.setEditable(false);
+        setId.setEditable(false);
+        setEmail.setEditable(true);
+        setContact.setEditable(true);
+
+      
+        logOutButton.setForeground(new Color(225,225,255));
+        editButton.setForeground(new Color(0,225,255));
+        saveButton.setForeground(new Color(225,225,255));
+    }//GEN-LAST:event_editButtonActionPerformed
+
+    private void setNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setNameActionPerformed
+
+    }//GEN-LAST:event_setNameActionPerformed
+
+    private void logOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logOutButtonActionPerformed
+        dispose();
+        JOptionPane.showMessageDialog(null, "Logged out successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        new LogIn().setVisible(true);
+
+        logOutButton.setForeground(new Color(0,225,255));
+        editButton.setForeground(new Color(225,225,255));
+        saveButton.setForeground(new Color(225,225,255));
+
+    }//GEN-LAST:event_logOutButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        removeReservationSelectedRowsFromDatabase();
+         populateBorrowsTableFromDatabase();
+           
+        populateReservationTableFromDatabase();
+        
+        
+          fillHistoryTableFromDatabase(userName.getText());// update tables in realtime
+            dbData();// update tables in realtime
+
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void returnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnButtonActionPerformed
+
+        removeBorrowsSelectedRowsFromDatabase();
+        
+        populateBorrowsTableFromDatabase();
+            populateReservationTableFromDatabase();
+          fillHistoryTableFromDatabase(userName.getText()); // update tables in realtime
+             dbData();// update tables in realtime
+
+             
+             
+             
+             
+             
+    }//GEN-LAST:event_returnButtonActionPerformed
+
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+                 dbData();
+        reserveButton.setForeground(new Color(0,225,255));
+        borrowButton.setForeground(new Color(0,225,255));
+        searchButton.setForeground(new Color(225,225,255));
+            updateButton.setForeground(new Color(0, 225, 255));
+       
+
+        String searchText = searchBook.getText().trim(); // Get the text entered in the searchBook field
+
+        // If the search text is empty, do nothing
+        if (searchText.isEmpty()) {
+            
+            return;
+        }
+        
+        
+
+        DefaultTableModel model = (DefaultTableModel) searchBookTable.getModel();
+
+        // Iterate over each row in the searchBookTable
+        for (int i = 0; i < model.getRowCount(); i++) {
+            // Iterate over each column in the current row
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                Object cellValue = model.getValueAt(i, j);
+                // Check if the cell value contains the search text
+                if (cellValue != null && cellValue.toString().toLowerCase().contains(searchText.toLowerCase())) {
+                    // Move the row to the top (insert it at index 0)
+                    Object[] rowData = new Object[model.getColumnCount()];
+                    for (int k = 0; k < model.getColumnCount(); k++) {
+                        rowData[k] = model.getValueAt(i, k);
+                    }
+                    model.removeRow(i);
+                    model.insertRow(0, rowData);
+                    return; // Stop searching after finding the first match
+                }
+            }
+        }
+
+    }//GEN-LAST:event_searchButtonActionPerformed
+   
+    
+    
+    private void searchBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBookActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchBookActionPerformed
+
+    private void searchBookFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchBookFocusLost
+        // in completion with placeholder
+
+        if (searchBook.getText().equals(""))   {
+            searchBook.setText("Search book title");
+            searchBook.setForeground(BLACK);
+        }
+
+    }//GEN-LAST:event_searchBookFocusLost
+
+    private void searchBookFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchBookFocusGained
+        // set placeholder search a book titile here
+
+        if (searchBook.getText().equals("Search book title"))   {
+            searchBook.setText("");
+            searchBook.setForeground(BLACK);
+        }
+    }//GEN-LAST:event_searchBookFocusGained
+
+    
+    
+    
+    
+    
+    public void addHistoryRecord(String title, String date, String status, String name) {
+        try {
+            // Add to JTable
+            DefaultTableModel model = (DefaultTableModel) historyTable.getModel();
+            model.addRow(new Object[]{title, date, null, status});
+            
+            // Update database
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            String sql = "INSERT INTO history (title, date, status, name) VALUES (?, ?, ?, ?)";
+            
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setString(1, title);
+                pstmt.setString(2, date);
+                pstmt.setString(3, status);
+                pstmt.setString(4, name);
+                
+                pstmt.executeUpdate();
+                
+                
+            } catch (SQLException e) {
+                e.printStackTrace();
+                // Optionally, handle the exception, e.g., show an error message
+            } finally {
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    private void borrowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowButtonActionPerformed
+
+           updateButton.setForeground(new Color(0, 225, 255));
+        borrowButton.setForeground(new Color(225, 225, 255));
+        reserveButton.setForeground(new Color(0,225,225));
+        searchButton.setForeground(new Color(0,225,225));
+
+         int[] selectedRows = searchBookTable.getSelectedRows();
+    
+    if (selectedRows.length == 0) {
+        JOptionPane.showMessageDialog(null, "Please select a book.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
+    } else {
+        try {
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+
+            if (connection != null) {
+                for (int rowIndex : selectedRows) {
+                    String title = (String) searchBookTable.getValueAt(rowIndex, 0);
+                    String name = userName.getText();
+
+                    try {
+                        // Check if the user is currently borrowing the book
+                        PreparedStatement checkBorrow = connection.prepareStatement(
+                            "SELECT * FROM borrows WHERE name = ? AND title = ?"
+                        );
+                        checkBorrow.setString(1, name);
+                        checkBorrow.setString(2, title);
+                        ResultSet rsBorrow = checkBorrow.executeQuery();
+
+                        if (rsBorrow.next()) {
+                            JOptionPane.showMessageDialog(this, "You are currently borrowing the book.", "Error", JOptionPane.ERROR_MESSAGE);
+                            continue; // Skip to the next selected book
+                        }
+
+                        
+                        // Check the status of the book
+                        PreparedStatement statusStatement = connection.prepareStatement(
+                            "SELECT status FROM books WHERE Title = ?"
+                        );
+                        statusStatement.setString(1, title);
+                        ResultSet statusResult = statusStatement.executeQuery();
+
+                        if (statusResult.next()) {
+                            String status = statusResult.getString("status");
+
+                            if (status.equals("Borrowed")) {
+                                JOptionPane.showMessageDialog(this, "The book \"" + title + "\" is already borrowed. We recommend you to reserve it.", "Error", JOptionPane.ERROR_MESSAGE);
+                            } else if (status.equals("Reserved")) {
+                                JOptionPane.showMessageDialog(this, "The book \"" + title + "\" is already reserved. We recommend you to reserve it.", "Error", JOptionPane.ERROR_MESSAGE);
+                            } else if (status.equals("Available")) {
+                                // Update the status of the book to 'Borrowed'
+                                PreparedStatement updateStatement = connection.prepareStatement(
+                                    "UPDATE books SET status = 'Borrowed' WHERE Title = ?"
+                                );
+                                updateStatement.setString(1, title);
+                                updateStatement.executeUpdate();
+
+                                String dob = LocalDate.now().toString();
+                                String dor = LocalDate.now().plusDays(7).toString();
+                                String status1 = "Borrowed";
+                                String date = LocalDate.now().toString();
+
+                                // Insert into borrows table
+                                PreparedStatement updateBorrows = connection.prepareStatement(
+                                    "INSERT INTO borrows (title, dob, dor, name) VALUES (?, ?, ?, ?)"
+                                );
+                                updateBorrows.setString(1, title);
+                                updateBorrows.setString(2, dob);
+                                updateBorrows.setString(3, dor);
+                                updateBorrows.setString(4, name);
+                                updateBorrows.executeUpdate();
+
+                                // Insert into history table
+                                PreparedStatement pstmt = connection.prepareStatement(
+                                    "INSERT INTO history (title, date, status, name) VALUES (?, ?, ?, ?)"
+                                );
+                                pstmt.setString(1, title);
+                                pstmt.setString(2, date);
+                                pstmt.setString(3, status1);
+                                pstmt.setString(4, name);
+                                pstmt.executeUpdate();
+
+                                JOptionPane.showMessageDialog(this, "The book \"" + title + "\" has been successfully borrowed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+
+                        // Close result sets and statements
+                        rsBorrow.close();                      
+                        statusResult.close();
+                        checkBorrow.close();
+                        statusStatement.close();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                // Close the connection after all operations are done
+                connection.close();
+            } else {
+                JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Clear the selection and update searchBookTable
+    searchBookTable.clearSelection();
+    DefaultTableModel model = (DefaultTableModel) searchBookTable.getModel();
+    model.setRowCount(0);
+    dbData();
+    populateBorrowsTableFromDatabase();
+    fillHistoryTableFromDatabase(userName.getText());
+    dbData(); // to update table in real-time
+                        
+
+    }//GEN-LAST:event_borrowButtonActionPerformed
+
+    
+    
+    private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
+
+        borrowButton.setForeground(new Color(0, 225, 255));
+    reserveButton.setForeground(new Color(225, 225, 225));
+    searchButton.setForeground(new Color(0, 225, 225));
+    updateButton.setForeground(new Color(0, 225, 255));
+
+    try {
+        // Get the selected rows from the searchBookTable
+        int[] selectedRows = searchBookTable.getSelectedRows();
+        
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(null, "Please select a book.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
+        } else {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            if (connection != null) {
+                // Iterate over the selected rows in searchBookTable
+                for (int rowIndex : selectedRows) {
+                    // Get the data from column 0 of the selected row in searchBookTable
+                    String title = (String) searchBookTable.getValueAt(rowIndex, 0);
+                    String name = userName.getText();
+
+                    try {
+                        // Check if the user is currently borrowing the book
+                        PreparedStatement checkBorrow = connection.prepareStatement(
+                            "SELECT * FROM borrows WHERE name = ? AND title = ?"
+                        );
+                        checkBorrow.setString(1, name);
+                        checkBorrow.setString(2, title);
+                        ResultSet rsBorrow = checkBorrow.executeQuery();
+
+                        if (rsBorrow.next()) {
+                            JOptionPane.showMessageDialog(this, "You are currently borrowing the book.", "Error", JOptionPane.ERROR_MESSAGE);
+                            continue; // Skip to the next selected book
+                        }
+
+                        // Check if the user is currently reserving the book
+                        PreparedStatement checkReserve = connection.prepareStatement(
+                            "SELECT * FROM reservation WHERE name = ? AND title = ?"
+                        );
+                        checkReserve.setString(1, name);
+                        checkReserve.setString(2, title);
+                        ResultSet rsReserve = checkReserve.executeQuery();
+
+                        if (rsReserve.next()) {
+                            JOptionPane.showMessageDialog(this, "You are currently reserving the book.", "Error", JOptionPane.ERROR_MESSAGE);
+                            continue; // Skip to the next selected book
+                        }
+
+                        // Check the status of the book
+                        PreparedStatement statusStatement = connection.prepareStatement(
+                            "SELECT status, nr FROM books WHERE Title = ?"
+                        );
+                        statusStatement.setString(1, title);
+                        ResultSet statusResult = statusStatement.executeQuery();
+
+                        if (statusResult.next()) {
+                            String status = statusResult.getString("status");
+                            String nrString = statusResult.getString("nr"); // Get the nr value as string
+                            int nr = Integer.parseInt(nrString); // Convert nr value to integer
+
+                            if (status.equals("Available")) {
+                                JOptionPane.showMessageDialog(this, "We encourage you to borrow the book since it is available.", "Error", JOptionPane.ERROR_MESSAGE);
+                                continue; // Skip to the next selected book
+                            } else if (status.equals("Borrowed") || status.equals("Reserved")) {
+                                // Update the status of the book to 'Reserved'
+                                PreparedStatement updateStatement = connection.prepareStatement(
+                                    "UPDATE books SET status = 'Reserved' WHERE Title = ?"
+                                );
+                                updateStatement.setString(1, title);
+                                updateStatement.executeUpdate();
+
+                                // Increment the nr column in the books table
+                                nr = nr + 1; // Increment the nr value
+                                String updatedNrString = Integer.toString(nr); // Convert back to string
+
+                                PreparedStatement incrementNrStatement = connection.prepareStatement(
+                                    "UPDATE books SET nr = ? WHERE Title = ?"
+                                );
+                                incrementNrStatement.setString(1, updatedNrString);
+                                incrementNrStatement.setString(2, title);
+                                incrementNrStatement.executeUpdate();
+                                
+                                String date = LocalDate.now().toString();
+                                String status1 = "Reserved";
+
+                                // Insert into reservation table
+                                PreparedStatement updateReservation = connection.prepareStatement(
+                                    "INSERT INTO reservation (title, dor, rn, name) VALUES (?, ?, ?, ?)"
+                                );
+                                updateReservation.setString(1, title);
+                                updateReservation.setString(2, date);
+                                updateReservation.setString(3, updatedNrString);
+                                updateReservation.setString(4, name);
+                                updateReservation.executeUpdate();
+
+                                // Insert into history table
+                                PreparedStatement pstmt = connection.prepareStatement(
+                                    "INSERT INTO history (title, date, status, name) VALUES (?, ?, ?, ?)"
+                                );
+                                pstmt.setString(1, title);
+                                pstmt.setString(2, date);
+                                pstmt.setString(3, status1);
+                                pstmt.setString(4, name);
+                                pstmt.executeUpdate();
+
+                                JOptionPane.showMessageDialog(this, "The book \"" + title + "\" has been successfully reserved.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+
+                        // Close result sets and statements
+                        rsReserve.close();
+                        statusResult.close();
+                        checkReserve.close();
+                        statusStatement.close();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                // Close the connection after all operations are done
+                connection.close();
+            } else {
+                JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    // Clear the selection and update searchBookTable
+    searchBookTable.clearSelection();
+    DefaultTableModel model = (DefaultTableModel) searchBookTable.getModel();
+    model.setRowCount(0);
+    dbData();
+    populateReservationTableFromDatabase();
+    fillHistoryTableFromDatabase(userName.getText());
+    dbData(); // update table in real-time
+    
+    }//GEN-LAST:event_reserveButtonActionPerformed
+
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+      
+        
+        updateButton.setForeground(new Color(225, 225, 255));
+        borrowButton.setForeground(new Color(0, 225, 255));
+        reserveButton.setForeground(new Color(0,225,225));
+        searchButton.setForeground(new Color(0,225,225));
+        
+        dbData(); // update table in real-time
+       fillHistoryTableFromDatabase(userName.getText());
+           populateReservationTableFromDatabase();
+              populateBorrowsTableFromDatabase();
+    }//GEN-LAST:event_updateButtonActionPerformed
+
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton booksButton;
-    private javax.swing.JTable borrowTable;
+    private javax.swing.JButton borrowButton;
     private javax.swing.JButton borrowsButton;
+    private javax.swing.JTable borrowsTable;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JLabel contact;
-    private javax.swing.JLabel contact1;
     private javax.swing.JButton editButton;
     private javax.swing.JLabel email;
-    private javax.swing.JButton englishButton;
-    private javax.swing.JButton helpButton;
     private javax.swing.JButton historyButton;
     private javax.swing.JTable historyTable;
     private javax.swing.JLabel id;
@@ -787,19 +2248,26 @@ public class userHome extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane2;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
     private java.awt.Panel leftPanel;
     private javax.swing.JButton logOutButton;
-    private javax.swing.JButton mathButton;
     private javax.swing.JLabel name;
     private javax.swing.JButton notificationsButton;
     private java.awt.Panel panel2;
     private javax.swing.JLabel profile;
     private javax.swing.JButton reservationButton;
+    private javax.swing.JTable reservationTable;
+    private javax.swing.JButton reserveButton;
+    private javax.swing.JButton returnButton;
     private javax.swing.JLabel role;
-    private javax.swing.JButton scienceButton;
+    private javax.swing.JButton saveButton;
+    private javax.swing.JTextField searchBook;
+    private javax.swing.JTable searchBookTable;
+    private javax.swing.JButton searchButton;
     private javax.swing.JTextField setContact;
     private javax.swing.JTextField setEmail;
     private javax.swing.JTextField setId;
@@ -807,6 +2275,9 @@ public class userHome extends javax.swing.JFrame {
     private javax.swing.JTextField setRole;
     private javax.swing.JButton settingsButton;
     private javax.swing.JTabbedPane tabs;
+    private javax.swing.JButton updateButton;
     private javax.swing.JLabel userName;
+    private javax.swing.JButton xsuerButton;
     // End of variables declaration//GEN-END:variables
+
 }
