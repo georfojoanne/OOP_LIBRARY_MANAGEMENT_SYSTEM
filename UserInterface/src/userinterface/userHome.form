@@ -133,7 +133,7 @@
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="200" y="0" width="1140" height="30"/>
+          <AbsoluteConstraints x="200" y="0" width="1140" height="60"/>
         </Constraint>
       </Constraints>
 
@@ -147,7 +147,7 @@
               <Color blue="f2" green="e8" red="e1" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\ASUS\OneDrive\JavaPractice\UserInterface\icons\Xicon.png"/>
+              <Image iconType="2" name="C:\Users\ASUS\OneDrive\Documents\librarian\OOP_LIBRARY_MANAGEMENT_SYSTEM\UserInterface\icons\Xbang.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="borderPainted" type="boolean" value="false"/>
@@ -158,7 +158,7 @@
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="640" y="10" width="-1" height="-1"/>
+              <AbsoluteConstraints x="632" y="10" width="50" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -362,7 +362,7 @@
               <Font name="Stylus BT" size="18" style="1"/>
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="ff" red="0" type="rgb"/>
+              <Color blue="ff" green="ff" id="white" palette="1" red="ff" type="palette"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Books"/>
             <Property name="actionCommand" type="java.lang.String" value="Borrowing"/>

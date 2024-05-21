@@ -258,7 +258,7 @@
             <Component class="javax.swing.JButton" name="jButton1">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\ASUS\OneDrive\JavaPractice\UserInterface\icons\Xicon.png"/>
+                  <Image iconType="2" name="C:\Users\ASUS\OneDrive\Documents\librarian\OOP_LIBRARY_MANAGEMENT_SYSTEM\UserInterface\icons\Xbang.png"/>
                 </Property>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="null"/>
@@ -271,7 +271,7 @@
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="380" y="10" width="-1" height="-1"/>
+                  <AbsoluteConstraints x="380" y="10" width="40" height="-1"/>
                 </Constraint>
               </Constraints>
             </Component>

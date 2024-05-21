@@ -463,7 +463,7 @@ public String getTextFromNameColumn() {
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
-        xsuerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\Xicon.png")); // NOI18N
+        xsuerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\Documents\\librarian\\OOP_LIBRARY_MANAGEMENT_SYSTEM\\UserInterface\\icons\\Xbang.png")); // NOI18N
         xsuerButton.setToolTipText("");
         xsuerButton.setBorderPainted(false);
         xsuerButton.setContentAreaFilled(false);
@@ -472,9 +472,9 @@ public String getTextFromNameColumn() {
                 xsuerButtonActionPerformed(evt);
             }
         });
-        panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 10, -1, -1));
+        panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 10, 50, -1));
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 1140, 30));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 1140, 60));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
@@ -565,7 +565,7 @@ public String getTextFromNameColumn() {
 
         booksButton.setBackground(new java.awt.Color(26, 27, 27));
         booksButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        booksButton.setForeground(new java.awt.Color(0, 255, 255));
+        booksButton.setForeground(java.awt.Color.white);
         booksButton.setText("Books");
         booksButton.setActionCommand("Borrowing");
         booksButton.setBorder(null);
