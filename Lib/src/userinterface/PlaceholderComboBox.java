@@ -1,3 +1,6 @@
+
+package userinterface;
+
 import javax.swing.*;
 
 public class PlaceholderComboBox extends JComboBox<String> {

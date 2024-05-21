@@ -1,10 +1,11 @@
 
+package userinterface;
+
+
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
@@ -12,20 +13,11 @@ import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 
-/**
- *
- * @author USER
- */
 public class Librarian extends javax.swing.JFrame {
     
     public Librarian() {
@@ -58,11 +50,16 @@ public class Librarian extends javax.swing.JFrame {
                 }
             }
         });
+       
+       
 
               bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
 
+    
+    
+    
   private void dbData(){
          
 try {
@@ -104,6 +101,9 @@ try {
     Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
 }
     }
+  
+  
+  
   
   private void populateBooksTableFromDatabase() {
     try {
