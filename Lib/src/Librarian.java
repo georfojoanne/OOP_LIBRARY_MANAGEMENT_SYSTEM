@@ -174,11 +174,11 @@ try {
         jButton14 = new javax.swing.JButton();
         jButton15 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        borrowsTable = new javax.swing.JTable();
         borrowsSearch = new javax.swing.JTextField();
         holdsPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        holdsTable = new javax.swing.JTable();
         jButton29 = new javax.swing.JButton();
         jButton30 = new javax.swing.JButton();
         jComboBox3 = new javax.swing.JComboBox<>();
@@ -197,7 +197,7 @@ try {
         categoryComboBox = new javax.swing.JComboBox<>();
         requestPanel = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable4 = new javax.swing.JTable();
+        requestTable = new javax.swing.JTable();
         jButton20 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         requestSearch = new javax.swing.JTextField();
@@ -206,12 +206,12 @@ try {
         jButton28 = new javax.swing.JButton();
         loansSearch = new javax.swing.JTextField();
         jScrollPane7 = new javax.swing.JScrollPane();
-        jTable7 = new javax.swing.JTable();
+        loansTable = new javax.swing.JTable();
         loanManagementPanel = new javax.swing.JPanel();
         jButton25 = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
         jScrollPane6 = new javax.swing.JScrollPane();
-        jTable6 = new javax.swing.JTable();
+        loansManagementTable = new javax.swing.JTable();
         jTextField25 = new javax.swing.JTextField();
         settingsPanel = new javax.swing.JPanel();
         jButton16 = new javax.swing.JButton();
@@ -445,12 +445,9 @@ try {
         jButton15.setText("STUDENTS");
         jButton15.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        borrowsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Username", "Book", "Due Date", "User Type"
@@ -471,7 +468,9 @@ try {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane2.setViewportView(jTable2);
+        borrowsTable.getTableHeader().setReorderingAllowed(false);
+        borrowsTable.setDefaultEditor(Object.class, null);
+        jScrollPane2.setViewportView(borrowsTable);
 
         borrowsSearch.setBackground(new java.awt.Color(255, 255, 255));
         borrowsSearch.setText("Search");
@@ -512,12 +511,9 @@ try {
 
         holdsPanel.setBackground(new java.awt.Color(28, 52, 62));
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+        holdsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
                 "Book", "Holds"
@@ -538,7 +534,9 @@ try {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane3.setViewportView(jTable3);
+        holdsTable.getTableHeader().setReorderingAllowed(false);
+        holdsTable.setDefaultEditor(Object.class, null);
+        jScrollPane3.setViewportView(holdsTable);
 
         jButton29.setBackground(new java.awt.Color(49, 98, 103));
         jButton29.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -555,6 +553,7 @@ try {
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jTextField22.setEditable(false);
+        jTextField22.setFocusable(false);
         jTextField22.setBackground(new java.awt.Color(131, 157, 167));
         jTextField22.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jTextField22.setForeground(new java.awt.Color(54, 61, 155));
@@ -628,6 +627,8 @@ try {
         jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField5.setText("TITLE");
         jTextField5.setAutoscrolls(false);
+        jTextField5.setEditable(false);
+        jTextField5.setFocusable(false);
         jTextField5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
         jTextField5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
@@ -651,6 +652,8 @@ try {
         jTextField6.setAutoscrolls(false);
         jTextField6.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
         jTextField6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField6.setEditable(false);
+        jTextField6.setFocusable(false);
 
         jTextField7.setEditable(false);
         jTextField7.setBackground(new java.awt.Color(131, 157, 167));
@@ -666,6 +669,8 @@ try {
                 jTextField7ActionPerformed(evt);
             }
         });
+        jTextField7.setEditable(false);
+        jTextField7.setFocusable(false);
 
         jTextField8.setEditable(false);
         jTextField8.setBackground(new java.awt.Color(131, 157, 167));
@@ -681,6 +686,7 @@ try {
                 jTextField8ActionPerformed(evt);
             }
         });
+        jTextField8.setFocusable(false);
 
         titleField.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         titleField.addActionListener(new java.awt.event.ActionListener() {
@@ -699,6 +705,8 @@ try {
         jTextField10.setAutoscrolls(false);
         jTextField10.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 2, true));
         jTextField10.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField10.setEditable(false);
+        jTextField10.setFocusable(false);
 
         authorAdd.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         authorAdd = new PlaceholderTextField("Enter author here");
@@ -772,12 +780,9 @@ try {
 
         requestPanel.setBackground(new java.awt.Color(28, 52, 62));
 
-        jTable4.setModel(new javax.swing.table.DefaultTableModel(
+        requestTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Username", "Book", "Due Date"
@@ -791,7 +796,9 @@ try {
                 return types [columnIndex];
             }
         });
-        jScrollPane4.setViewportView(jTable4);
+        jScrollPane4.setViewportView(requestTable);
+        requestTable.getTableHeader().setReorderingAllowed(false);
+        requestTable.setDefaultEditor(Object.class, null);
 
         jButton20.setBackground(new java.awt.Color(49, 98, 103));
         jButton20.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -870,13 +877,10 @@ try {
         loansSearch.setText("Search");
         loansSearch = new PlaceholderTextField("Search");
 
-        jTable7.setForeground(new java.awt.Color(0, 0, 0));
-        jTable7.setModel(new javax.swing.table.DefaultTableModel(
+        loansTable.setForeground(new java.awt.Color(0, 0, 0));
+        loansTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Username", "Book", "Due Date", "Fee"
@@ -897,7 +901,9 @@ try {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane7.setViewportView(jTable7);
+        jScrollPane7.setViewportView(loansTable);
+        loansTable.getTableHeader().setReorderingAllowed(false);
+        loansTable.setDefaultEditor(Object.class, null);
 
         javax.swing.GroupLayout loansPanelLayout = new javax.swing.GroupLayout(loansPanel);
         loansPanel.setLayout(loansPanelLayout);
@@ -934,17 +940,17 @@ try {
 
         jButton25.setBackground(new java.awt.Color(49, 98, 103));
         jButton25.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton25.setForeground(new java.awt.Color(255, 255, 255));
+        jButton25.setForeground(new java.awt.Color(0, 255, 255));
         jButton25.setText("CONFIRM PAYMENT");
         jButton25.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         jButton26.setBackground(new java.awt.Color(49, 98, 103));
         jButton26.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton26.setForeground(new java.awt.Color(255, 255, 255));
+        jButton26.setForeground(new java.awt.Color(0, 255, 255));
         jButton26.setText("NOTIFY USER");
         jButton26.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jTable6.setModel(new javax.swing.table.DefaultTableModel(
+        loansManagementTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -970,7 +976,9 @@ try {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane6.setViewportView(jTable6);
+        loansManagementTable.getTableHeader().setReorderingAllowed(false);
+        loansManagementTable.setDefaultEditor(Object.class, null);
+        jScrollPane6.setViewportView(loansManagementTable);
 
         jTextField25.setBackground(new java.awt.Color(255, 255, 255));
         jTextField25.setText("Search");
@@ -1064,6 +1072,7 @@ try {
                 jTextField13ActionPerformed(evt);
             }
         });
+        jTextField13.setFocusable(false);
 
         jTextField14.setEditable(false);
         jTextField14.setBackground(new java.awt.Color(131, 157, 167));
@@ -1074,6 +1083,7 @@ try {
         jTextField14.setAutoscrolls(false);
         jTextField14.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
         jTextField14.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField14.setFocusable(false);
 
         jTextField16.setEditable(false);
         jTextField16.setBackground(new java.awt.Color(131, 157, 167));
@@ -1084,6 +1094,7 @@ try {
         jTextField16.setAutoscrolls(false);
         jTextField16.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
         jTextField16.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTextField16.setFocusable(false);
 
         authorUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         authorUpdate.setText("Author");
@@ -1107,6 +1118,7 @@ try {
                 jTextField18ActionPerformed(evt);
             }
         });
+        jTextField18.setFocusable(false);
 
         isbnUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         isbnUpdate.setText("ISBN");
@@ -1125,6 +1137,7 @@ try {
                 jTextField20ActionPerformed(evt);
             }
         });
+        jTextField20.setFocusable(false);
 
         categoryUpdate.setBackground(new java.awt.Color(156, 153, 255));
         categoryUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 14)); // NOI18N
@@ -1314,6 +1327,11 @@ try {
         jTextField2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTextField2.setEditable(false);
         jTextField2.setFocusable(false);
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
 
         jTextField21.setEditable(false);
         jTextField21.setBackground(new java.awt.Color(28, 52, 62));
@@ -1340,6 +1358,8 @@ try {
                 jTextField15ActionPerformed(evt);
             }
         });
+        jTextField15.setEditable(false);
+        jTextField15.setFocusable(false);
 
         requestsButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 14)); // NOI18N
         requestsButton.setForeground(new java.awt.Color(255, 255, 255));
@@ -1450,7 +1470,7 @@ try {
 
             
     private void loansButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loansButtonActionPerformed
-        jTabbedPane1.setSelectedIndex(6);
+        jTabbedPane1.setSelectedIndex(5);
     }//GEN-LAST:event_loansButtonActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
@@ -1503,7 +1523,7 @@ try {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton27ActionPerformed
-        jTabbedPane1.setSelectedIndex(7);
+        jTabbedPane1.setSelectedIndex(6);
     }//GEN-LAST:event_jButton27ActionPerformed
 
     private void authorUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_authorUpdateActionPerformed
@@ -1527,7 +1547,7 @@ try {
     }//GEN-LAST:event_jTextField15ActionPerformed
 
     private void requestsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_requestsButtonActionPerformed
-        jTabbedPane1.setSelectedIndex(5);
+        jTabbedPane1.setSelectedIndex(4);
     }//GEN-LAST:event_requestsButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -1628,6 +1648,10 @@ try {
         });
     }//GEN-LAST:event_jButton21ActionPerformed
 
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1677,11 +1701,13 @@ try {
     private javax.swing.JButton borrowsButton;
     private javax.swing.JPanel borrowsPanel;
     private javax.swing.JTextField borrowsSearch;
+    private javax.swing.JTable borrowsTable;
     private javax.swing.JComboBox<String> categoryComboBox;
     private javax.swing.JComboBox<String> categoryUpdate;
     private javax.swing.JButton holdsButton;
     private javax.swing.JPanel holdsPanel;
     private javax.swing.JTextField holdsSearch;
+    private javax.swing.JTable holdsTable;
     private javax.swing.JTextField isbnAdd;
     private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
@@ -1714,11 +1740,6 @@ try {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTable jTable3;
-    private javax.swing.JTable jTable4;
-    private javax.swing.JTable jTable6;
-    private javax.swing.JTable jTable7;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField13;
     private javax.swing.JTextField jTextField14;
@@ -1736,12 +1757,15 @@ try {
     private javax.swing.JTextField jTextField8;
     private javax.swing.JPanel loanManagementPanel;
     private javax.swing.JButton loansButton;
+    private javax.swing.JTable loansManagementTable;
     private javax.swing.JPanel loansPanel;
     private javax.swing.JTextField loansSearch;
+    private javax.swing.JTable loansTable;
     private javax.swing.JButton refreshButton;
     private javax.swing.JButton removeButton;
     private javax.swing.JPanel requestPanel;
     private javax.swing.JTextField requestSearch;
+    private javax.swing.JTable requestTable;
     private javax.swing.JButton requestsButton;
     private javax.swing.JPanel rightmostPanel;
     private javax.swing.JTextField searchBooks;
