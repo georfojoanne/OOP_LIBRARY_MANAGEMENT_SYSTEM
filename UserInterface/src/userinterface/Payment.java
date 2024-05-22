@@ -129,8 +129,6 @@ public class Payment extends javax.swing.JFrame {
 
         panel2.setBackground(new java.awt.Color(38, 51, 60));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\libitz.png")); // NOI18N
-
         gcashNumber.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         gcashNumber.setForeground(new java.awt.Color(102, 255, 255));
         gcashNumber.setText("Gcash Number :");
@@ -238,8 +236,6 @@ public class Payment extends javax.swing.JFrame {
 
         payment.setBackground(new java.awt.Color(38, 51, 60));
         payment.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\libitz.png")); // NOI18N
         payment.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(154, 0, 192, -1));
 
         amount.setBackground(new java.awt.Color(102, 255, 255));

@@ -463,7 +463,6 @@ public String getTextFromNameColumn() {
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
-        xsuerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\Documents\\librarian\\OOP_LIBRARY_MANAGEMENT_SYSTEM\\UserInterface\\icons\\Xbang.png")); // NOI18N
         xsuerButton.setToolTipText("");
         xsuerButton.setBorderPainted(false);
         xsuerButton.setContentAreaFilled(false);
@@ -479,8 +478,6 @@ public String getTextFromNameColumn() {
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
         leftPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        profile.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\whiteIcon.png")); // NOI18N
         leftPanel.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 66, -1, 90));
 
         borrowsButton.setBackground(new java.awt.Color(26, 27, 27));
