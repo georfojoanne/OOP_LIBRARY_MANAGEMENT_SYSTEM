@@ -1611,29 +1611,20 @@ try {
     }//GEN-LAST:event_categoryUpdateActionPerformed
 
     private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
+
+        String title = titleUpdate.getText();
+        String author = authorUpdate.getText();
+        String isbn = isbnUpdate.getText();
+        String category = (String) categoryUpdate.getSelectedItem();
         
-        //pass values from selected row to the text fields
-        bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-           public void actionPerformed(ActionEvent e) {
-                // Get selected row index
-                int selectedRow = bookTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Get values from text fields and combo box
-                    String title = titleUpdate.getText();
-                    String author = authorUpdate.getText();
-                    String isbn = isbnUpdate.getText();
-                    String category = (String) categoryUpdate.getSelectedItem();
-                    
-                    updateDatabase(title, author, isbn, category);
-
-                }
-            }
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-            }
-        });
+            updateDatabase(title, author, isbn, category);
+            
+            System.out.println("New Title: " + title);
+            
+        titleUpdate.setText("");
+        authorUpdate.setText("");
+        isbnUpdate.setText("");
+            
     }//GEN-LAST:event_jButton21ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -1770,21 +1761,20 @@ try {
             dbConnection con = new dbConnection();
             Connection connection = con.getConnection();
             
-            // Create a PreparedStatement to execute the INSERT query
-            String query = "UPDATE books SET (Title, Author, ISBN, Category) VALUES (?, ?, ?, ?)";
+            // Create a PreparedStatement to execute the UPDATE query
+            String query = "UPDATE books SET title = ?, author = ?, category = ? WHERE isbn = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, title);
             statement.setString(2, author);
-            statement.setString(3, isbn);
-            statement.setString(4, category);
+            statement.setString(3, category);
+            statement.setString(4, isbn);
             
-            
-            // Execute the INSERT query
+            // Execute the UPDATE query
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Book added successfully!");
+                JOptionPane.showMessageDialog(null, "Book updated successfully!");
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to add book.");
+                JOptionPane.showMessageDialog(null, "Failed to update book.");
             }
             
             // Close the connection and statement
@@ -1795,5 +1785,6 @@ try {
             JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
         }
     }
-}
+    }
+
 

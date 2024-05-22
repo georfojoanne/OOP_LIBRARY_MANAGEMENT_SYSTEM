@@ -74,9 +74,6 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\ASUS\OneDrive\Documents\librarian\OOP_LIBRARY_MANAGEMENT_SYSTEM\UserInterface\icons\Xbang.png"/>
-            </Property>
             <Property name="borderPainted" type="boolean" value="false"/>
             <Property name="contentAreaFilled" type="boolean" value="false"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -2196,9 +2193,6 @@
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="0" type="rgb"/>
-            </Property>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\ASUS\OneDrive\Documents\librarian\OOP_LIBRARY_MANAGEMENT_SYSTEM\UserInterface\icons\log out.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="LOG OUT"/>
             <Property name="borderPainted" type="boolean" value="false"/>
