@@ -34,8 +34,9 @@ public class userHome extends javax.swing.JFrame  {
            
                
                retrieveUserInfo(userName.getText());
-               checkForOverdueAndUpdateUserInfo(userName.getText());
                
+             
+                
              
                
                 
@@ -49,64 +50,11 @@ public class userHome extends javax.swing.JFrame  {
     
     
     
-    // Method to check for overdue borrows and update userinfo table
-private static void checkForOverdueAndUpdateUserInfo(String username) {
-    try {
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-
-        // Step 1: Count the number of overdue borrows
-        String countQuery = "SELECT COUNT(*) AS overdue_count FROM borrows WHERE name = ? AND dor < ?";
-        PreparedStatement countStatement = connection.prepareStatement(countQuery);
-        countStatement.setString(1, username);
-        countStatement.setDate(2, Date.valueOf(LocalDate.now()));
-        ResultSet countResult = countStatement.executeQuery();
-
-        int overdueCount = 0;
-        if (countResult.next()) {
-            overdueCount = countResult.getInt("overdue_count");
-        }
-
-        // Step 2: Update userinfo table
-        String updateQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
-        PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-        updateStatement.setInt(1, overdueCount * 10);
-        updateStatement.setString(2, username);
-        updateStatement.executeUpdate();
-
-        // Step 3: Check for overdue borrows for the user
-        String borrowQuery = "SELECT dor FROM borrows WHERE name = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(borrowQuery);
-        preparedStatement.setString(1, username);
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        if (resultSet.next()) {
-            Date dueDate = resultSet.getDate("dor");
-            LocalDate currentDate = LocalDate.now();
-
-            if (dueDate.toLocalDate().isBefore(currentDate)) {
-                int choice = JOptionPane.showConfirmDialog(null, "You have overdue borrows. Do you want to pay now?", "Overdue Borrows", JOptionPane.YES_NO_OPTION);
-                if (choice == JOptionPane.YES_OPTION) {
-                    new userHome().setVisible(false);
-                    new Payment().setVisible(true);
-                } 
-                else {
-                    new userHome().setVisible(false);
-                    new LogIn().setVisible(true);
-        
-                }
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
-
     
     
     
     
-    
+ 
     
     
     
@@ -453,6 +401,7 @@ public String getTextFromNameColumn() {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(900, 700));
         setUndecorated(true);
         setPreferredSize(new java.awt.Dimension(900, 700));
         setResizable(false);
@@ -473,7 +422,7 @@ public String getTextFromNameColumn() {
         });
         panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 10, 50, -1));
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 1140, 60));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 70));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
@@ -1200,7 +1149,6 @@ public String getTextFromNameColumn() {
                      settingsButton.setForeground(new Color(225,225,255));
                      
                      
-                     checkForOverdueAndUpdateUserInfo(userName.getText());
                      
                      
                    
