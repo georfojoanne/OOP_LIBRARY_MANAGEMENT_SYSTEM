@@ -1172,6 +1172,7 @@ try {
         categoryUpdate.setEditable(false);
         categoryUpdate.setFocusable(false);
         categoryUpdate.setEnabled(false);
+        categoryUpdate.setForeground(Color.CYAN);
 
         jButton21.setBackground(new java.awt.Color(49, 98, 103));
         jButton21.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
