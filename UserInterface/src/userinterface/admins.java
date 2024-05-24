@@ -175,7 +175,6 @@ public class admins extends javax.swing.JFrame {
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 80, -1, -1));
 
         jButton1.setBackground(new java.awt.Color(51, 51, 51));
-        jButton1.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\Documents\\librarian\\OOP_LIBRARY_MANAGEMENT_SYSTEM\\UserInterface\\icons\\Xbang.png")); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);

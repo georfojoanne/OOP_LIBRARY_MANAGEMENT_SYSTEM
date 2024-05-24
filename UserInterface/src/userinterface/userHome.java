@@ -477,7 +477,6 @@ public void getTextFromNameColumn() {
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
-        xsuerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\Xbang.png")); // NOI18N
         xsuerButton.setToolTipText("");
         xsuerButton.setBorderPainted(false);
         xsuerButton.setContentAreaFilled(false);
