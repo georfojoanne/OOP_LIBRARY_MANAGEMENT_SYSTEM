@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
+import java.time.LocalDate;
 
 
 public class LogIn extends javax.swing.JFrame {
@@ -192,6 +193,98 @@ public class LogIn extends javax.swing.JFrame {
     
     
     
+    
+    
+    
+    // Method to check for overdue borrows and update userinfo table
+private static void checkForOverdueAndUpdateUserInfo(String username) {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Step 1: Count the number of overdue borrows
+        String countQuery = "SELECT COUNT(*) AS overdue_count FROM borrows WHERE name = ? AND dor < ?";
+        PreparedStatement countStatement = connection.prepareStatement(countQuery);
+        countStatement.setString(1, username);
+        countStatement.setDate(2, Date.valueOf(LocalDate.now()));
+        ResultSet countResult = countStatement.executeQuery();
+
+        int overdueCount = 0;
+        if (countResult.next()) {
+            overdueCount = countResult.getInt("overdue_count");
+        }
+
+        // Step 2: Update userinfo table
+        String updateQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
+        PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+        updateStatement.setInt(1, overdueCount * 10);
+        updateStatement.setString(2, username);
+        updateStatement.executeUpdate();
+
+        // Step 3: Check for overdue borrows for the user
+        String borrowQuery = "SELECT dor FROM borrows WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(borrowQuery);
+        preparedStatement.setString(1, username);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            Date dueDate = resultSet.getDate("dor");
+            LocalDate currentDate = LocalDate.now();
+
+            if (dueDate.toLocalDate().isBefore(currentDate)) {
+                
+                int choice = JOptionPane.showConfirmDialog(null, "You have overdue borrows. Do you want to pay now?", "Overdue Borrows", JOptionPane.YES_NO_OPTION);
+               
+             
+                    
+                
+                
+                if (choice == JOptionPane.YES_OPTION) {
+                     
+                                 
+                    new Payment().setVisible(true);
+                    
+                    
+                } 
+                
+                
+                else {
+                     
+                    new LogIn().setVisible(true);
+        
+                }
+                
+                          
+                
+                
+            }
+            
+            
+            else {
+                new userHome().setVisible(true);
+            }
+            
+            
+        }
+        
+        
+        
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     private void logInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInButtonActionPerformed
                           
         String username = userLogin.getText().trim();  
@@ -237,9 +330,12 @@ public class LogIn extends javax.swing.JFrame {
             if (rs1.next()) {
                 
                 JOptionPane.showMessageDialog(null, "Login Successful.", "Login", JOptionPane.INFORMATION_MESSAGE);
-                  
-                    setUsername(username);
-                new userHome().setVisible(true);
+                
+                    checkForOverdueAndUpdateUserInfo( userLogin.getText().trim());
+                          setUsername(username);
+                          
+                          
+                           
                 
                
                     

@@ -359,83 +359,98 @@ public class Payment extends javax.swing.JFrame {
     }//GEN-LAST:event_userFieldActionPerformed
 
     private void payButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payButtonActionPerformed
-       
-    try {
-        
+     try {
         // Get the database connection
         dbConnection conn = new dbConnection();
         Connection connection = conn.getConnection();
         
-        // Get the text from the userField
+        // Get the text from the userField and amountField
         String userText = userField.getText();
+        String amountText = amountField.getText();
+        double amount = Double.parseDouble(amountText); // Assuming amountField is for entering a numerical value
         
         // Update the loan column in the userinfo table
-        String updateQuery = "UPDATE userinfo SET loan = 0 WHERE name = ?";
+        String updateQueryUserInfo = "UPDATE userinfo SET loan = 0 WHERE name = ?";
+        // Update the dor column in the borrows table by adding 7 days
+        String updateQueryBorrows = "UPDATE borrows SET dor = DATE_ADD(dor, INTERVAL 7 DAY) WHERE name = ?";
+        // Query to get overdue borrows
+        String selectOverdueBorrowsQuery = "SELECT title FROM borrows WHERE dor < CURDATE() AND name = ?";
+        // Insert into history table
+        String insertHistoryQuery = "INSERT INTO history (title, date, status, name) VALUES (?, CURDATE(), ?, ?)";
+        // Update earnings for librarian and admin
+        String updateEarningsQuery = "UPDATE librarian SET earnings = earnings + ?"; // Assuming librarian table has an 'earnings' column
+        String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ?"; // Assuming admin table has an 'earnings' column
         
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-            preparedStatement.setString(1, userText);
+        try (PreparedStatement preparedStatementUserInfo = connection.prepareStatement(updateQueryUserInfo);
+             PreparedStatement selectOverdueBorrowsStmt = connection.prepareStatement(selectOverdueBorrowsQuery);
+             PreparedStatement insertHistoryStmt = connection.prepareStatement(insertHistoryQuery);
+             PreparedStatement preparedStatementBorrows = connection.prepareStatement(updateQueryBorrows);
+             PreparedStatement updateEarningsStmt = connection.prepareStatement(updateEarningsQuery);
+             PreparedStatement updateAdminEarningsStmt = connection.prepareStatement(updateAdminEarningsQuery)) {
             
-            int rowsAffected = preparedStatement.executeUpdate();
+            // Update userinfo table
+            preparedStatementUserInfo.setString(1, userText);
+            int rowsAffectedUserInfo = preparedStatementUserInfo.executeUpdate();
             
-            if (rowsAffected > 0) {
+            // Check for overdue borrows and insert into history
+            selectOverdueBorrowsStmt.setString(1, userText);
+            ResultSet overdueBorrows = selectOverdueBorrowsStmt.executeQuery();
+            
+            String status = "Overdue Paid";
+            
+            while (overdueBorrows.next()) {
+                String title = overdueBorrows.getString("title");
+                insertHistoryStmt.setString(1, title);
+                insertHistoryStmt.setString(2, status);
+                insertHistoryStmt.setString(3, userText);
+                insertHistoryStmt.executeUpdate();
+            }
+            
+            // Update earnings for librarian
+            updateEarningsStmt.setDouble(1, amount);
+            updateEarningsStmt.executeUpdate();
+            
+            // Update earnings for admin
+            updateAdminEarningsStmt.setDouble(1, amount);
+            updateAdminEarningsStmt.executeUpdate();
+            
+            // Update borrows table after recording history
+            preparedStatementBorrows.setString(1, userText);
+            int rowsAffectedBorrows = preparedStatementBorrows.executeUpdate();
+            
+            if (rowsAffectedUserInfo > 0) {
                 // Show success message if the update is successful
                 JOptionPane.showMessageDialog(this, "Payment successful. Please log in to your account.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                
-                 new LogIn().setVisible(true);
-                 
-                
+                new LogIn().setVisible(true);
             } else {
-                // Show error message if no rows were updated
-                JOptionPane.showMessageDialog(this, "User not found or no changes made.", "Error", JOptionPane.ERROR_MESSAGE);
+                // Show error message if no rows were updated in the userinfo table
+                JOptionPane.showMessageDialog(this, "User not found or no changes made to userinfo.", "Error", JOptionPane.ERROR_MESSAGE);
             }
+            
+            if (rowsAffectedBorrows > 0) {
+                // Show a separate success message if the borrows table was updated
+                JOptionPane.showMessageDialog(this, "Borrow date extended successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // Show error message if no rows were updated in the borrows table
+                JOptionPane.showMessageDialog(this, "No borrows record found or no changes made to borrows.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
         } catch (SQLException e) {
             // Show error message if there is a database error
             JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-        
-        
     } catch (SQLException ex) {
-            Logger.getLogger(Payment.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(Payment.class.getName()).log(Level.SEVERE, null, ex);
     }
         
-        
+     dispose();
+     
     }//GEN-LAST:event_payButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Payment.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Payment.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Payment.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Payment.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Payment().setVisible(true);
-            }
-        });
-    }
+    
+    
+  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel amount;
