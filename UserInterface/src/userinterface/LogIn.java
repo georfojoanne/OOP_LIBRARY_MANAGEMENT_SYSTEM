@@ -30,7 +30,7 @@ public class LogIn extends javax.swing.JFrame {
  
        
       
-       // Method to move the row to the first position in the table if found
+       
     public void setUsername(String userInput) {
         try {
             // Get the database connection
@@ -49,6 +49,7 @@ public class LogIn extends javax.swing.JFrame {
             // Close resources
             statement.close();
             connection.close();
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -209,6 +210,8 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
         countStatement.setDate(2, Date.valueOf(LocalDate.now()));
         ResultSet countResult = countStatement.executeQuery();
 
+        
+        
         int overdueCount = 0;
         if (countResult.next()) {
             overdueCount = countResult.getInt("overdue_count");
@@ -227,6 +230,10 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
         preparedStatement.setString(1, username);
         ResultSet resultSet = preparedStatement.executeQuery();
 
+        
+        
+        
+        
         if (resultSet.next()) {
             Date dueDate = resultSet.getDate("dor");
             LocalDate currentDate = LocalDate.now();
@@ -259,13 +266,20 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
                 
             }
             
-            
             else {
+                new userHome().setVisible(true);
+               
+            }
+            
+              
+          
+            
+        }
+        
+          else {
                 new userHome().setVisible(true);
             }
             
-            
-        }
         
         
         
@@ -328,11 +342,13 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
             
             int x=0;
             if (rs1.next()) {
+                   setUsername(username);
                 
                 JOptionPane.showMessageDialog(null, "Login Successful.", "Login", JOptionPane.INFORMATION_MESSAGE);
                 
                     checkForOverdueAndUpdateUserInfo( userLogin.getText().trim());
-                          setUsername(username);
+                       
+                          
                           
                           
                            

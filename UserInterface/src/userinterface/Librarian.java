@@ -35,8 +35,9 @@ public class Librarian extends javax.swing.JFrame {
         
         dbData();
        populateBooksTableFromDatabase();
-       populateBorrowsTableFromDatabase();
+       populateReturns();
        populateLoansTableFromDatabase();
+       holds();
        
        bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
@@ -61,6 +62,99 @@ public class Librarian extends javax.swing.JFrame {
 
               bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
+    
+    
+    
+    
+    private void holds() {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        connection = con.getConnection();
+
+        // Prepare the SQL query to retrieve the "title" column from the "reservation" table
+        String query = "SELECT title FROM reservation";
+        preparedStatement = connection.prepareStatement(query);
+
+        // Execute the query
+        resultSet = preparedStatement.executeQuery();
+
+        // Get the model of the holdsTable (JTable)
+        DefaultTableModel model = (DefaultTableModel) holdsTable.getModel();
+
+        // Clear the existing rows in the model (optional, if you want to reset the table each time)
+        model.setRowCount(0);
+
+        // Iterate through the result set and add each "title" value to the holdsTable
+        while (resultSet.next()) {
+            String title = resultSet.getString("title");
+            model.addRow(new Object[]{title});
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (resultSet != null) resultSet.close();
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+    
+    
+    
+    
+    
+    
+    
+   
+  private void populateReturns() {
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        if (connection != null) {
+            
+
+            PreparedStatement statement = connection.prepareStatement("SELECT name, title, dob, dor FROM returns");
+            ResultSet resultSet = statement.executeQuery();
+            
+            
+            // Clear existing rows from borrowsTable
+            DefaultTableModel model = (DefaultTableModel) returnsTable.getModel();
+            model.setRowCount(0);
+            
+            // Add fetched data to borrowsTable
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String title = resultSet.getString("title");
+                String dob = resultSet.getString("dob");
+                String dor = resultSet.getString("dor");
+                
+                
+                // Add a row to the borrowsTable
+                model.addRow(new Object[]{title, dob, dor, name});
+            }
+            
+            // Close the connection
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+    
     
     
 
@@ -147,45 +241,6 @@ try {
 }
   
   
-  private void populateBorrowsTableFromDatabase() {
-    try {
-        // Establish a database connection
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-        
-        if (connection != null) {
-            
-
-            PreparedStatement statement = connection.prepareStatement("SELECT title,dob,dor,name FROM borrows");
-            ResultSet resultSet = statement.executeQuery();
-            
-            
-            // Clear existing rows from borrowsTable
-            DefaultTableModel model = (DefaultTableModel) borrowsTable.getModel();
-            model.setRowCount(0);
-            
-            // Add fetched data to borrowsTable
-            while (resultSet.next()) {
-                String title = resultSet.getString("title");
-                String dob = resultSet.getString("dob");
-                String dor = resultSet.getString("dor");
-                String name = resultSet.getString("name");
-                
-                
-                // Add a row to the borrowsTable
-                model.addRow(new Object[]{title, dob, dor, name});
-            }
-            
-            // Close the connection
-            connection.close();
-        } else {
-            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    } catch (SQLException ex) {
-        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-  
     private void populateLoansTableFromDatabase() {
     try {
         // Establish a database connection
@@ -235,15 +290,13 @@ try {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jSeparator1 = new javax.swing.JSeparator();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         booksPanel = new javax.swing.JPanel();
-        jButton11 = new javax.swing.JButton();
-        jButton12 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
         searchBooks = new javax.swing.JTextField();
         removeButton = new javax.swing.JButton();
         updateButton = new javax.swing.JButton();
@@ -251,18 +304,14 @@ try {
         jScrollPane5 = new javax.swing.JScrollPane();
         bookTable = new javax.swing.JTable();
         borrowsPanel = new javax.swing.JPanel();
-        jButton14 = new javax.swing.JButton();
-        jButton15 = new javax.swing.JButton();
+        confirmButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        borrowsTable = new javax.swing.JTable();
+        returnsTable = new javax.swing.JTable();
         borrowsSearch = new javax.swing.JTextField();
-        holdsPanel = new javax.swing.JPanel();
+        reservationPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         holdsTable = new javax.swing.JTable();
-        jButton29 = new javax.swing.JButton();
-        jButton30 = new javax.swing.JButton();
-        jComboBox3 = new javax.swing.JComboBox<>();
-        jTextField22 = new javax.swing.JTextField();
+        reserveButton = new javax.swing.JButton();
         holdsSearch = new javax.swing.JTextField();
         addBookPanel = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
@@ -275,12 +324,12 @@ try {
         authorAdd = new javax.swing.JTextField();
         isbnAdd = new javax.swing.JTextField();
         categoryComboBox = new javax.swing.JComboBox<>();
-        requestPanel = new javax.swing.JPanel();
+        reservePanel = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         requestTable = new javax.swing.JTable();
         jButton20 = new javax.swing.JButton();
-        jButton22 = new javax.swing.JButton();
         requestSearch = new javax.swing.JTextField();
+        jButton22 = new javax.swing.JButton();
         loansPanel = new javax.swing.JPanel();
         jButton27 = new javax.swing.JButton();
         jButton28 = new javax.swing.JButton();
@@ -307,7 +356,7 @@ try {
         jButton23 = new javax.swing.JButton();
         jButton24 = new javax.swing.JButton();
         rightmostPanel = new javax.swing.JPanel();
-        borrowsButton = new javax.swing.JButton();
+        returnsButton = new javax.swing.JButton();
         addBooksButton = new javax.swing.JButton();
         booksButton = new javax.swing.JButton();
         loansButton = new javax.swing.JButton();
@@ -315,9 +364,9 @@ try {
         jTextField21 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jTextField15 = new javax.swing.JTextField();
-        requestsButton = new javax.swing.JButton();
         holdsButton = new javax.swing.JButton();
         jButton17 = new javax.swing.JButton();
+        borrowsButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(72, 96, 105));
@@ -327,6 +376,7 @@ try {
 
         jPanel1.setBackground(new java.awt.Color(10, 29, 36));
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -358,10 +408,10 @@ try {
                     .addComponent(jLabel3)
                     .addComponent(jLabel1)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, -1));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 60));
 
         jTabbedPane1.setBackground(new java.awt.Color(204, 185, 174));
         jTabbedPane1.setForeground(new java.awt.Color(204, 204, 204));
@@ -370,34 +420,6 @@ try {
 
         booksPanel.setBackground(new java.awt.Color(28, 52, 62));
         booksPanel.setForeground(new java.awt.Color(159, 212, 179));
-
-        jButton11.setBackground(new java.awt.Color(49, 98, 103));
-        jButton11.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        jButton11.setForeground(new java.awt.Color(0, 255, 255));
-        jButton11.setText("SCIENCE");
-        jButton11.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton11ActionPerformed(evt);
-            }
-        });
-
-        jButton12.setBackground(new java.awt.Color(49, 98, 103));
-        jButton12.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        jButton12.setForeground(new java.awt.Color(0, 255, 255));
-        jButton12.setText("ENGLISH");
-        jButton12.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jButton13.setBackground(new java.awt.Color(49, 98, 103));
-        jButton13.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton13.setForeground(new java.awt.Color(0, 255, 255));
-        jButton13.setText("MATH");
-        jButton13.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
-            }
-        });
 
         searchBooks.setBackground(new java.awt.Color(255, 255, 255));
         searchBooks.setText("Search");
@@ -471,27 +493,16 @@ try {
                         .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 110, Short.MAX_VALUE)
                         .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(booksPanelLayout.createSequentialGroup()
-                        .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(82, 82, 82)
-                        .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane5))
                 .addContainerGap())
         );
         booksPanelLayout.setVerticalGroup(
             booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(booksPanelLayout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(17, 17, 17)
                 .addComponent(searchBooks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -506,29 +517,23 @@ try {
         borrowsPanel.setName("Book"); // NOI18N
         borrowsPanel.setNextFocusableComponent(booksButton);
 
-        jButton14.setBackground(new java.awt.Color(49, 98, 103));
-        jButton14.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton14.setForeground(new java.awt.Color(0, 255, 255));
-        jButton14.setText("FACULTY");
-        jButton14.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton14.addActionListener(new java.awt.event.ActionListener() {
+        confirmButton.setBackground(new java.awt.Color(49, 98, 103));
+        confirmButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        confirmButton.setForeground(new java.awt.Color(0, 255, 255));
+        confirmButton.setText("CONFIRM RETURN");
+        confirmButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton14ActionPerformed(evt);
+                confirmButtonActionPerformed(evt);
             }
         });
 
-        jButton15.setBackground(new java.awt.Color(49, 98, 103));
-        jButton15.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton15.setForeground(new java.awt.Color(0, 255, 255));
-        jButton15.setText("STUDENTS");
-        jButton15.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        borrowsTable.setModel(new javax.swing.table.DefaultTableModel(
+        returnsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Title", "Date of Borrow", "Date of Return", "User Name"
+                "Title", "Date of Borrow", "Due Date", "User Name"
             }
         ) {
             Class[] types = new Class [] {
@@ -546,9 +551,9 @@ try {
                 return canEdit [columnIndex];
             }
         });
-        borrowsTable.getTableHeader().setReorderingAllowed(false);
-        borrowsTable.setDefaultEditor(Object.class, null);
-        jScrollPane2.setViewportView(borrowsTable);
+        returnsTable.getTableHeader().setReorderingAllowed(false);
+        returnsTable.setDefaultEditor(Object.class, null);
+        jScrollPane2.setViewportView(returnsTable);
 
         borrowsSearch.setBackground(new java.awt.Color(255, 255, 255));
         borrowsSearch.setText("Search");
@@ -561,47 +566,43 @@ try {
             .addGroup(borrowsPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                     .addComponent(borrowsSearch)
-                    .addGroup(borrowsPanelLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
+                .addContainerGap(101, Short.MAX_VALUE)
+                .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 474, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(115, 115, 115))
         );
         borrowsPanelLayout.setVerticalGroup(
             borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(16, 16, 16)
                 .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 526, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
         );
 
         jTabbedPane1.addTab("tab2", borrowsPanel);
 
-        holdsPanel.setBackground(new java.awt.Color(28, 52, 62));
+        reservationPanel.setBackground(new java.awt.Color(28, 52, 62));
 
         holdsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Book", "Holds"
+                "Book"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class
+                java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -616,33 +617,14 @@ try {
         holdsTable.setDefaultEditor(Object.class, null);
         jScrollPane3.setViewportView(holdsTable);
 
-        jButton29.setBackground(new java.awt.Color(49, 98, 103));
-        jButton29.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton29.setForeground(new java.awt.Color(0, 255, 255));
-        jButton29.setText("NOTIFY");
-        jButton29.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jButton30.setBackground(new java.awt.Color(49, 98, 103));
-        jButton30.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton30.setForeground(new java.awt.Color(0, 255, 255));
-        jButton30.setText("CANCEL");
-        jButton30.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jTextField22.setEditable(false);
-        jTextField22.setFocusable(false);
-        jTextField22.setBackground(new java.awt.Color(131, 157, 167));
-        jTextField22.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField22.setForeground(new java.awt.Color(54, 61, 155));
-        jTextField22.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField22.setText("USER");
-        jTextField22.setAutoscrolls(false);
-        jTextField22.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-        jTextField22.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTextField22.addActionListener(new java.awt.event.ActionListener() {
+        reserveButton.setBackground(new java.awt.Color(49, 98, 103));
+        reserveButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        reserveButton.setForeground(new java.awt.Color(0, 255, 255));
+        reserveButton.setText("RESERVES");
+        reserveButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reserveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField22ActionPerformed(evt);
+                reserveButtonActionPerformed(evt);
             }
         });
 
@@ -650,51 +632,40 @@ try {
         holdsSearch.setText("Search");
         holdsSearch = new PlaceholderTextField("Search");
 
-        javax.swing.GroupLayout holdsPanelLayout = new javax.swing.GroupLayout(holdsPanel);
-        holdsPanel.setLayout(holdsPanelLayout);
-        holdsPanelLayout.setHorizontalGroup(
-            holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(holdsPanelLayout.createSequentialGroup()
-                .addComponent(jTextField22)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(holdsPanelLayout.createSequentialGroup()
+        javax.swing.GroupLayout reservationPanelLayout = new javax.swing.GroupLayout(reservationPanel);
+        reservationPanel.setLayout(reservationPanelLayout);
+        reservationPanelLayout.setHorizontalGroup(
+            reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reservationPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(holdsPanelLayout.createSequentialGroup()
-                        .addComponent(jButton29, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane3))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                 .addContainerGap())
-            .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(holdsPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservationPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(142, 142, 142))
+            .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(reservationPanelLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(holdsSearch)
                     .addContainerGap()))
         );
-        holdsPanelLayout.setVerticalGroup(
-            holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(holdsPanelLayout.createSequentialGroup()
+        reservationPanelLayout.setVerticalGroup(
+            reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reservationPanelLayout.createSequentialGroup()
                 .addGap(48, 48, 48)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox3)
-                    .addComponent(jTextField22, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
-                .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
-            .addGroup(holdsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(holdsPanelLayout.createSequentialGroup()
+            .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(reservationPanelLayout.createSequentialGroup()
                     .addGap(16, 16, 16)
                     .addComponent(holdsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(607, Short.MAX_VALUE)))
         );
 
-        jTabbedPane1.addTab("tab3", holdsPanel);
+        jTabbedPane1.addTab("tab3", reservationPanel);
 
         addBookPanel.setBackground(new java.awt.Color(28, 52, 62));
 
@@ -856,18 +827,18 @@ try {
 
         jTabbedPane1.addTab("tab5", addBookPanel);
 
-        requestPanel.setBackground(new java.awt.Color(28, 52, 62));
+        reservePanel.setBackground(new java.awt.Color(28, 52, 62));
 
         requestTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Username", "Book", "Due Date"
+                "Username", "Reservation Number"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -881,56 +852,57 @@ try {
         jButton20.setBackground(new java.awt.Color(49, 98, 103));
         jButton20.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton20.setForeground(new java.awt.Color(0, 255, 255));
-        jButton20.setText("REQ");
+        jButton20.setText("CONFIRM BORROW");
         jButton20.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jButton22.setBackground(new java.awt.Color(49, 98, 103));
-        jButton22.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton22.setForeground(new java.awt.Color(0, 255, 255));
-        jButton22.setText("CANCEL");
-        jButton22.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         requestSearch.setBackground(new java.awt.Color(255, 255, 255));
         requestSearch.setText("Search");
         requestSearch = new PlaceholderTextField("Search");
 
-        javax.swing.GroupLayout requestPanelLayout = new javax.swing.GroupLayout(requestPanel);
-        requestPanel.setLayout(requestPanelLayout);
-        requestPanelLayout.setHorizontalGroup(
-            requestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(requestPanelLayout.createSequentialGroup()
+        jButton22.setBackground(new java.awt.Color(49, 98, 103));
+        jButton22.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jButton22.setForeground(new java.awt.Color(0, 255, 255));
+        jButton22.setText("NOTIFY");
+        jButton22.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        javax.swing.GroupLayout reservePanelLayout = new javax.swing.GroupLayout(reservePanel);
+        reservePanel.setLayout(reservePanelLayout);
+        reservePanelLayout.setHorizontalGroup(
+            reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reservePanelLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton20, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
+            .addGroup(reservePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(requestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
-                    .addGroup(requestPanelLayout.createSequentialGroup()
-                        .addComponent(jButton20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                 .addContainerGap())
-            .addGroup(requestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(requestPanelLayout.createSequentialGroup()
+            .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(reservePanelLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(requestSearch)
                     .addContainerGap()))
         );
-        requestPanelLayout.setVerticalGroup(
-            requestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(requestPanelLayout.createSequentialGroup()
+        reservePanelLayout.setVerticalGroup(
+            reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reservePanelLayout.createSequentialGroup()
                 .addGap(44, 44, 44)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(requestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(18, 18, 18)
+                .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton20, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30))
-            .addGroup(requestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(requestPanelLayout.createSequentialGroup()
+                .addGap(24, 24, 24))
+            .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(reservePanelLayout.createSequentialGroup()
                     .addGap(16, 16, 16)
                     .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(607, Short.MAX_VALUE)))
         );
 
-        jTabbedPane1.addTab("tab6", requestPanel);
+        jTabbedPane1.addTab("tab6", reservePanel);
 
         loansPanel.setBackground(new java.awt.Color(28, 52, 62));
 
@@ -1318,16 +1290,16 @@ try {
 
         rightmostPanel.setBackground(new java.awt.Color(10, 29, 36));
 
-        borrowsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        borrowsButton.setForeground(new java.awt.Color(255, 255, 255));
-        borrowsButton.setText("Borrows");
-        borrowsButton.setBorder(null);
-        borrowsButton.setBorderPainted(false);
-        borrowsButton.setContentAreaFilled(false);
-        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        borrowsButton.addActionListener(new java.awt.event.ActionListener() {
+        returnsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
+        returnsButton.setForeground(new java.awt.Color(255, 255, 255));
+        returnsButton.setText("Returns");
+        returnsButton.setBorder(null);
+        returnsButton.setBorderPainted(false);
+        returnsButton.setContentAreaFilled(false);
+        returnsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        returnsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                borrowsButtonActionPerformed(evt);
+                returnsButtonActionPerformed(evt);
             }
         });
 
@@ -1412,22 +1384,9 @@ try {
         jTextField15.setEditable(false);
         jTextField15.setFocusable(false);
 
-        requestsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        requestsButton.setForeground(new java.awt.Color(255, 255, 255));
-        requestsButton.setText("Requests");
-        requestsButton.setBorder(null);
-        requestsButton.setBorderPainted(false);
-        requestsButton.setContentAreaFilled(false);
-        requestsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        requestsButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                requestsButtonActionPerformed(evt);
-            }
-        });
-
         holdsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         holdsButton.setForeground(new java.awt.Color(255, 255, 255));
-        holdsButton.setText("Holds");
+        holdsButton.setText("Reservations");
         holdsButton.setBorder(null);
         holdsButton.setBorderPainted(false);
         holdsButton.setContentAreaFilled(false);
@@ -1445,6 +1404,19 @@ try {
         jButton17.setContentAreaFilled(false);
         jButton17.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
+        borrowsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
+        borrowsButton.setForeground(new java.awt.Color(255, 255, 255));
+        borrowsButton.setText("Borrows");
+        borrowsButton.setBorder(null);
+        borrowsButton.setBorderPainted(false);
+        borrowsButton.setContentAreaFilled(false);
+        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        borrowsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrowsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout rightmostPanelLayout = new javax.swing.GroupLayout(rightmostPanel);
         rightmostPanel.setLayout(rightmostPanelLayout);
         rightmostPanelLayout.setHorizontalGroup(
@@ -1453,15 +1425,16 @@ try {
                 .addContainerGap()
                 .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(rightmostPanelLayout.createSequentialGroup()
-                        .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(booksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(borrowsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(addBooksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                            .addComponent(loansButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(requestsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(holdsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jTextField15, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jTextField15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(holdsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
+                                .addComponent(loansButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(addBooksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(returnsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(booksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(borrowsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rightmostPanelLayout.createSequentialGroup()
                         .addGap(0, 42, Short.MAX_VALUE)
@@ -1478,7 +1451,7 @@ try {
             .addGroup(rightmostPanelLayout.createSequentialGroup()
                 .addGap(43, 43, 43)
                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
                 .addComponent(jLabel2)
@@ -1487,16 +1460,16 @@ try {
                 .addGap(39, 39, 39)
                 .addComponent(booksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(returnsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(borrowsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addBooksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(loansButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(requestsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(holdsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(133, 133, 133)
+                .addGap(177, 177, 177)
                 .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(44, 44, 44))
         );
@@ -1507,9 +1480,9 @@ try {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void borrowsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowsButtonActionPerformed
+    private void returnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(1);
-    }//GEN-LAST:event_borrowsButtonActionPerformed
+    }//GEN-LAST:event_returnsButtonActionPerformed
 
     private void addBooksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBooksButtonActionPerformed
         jTabbedPane1.setSelectedIndex(3);
@@ -1525,18 +1498,6 @@ try {
     private void loansButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loansButtonActionPerformed
         jTabbedPane1.setSelectedIndex(5);
     }//GEN-LAST:event_loansButtonActionPerformed
-
-    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton11ActionPerformed
-
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton13ActionPerformed
-
-    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton14ActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         jTabbedPane1.setSelectedIndex(7);
@@ -1583,17 +1544,9 @@ try {
         populateBooksTableFromDatabase();
     }//GEN-LAST:event_refreshButtonActionPerformed
 
-    private void jTextField22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField22ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField22ActionPerformed
-
     private void jTextField15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField15ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField15ActionPerformed
-
-    private void requestsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_requestsButtonActionPerformed
-        jTabbedPane1.setSelectedIndex(4);
-    }//GEN-LAST:event_requestsButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
        try {
@@ -1724,6 +1677,87 @@ try {
         categoryUpdate.setEnabled(false);
     }//GEN-LAST:event_jButton24ActionPerformed
 
+    private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
+     try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Get the selected rows from the returnsTable
+        int[] selectedRows = returnsTable.getSelectedRows();
+
+        // Check if any row is selected
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(this, "Please select a book.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
+            return; // Exit the method if no row is selected
+        }
+
+        try {
+            // Iterate through the selected rows
+            for (int rowIndex : selectedRows) {
+                String title = (String) returnsTable.getValueAt(rowIndex, 0); // Get Title from column 0
+                String name = (String) returnsTable.getValueAt(rowIndex, 3); // Get Name from column 3
+
+                // Delete matching rows from the 'returns' table
+                try (PreparedStatement deleteReturnsStmt = connection.prepareStatement("DELETE FROM returns WHERE Title = ? AND name = ?")) {
+                    deleteReturnsStmt.setString(1, title);
+                    deleteReturnsStmt.setString(2, name);
+                    deleteReturnsStmt.executeUpdate();
+                }
+
+                // Delete matching rows from the 'borrows' table
+                try (PreparedStatement deleteBorrowsStmt = connection.prepareStatement("DELETE FROM borrows WHERE Title = ? AND name = ?")) {
+                    deleteBorrowsStmt.setString(1, title);
+                    deleteBorrowsStmt.setString(2, name);
+                    deleteBorrowsStmt.executeUpdate();
+                }
+
+                // Insert into 'history' table
+                try (PreparedStatement insertHistoryStmt = connection.prepareStatement("INSERT INTO history (Title, status, date, name) VALUES (?, 'Returned', CURDATE(), ?)")) {
+                    insertHistoryStmt.setString(1, title);
+                    insertHistoryStmt.setString(2, name);
+                    insertHistoryStmt.executeUpdate();
+                }
+
+                // Decrement 'nr' column in 'books' table
+                try (PreparedStatement decrementNrStmt = connection.prepareStatement("UPDATE books SET nr = nr - 1 WHERE Title = ?")) {
+                    decrementNrStmt.setString(1, title);
+                    decrementNrStmt.executeUpdate();
+                }
+
+                // Update 'status' column in 'books' table based on 'nr' value
+                try (PreparedStatement updateStatusStmt = connection.prepareStatement("UPDATE books SET status = CASE WHEN nr >= 2 THEN 'Reserved' WHEN nr = 1 THEN 'Borrowed' ELSE 'Available' END WHERE Title = ?")) {
+                    updateStatusStmt.setString(1, title);
+                    updateStatusStmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the database connection
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    populateReturns();
+    }//GEN-LAST:event_confirmButtonActionPerformed
+
+    private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
+        jTabbedPane1.setSelectedIndex(4);
+    }//GEN-LAST:event_reserveButtonActionPerformed
+
+    private void borrowsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowsButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_borrowsButtonActionPerformed
+
     
     
 
@@ -1740,21 +1774,15 @@ try {
     private javax.swing.JButton borrowsButton;
     private javax.swing.JPanel borrowsPanel;
     private javax.swing.JTextField borrowsSearch;
-    private javax.swing.JTable borrowsTable;
     private javax.swing.JComboBox<String> categoryComboBox;
     private javax.swing.JComboBox<String> categoryUpdate;
+    private javax.swing.JButton confirmButton;
     private javax.swing.JButton holdsButton;
-    private javax.swing.JPanel holdsPanel;
     private javax.swing.JTextField holdsSearch;
     private javax.swing.JTable holdsTable;
     private javax.swing.JTextField isbnAdd;
     private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton21;
@@ -1765,9 +1793,6 @@ try {
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
-    private javax.swing.JButton jButton29;
-    private javax.swing.JButton jButton30;
-    private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -1778,6 +1803,7 @@ try {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField13;
@@ -1788,7 +1814,6 @@ try {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField20;
     private javax.swing.JTextField jTextField21;
-    private javax.swing.JTextField jTextField22;
     private javax.swing.JTextField jTextField25;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
@@ -1802,10 +1827,13 @@ try {
     private javax.swing.JTable loansTable;
     private javax.swing.JButton refreshButton;
     private javax.swing.JButton removeButton;
-    private javax.swing.JPanel requestPanel;
     private javax.swing.JTextField requestSearch;
     private javax.swing.JTable requestTable;
-    private javax.swing.JButton requestsButton;
+    private javax.swing.JPanel reservationPanel;
+    private javax.swing.JButton reserveButton;
+    private javax.swing.JPanel reservePanel;
+    private javax.swing.JButton returnsButton;
+    private javax.swing.JTable returnsTable;
     private javax.swing.JPanel rightmostPanel;
     private javax.swing.JTextField searchBooks;
     private javax.swing.JTextField titleField;

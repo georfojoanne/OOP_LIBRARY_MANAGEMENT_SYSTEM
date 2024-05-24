@@ -23,6 +23,9 @@ public class userHome extends javax.swing.JFrame  {
         initComponents();
               
               dbData();
+              
+              
+              
                getTextFromNameColumn();
               
                
@@ -48,6 +51,67 @@ public class userHome extends javax.swing.JFrame  {
     
     
     
+    
+    
+    
+   private void requestReturn() {
+     try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Get the selected rows from the borrowsTable
+        int[] selectedRows = borrowsTable.getSelectedRows();
+
+        // Get the username
+        String name = userName.getText();
+
+        try {
+            // Prepare the SQL insert statement for returns table
+            String sqlReturns = "INSERT INTO returns (title, dob, dor, name) VALUES (?, ?, ?, ?)";
+            PreparedStatement pstmtReturns = connection.prepareStatement(sqlReturns);
+
+            // Prepare the SQL insert statement for history table
+            String sqlHistory = "INSERT INTO history (title, status, date, name) VALUES (?, ?, CURDATE(), ?)";
+            PreparedStatement pstmtHistory = connection.prepareStatement(sqlHistory);
+
+            // Iterate through the selected rows
+            for (int row : selectedRows) {
+                // Get data from the borrowsTable columns
+                String title = (String) borrowsTable.getValueAt(row, 0);
+                String dob = (String) borrowsTable.getValueAt(row, 1);
+                String dor = (String) borrowsTable.getValueAt(row, 2);
+
+                // Set the parameters for the SQL statements
+                pstmtReturns.setString(1, title);
+                pstmtReturns.setString(2, dob);
+                pstmtReturns.setString(3, dor);
+                pstmtReturns.setString(4, name);
+
+                pstmtHistory.setString(1, title);
+                pstmtHistory.setString(2, "Request Return"); // Set status to "Request Return"
+                pstmtHistory.setString(3, name);
+
+                // Execute the insert statements
+                pstmtReturns.executeUpdate();
+                pstmtHistory.executeUpdate();
+            }
+
+            // Close the PreparedStatements
+            pstmtReturns.close();
+            pstmtHistory.close();
+
+            // Optionally, close the connection
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+ 
     
     
     
@@ -164,9 +228,8 @@ public class userHome extends javax.swing.JFrame  {
     
     
    
-    
- // Method to set the username to the actual username and update the "number" column to '1' for all rows
-public String getTextFromNameColumn() {
+// Method to set the username to the actual username and update the "number" column to '1' for all rows
+public void getTextFromNameColumn() {
     String name = null;
 
     Connection connection = null;
@@ -187,17 +250,18 @@ public String getTextFromNameColumn() {
         // If a row with "number" equal to '2' is found, retrieve the text from the "name" column
         if (resultSet.next()) {
             name = resultSet.getString("name");
-           
-
-            // Update the "number" to '1' for all rows
-            String updateQuery = "UPDATE userinfo SET number = '1' WHERE number = '2'";
-            
-            
-            int rowsUpdated = statement.executeUpdate(updateQuery);
-           
+              
         } else {
             System.out.println("No row found with 'number' equal to '2'.");
         }
+        
+        // Update the "number" to '1' for all rows
+        String updateQuery = "UPDATE userinfo SET number = '1' WHERE number = '2'";
+        
+        
+        int rowsUpdated = statement.executeUpdate(updateQuery);
+        
+
     } catch (SQLException e) {
         e.printStackTrace();
     } finally {
@@ -210,10 +274,10 @@ public String getTextFromNameColumn() {
         }
     }
 
-    userName.setText(name);
-
-    return name;
+  userName.setText(name);
+    
 }
+
 
     
     
@@ -301,6 +365,7 @@ public String getTextFromNameColumn() {
         notificationsButton = new javax.swing.JButton();
         booksButton = new javax.swing.JButton();
         userName = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         tabs = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         borrowButton = new javax.swing.JButton();
@@ -412,9 +477,14 @@ public String getTextFromNameColumn() {
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
+        xsuerButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\Xbang.png")); // NOI18N
         xsuerButton.setToolTipText("");
         xsuerButton.setBorderPainted(false);
         xsuerButton.setContentAreaFilled(false);
+        xsuerButton.setFocusable(false);
+        xsuerButton.setRequestFocusEnabled(false);
+        xsuerButton.setRolloverEnabled(false);
+        xsuerButton.setVerifyInputWhenFocusTarget(false);
         xsuerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 xsuerButtonActionPerformed(evt);
@@ -422,7 +492,7 @@ public String getTextFromNameColumn() {
         });
         panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 10, 50, -1));
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 70));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 40));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
@@ -532,7 +602,10 @@ public String getTextFromNameColumn() {
         userName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         userName.setForeground(java.awt.Color.white);
         userName.setText("User Name");
-        leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 180, -1, -1));
+        leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 180, -1, -1));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/whiteIcon.png"))); // NOI18N
+        leftPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, -1, -1));
 
         getContentPane().add(leftPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 800));
 
@@ -734,14 +807,14 @@ public String getTextFromNameColumn() {
         jPanel12.setLayout(jPanel12Layout);
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel12Layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(37, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(299, Short.MAX_VALUE)
                 .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(287, 287, 287))
+            .addGroup(jPanel12Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -820,13 +893,14 @@ public String getTextFromNameColumn() {
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
-                .addGap(32, 32, 32)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(293, 293, 293))
+                .addContainerGap(38, Short.MAX_VALUE)
+                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
+                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(293, 293, 293))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(35, 35, 35))))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1739,22 +1813,22 @@ private void populateBorrowsTableFromDatabase() {
     }//GEN-LAST:event_logOutButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        removeReservationSelectedRowsFromDatabase();
-         populateBorrowsTableFromDatabase();
-           
-        populateReservationTableFromDatabase();
-        
-        
-          fillHistoryTableFromDatabase(userName.getText());// update tables in realtime
+       
+       
+            removeReservationSelectedRowsFromDatabase();
+            populateBorrowsTableFromDatabase();
+            populateReservationTableFromDatabase();
+            fillHistoryTableFromDatabase(userName.getText());// update tables in realtime
             dbData();// update tables in realtime
 
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void returnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnButtonActionPerformed
 
-        removeBorrowsSelectedRowsFromDatabase();
         
-        populateBorrowsTableFromDatabase();
+        
+           requestReturn();
+           populateBorrowsTableFromDatabase();
             populateReservationTableFromDatabase();
           fillHistoryTableFromDatabase(userName.getText()); // update tables in realtime
              dbData();// update tables in realtime
@@ -1883,13 +1957,13 @@ private void populateBorrowsTableFromDatabase() {
     
     private void borrowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowButtonActionPerformed
 
-           updateButton.setForeground(new Color(0, 225, 255));
-        borrowButton.setForeground(new Color(225, 225, 255));
-        reserveButton.setForeground(new Color(0,225,225));
-        searchButton.setForeground(new Color(0,225,225));
+        updateButton.setForeground(new Color(0, 225, 255));
+    borrowButton.setForeground(new Color(225, 225, 255));
+    reserveButton.setForeground(new Color(0, 225, 225));
+    searchButton.setForeground(new Color(0, 225, 225));
 
-         int[] selectedRows = searchBookTable.getSelectedRows();
-    
+    int[] selectedRows = searchBookTable.getSelectedRows();
+
     if (selectedRows.length == 0) {
         JOptionPane.showMessageDialog(null, "Please select a book.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
     } else {
@@ -1916,7 +1990,6 @@ private void populateBorrowsTableFromDatabase() {
                             continue; // Skip to the next selected book
                         }
 
-                        
                         // Check the status of the book
                         PreparedStatement statusStatement = connection.prepareStatement(
                             "SELECT status FROM books WHERE Title = ?"
@@ -1939,20 +2012,20 @@ private void populateBorrowsTableFromDatabase() {
                                 updateStatement.setString(1, title);
                                 updateStatement.executeUpdate();
 
+                                
+
+                                // Insert into 'borrows' table
+                                PreparedStatement insertBorrowStmt = connection.prepareStatement(
+                                    "INSERT INTO borrows (title, dob, dor, name) VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), ?)"
+                                );
+                                insertBorrowStmt.setString(1, title);
+                                insertBorrowStmt.setString(2, name);
+                                insertBorrowStmt.executeUpdate();
+
                                 String dob = LocalDate.now().toString();
                                 String dor = LocalDate.now().plusDays(7).toString();
                                 String status1 = "Borrowed";
                                 String date = LocalDate.now().toString();
-
-                                // Insert into borrows table
-                                PreparedStatement updateBorrows = connection.prepareStatement(
-                                    "INSERT INTO borrows (title, dob, dor, name) VALUES (?, ?, ?, ?)"
-                                );
-                                updateBorrows.setString(1, title);
-                                updateBorrows.setString(2, dob);
-                                updateBorrows.setString(3, dor);
-                                updateBorrows.setString(4, name);
-                                updateBorrows.executeUpdate();
 
                                 // Insert into history table
                                 PreparedStatement pstmt = connection.prepareStatement(
@@ -1969,7 +2042,7 @@ private void populateBorrowsTableFromDatabase() {
                         }
 
                         // Close result sets and statements
-                        rsBorrow.close();                      
+                        rsBorrow.close();
                         statusResult.close();
                         checkBorrow.close();
                         statusStatement.close();
@@ -1996,10 +2069,12 @@ private void populateBorrowsTableFromDatabase() {
     populateBorrowsTableFromDatabase();
     fillHistoryTableFromDatabase(userName.getText());
     dbData(); // to update table in real-time
-                        
 
+        
     }//GEN-LAST:event_borrowButtonActionPerformed
 
+    
+    
     
     
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
@@ -2093,7 +2168,7 @@ private void populateBorrowsTableFromDatabase() {
 
                                 // Insert into reservation table
                                 PreparedStatement updateReservation = connection.prepareStatement(
-                                    "INSERT INTO reservation (title, dor, rn, name) VALUES (?, ?, ?, ?)"
+                                    "INSERT INTO reservation (title, dor, rn , name) VALUES (?, ?, ?, ?)"
                                 );
                                 updateReservation.setString(1, title);
                                 updateReservation.setString(2, date);
@@ -2176,6 +2251,7 @@ private void populateBorrowsTableFromDatabase() {
     private javax.swing.JLabel id;
     private javax.swing.JColorChooser jColorChooser1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
