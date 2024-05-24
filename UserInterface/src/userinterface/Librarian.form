@@ -1661,6 +1661,9 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="authorUpdateActionPerformed"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="authorUpdate.setEditable(false);&#xa;authorUpdate.setFocusable(false);&#xa;authorUpdate.setForeground(Color.GRAY);"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextField18">
               <Properties>
@@ -1702,6 +1705,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="ISBN"/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="isbnUpdate.setEditable(false);&#xa;isbnUpdate.setFocusable(false);&#xa;isbnUpdate.setForeground(Color.GRAY);"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextField20">
               <Properties>
@@ -1759,6 +1765,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="categoryUpdateActionPerformed"/>
               </Events>
               <AuxValues>
+                <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="categoryUpdate.setEditable(false);&#xa;categoryUpdate.setFocusable(false);&#xa;categoryUpdate.setEnabled(false);"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
@@ -1792,6 +1799,9 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="titleUpdateActionPerformed"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="titleUpdate.setEditable(false);&#xa;titleUpdate.setFocusable(false);&#xa;titleUpdate.setForeground(Color.GRAY);"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JButton" name="jButton23">
               <Properties>
@@ -1809,6 +1819,9 @@
                   <Color id="Hand Cursor"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton23ActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="jButton24">
               <Properties>
@@ -1826,6 +1839,9 @@
                   <Color id="Hand Cursor"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton24ActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

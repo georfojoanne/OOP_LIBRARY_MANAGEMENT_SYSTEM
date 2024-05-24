@@ -2,6 +2,7 @@ package userinterface;
 
 
 import java.awt.Color;
+import static java.awt.Color.GRAY;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
@@ -1145,6 +1146,9 @@ try {
                 authorUpdateActionPerformed(evt);
             }
         });
+        authorUpdate.setEditable(false);
+        authorUpdate.setFocusable(false);
+        authorUpdate.setForeground(Color.GRAY);
 
         jTextField18.setEditable(false);
         jTextField18.setBackground(new java.awt.Color(131, 157, 167));
@@ -1164,6 +1168,9 @@ try {
 
         isbnUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         isbnUpdate.setText("ISBN");
+        isbnUpdate.setEditable(false);
+        isbnUpdate.setFocusable(false);
+        isbnUpdate.setForeground(Color.GRAY);
 
         jTextField20.setEditable(false);
         jTextField20.setBackground(new java.awt.Color(131, 157, 167));
@@ -1190,6 +1197,9 @@ try {
                 categoryUpdateActionPerformed(evt);
             }
         });
+        categoryUpdate.setEditable(false);
+        categoryUpdate.setFocusable(false);
+        categoryUpdate.setEnabled(false);
 
         jButton21.setBackground(new java.awt.Color(49, 98, 103));
         jButton21.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1204,6 +1214,9 @@ try {
 
         titleUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         titleUpdate.setText("Title");
+        titleUpdate.setEditable(false);
+        titleUpdate.setFocusable(false);
+        titleUpdate.setForeground(Color.GRAY);
         titleUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 titleUpdateActionPerformed(evt);
@@ -1215,12 +1228,22 @@ try {
         jButton23.setForeground(new java.awt.Color(0, 255, 255));
         jButton23.setText("EDIT");
         jButton23.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton23.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton23ActionPerformed(evt);
+            }
+        });
 
         jButton24.setBackground(new java.awt.Color(49, 98, 103));
         jButton24.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton24.setForeground(new java.awt.Color(0, 255, 255));
         jButton24.setText("SAVE");
         jButton24.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton24ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout updatePanelLayout = new javax.swing.GroupLayout(updatePanel);
         updatePanel.setLayout(updatePanelLayout);
@@ -1573,33 +1596,37 @@ try {
     }//GEN-LAST:event_requestsButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-        try{
-            //get selected rows
-            int[] selectedRows = bookTable.getSelectedRows();
-            //for the connection
-            dbConnection con = new dbConnection();
-            Connection connection = con.getConnection();
-            
-            if(connection != null){
-                
-                for(int rowIndex : selectedRows){ //iterate the selected rows in bookTable
-                    
-                    String title = (String) bookTable.getValueAt(rowIndex,0);
-                    
-                    //remove books implementation
-                    String query = "DELETE FROM books WHERE title = ?";
-                    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-                        pstmt.setString(1, title);
-                        pstmt.executeUpdate();
-                    }   catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-            populateBooksTableFromDatabase();
-        } 
+       try {
+    // Get selected rows
+    int[] selectedRows = bookTable.getSelectedRows();
+
+    // For the connection
+    dbConnection con = new dbConnection();
+    Connection connection = con.getConnection();
+
+    if (connection != null) {
+        for (int rowIndex : selectedRows) {
+            if (rowIndex >= 0 && rowIndex < bookTable.getRowCount()) { //this validates the index of the row
+                // Get the title from the selected row
+                String title = (String) bookTable.getValueAt(rowIndex, 0);
+
+                String query = "DELETE FROM books WHERE title = ?"; //removes book
+                try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    pstmt.setString(1, title);
+                    pstmt.executeUpdate();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                System.err.println("Invalid row index: " + rowIndex);
+            }
         }
-        } catch(SQLException ex){
-            ex.printStackTrace();
-        }
+        // this automatically refresh the table after deletion
+        populateBooksTableFromDatabase();
+    }
+} catch (SQLException ex) {
+    ex.printStackTrace();
+}
     }//GEN-LAST:event_removeButtonActionPerformed
 
     private void titleFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleFieldActionPerformed
@@ -1613,8 +1640,7 @@ try {
                 String isbn = isbnAdd.getText();
                 String selectedCategory = (String) categoryComboBox.getSelectedItem();
                 
-                if (selectedCategory == null) {
-        // Handle the case where no valid category is selected
+                if (selectedCategory == null) { // of there is no category selected
         JOptionPane.showMessageDialog(this, "Please select a valid category.");
         return;
     }
@@ -1622,7 +1648,7 @@ try {
             JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
             return;
         }
-                // Add the data to the database
+                // adding the data to the database
                 addBookToDatabase(title, author, isbn, selectedCategory);
                 
                 //clear the textfields
@@ -1651,9 +1677,11 @@ try {
         String isbn = isbnUpdate.getText();
         String category = (String) categoryUpdate.getSelectedItem();
         
-            updateDatabase(title, author, isbn, category);
+        //to pass the data in the text field to the variables
+        
+            updateDatabase(title, author, isbn, category); // updates to the database
             
-            System.out.println("New Title: " + title);
+            System.out.println("New Title: " + title); //for debugging
             
         titleUpdate.setText("");
         authorUpdate.setText("");
@@ -1664,6 +1692,37 @@ try {
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
+        titleUpdate.setEditable(true);
+        titleUpdate.setFocusable(true);
+        titleUpdate.setForeground(Color.BLACK);
+        
+        authorUpdate.setEditable(true);
+        authorUpdate.setFocusable(true);
+        authorUpdate.setForeground(Color.BLACK);
+        
+        categoryUpdate.setEditable(true);
+        categoryUpdate.setEnabled(true);
+    }//GEN-LAST:event_jButton23ActionPerformed
+
+    private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
+        titleUpdate.setEditable(false);
+        titleUpdate.setFocusable(false);
+        titleUpdate.setForeground(Color.GRAY);
+        
+        authorUpdate.setEditable(false);
+        authorUpdate.setFocusable(false);
+        authorUpdate.setForeground(Color.GRAY);
+        
+        isbnUpdate.setEditable(false);
+        isbnUpdate.setFocusable(false);
+        isbnUpdate.setForeground(Color.GRAY);
+        
+        categoryUpdate.setEditable(false);
+        categoryUpdate.setFocusable(false);
+        categoryUpdate.setEnabled(false);
+    }//GEN-LAST:event_jButton24ActionPerformed
 
     
     
@@ -1787,8 +1846,7 @@ try {
         }
     }
     private void updateDatabase(String title, String author, String isbn, String category) {
-        
-try {
+  try {
             // Establish a connection to your database
             dbConnection con = new dbConnection();
             Connection connection = con.getConnection();
@@ -1806,7 +1864,7 @@ try {
             if (rowsAffected > 0) {
                 JOptionPane.showMessageDialog(null, "Book updated successfully!");
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to update book.");
+                JOptionPane.showMessageDialog(null, "Failed to update book. No book found with the given ISBN.");
             }
             
             // Close the connection and statement
@@ -1817,6 +1875,6 @@ try {
             JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
         }
     }
-    }
+}
 
 
