@@ -1765,7 +1765,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="categoryUpdateActionPerformed"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="categoryUpdate.setEditable(false);&#xa;categoryUpdate.setFocusable(false);&#xa;categoryUpdate.setEnabled(false);"/>
+                <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="categoryUpdate.setEditable(false);&#xa;categoryUpdate.setFocusable(false);&#xa;categoryUpdate.setEnabled(false);&#xa;categoryUpdate.setForeground(Color.CYAN);"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
