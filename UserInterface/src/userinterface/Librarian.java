@@ -2,11 +2,7 @@ package userinterface;
 
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
@@ -14,7 +10,6 @@ import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -39,6 +34,8 @@ public class Librarian extends javax.swing.JFrame {
         
         dbData();
        populateBooksTableFromDatabase();
+       populateBorrowsTableFromDatabase();
+       populateLoansTableFromDatabase();
        
        bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
@@ -63,6 +60,8 @@ public class Librarian extends javax.swing.JFrame {
 
               bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
+    
+    
 
 
   private void dbData(){
@@ -147,6 +146,83 @@ try {
 }
   
   
+  private void populateBorrowsTableFromDatabase() {
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        if (connection != null) {
+            
+
+            PreparedStatement statement = connection.prepareStatement("SELECT title,dob,dor,name FROM borrows");
+            ResultSet resultSet = statement.executeQuery();
+            
+            
+            // Clear existing rows from borrowsTable
+            DefaultTableModel model = (DefaultTableModel) borrowsTable.getModel();
+            model.setRowCount(0);
+            
+            // Add fetched data to borrowsTable
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String dob = resultSet.getString("dob");
+                String dor = resultSet.getString("dor");
+                String name = resultSet.getString("name");
+                
+                
+                // Add a row to the borrowsTable
+                model.addRow(new Object[]{title, dob, dor, name});
+            }
+            
+            // Close the connection
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+  
+    private void populateLoansTableFromDatabase() {
+    try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        if (connection != null) {
+            
+
+            PreparedStatement statement = connection.prepareStatement("SELECT title,dor,rn,name FROM reservation");
+            ResultSet resultSet = statement.executeQuery();
+            
+            
+            // Clear existing rows from borrowsTable
+            DefaultTableModel model = (DefaultTableModel) loansTable.getModel();
+            model.setRowCount(0);
+            
+            // Add fetched data to borrowsTable
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String dor = resultSet.getString("dor");
+                String rn = resultSet.getString("rn");
+                String name = resultSet.getString("name");
+                
+                
+                // Add a row to the borrowsTable
+                model.addRow(new Object[]{title, dor, rn, name});
+            }
+            
+            // Close the connection
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
  
                      
     /**
@@ -216,8 +292,6 @@ try {
         jScrollPane6 = new javax.swing.JScrollPane();
         loansManagementTable = new javax.swing.JTable();
         jTextField25 = new javax.swing.JTextField();
-        settingsPanel = new javax.swing.JPanel();
-        jButton16 = new javax.swing.JButton();
         updatePanel = new javax.swing.JPanel();
         jTextField13 = new javax.swing.JTextField();
         jTextField14 = new javax.swing.JTextField();
@@ -252,7 +326,6 @@ try {
 
         jPanel1.setBackground(new java.awt.Color(10, 29, 36));
 
-        jButton1.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\Documents\\librarian\\OOP_LIBRARY_MANAGEMENT_SYSTEM\\UserInterface\\icons\\Xbang.png")); // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -454,14 +527,14 @@ try {
 
             },
             new String [] {
-                "Username", "Book", "Due Date", "User Type"
+                "Title", "Date of Borrow", "Date of Return", "User Name"
             }
         ) {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -1025,40 +1098,6 @@ try {
 
         jTabbedPane1.addTab("tab8", loanManagementPanel);
 
-        settingsPanel.setBackground(new java.awt.Color(28, 52, 62));
-        settingsPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jButton16.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 12)); // NOI18N
-        jButton16.setForeground(new java.awt.Color(0, 255, 255));
-        jButton16.setText("LOG OUT");
-        jButton16.setBorderPainted(false);
-        jButton16.setContentAreaFilled(false);
-        jButton16.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton16.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton16ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout settingsPanelLayout = new javax.swing.GroupLayout(settingsPanel);
-        settingsPanel.setLayout(settingsPanelLayout);
-        settingsPanelLayout.setHorizontalGroup(
-            settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settingsPanelLayout.createSequentialGroup()
-                .addContainerGap(564, Short.MAX_VALUE)
-                .addComponent(jButton16)
-                .addContainerGap())
-        );
-        settingsPanelLayout.setVerticalGroup(
-            settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(settingsPanelLayout.createSequentialGroup()
-                .addContainerGap(533, Short.MAX_VALUE)
-                .addComponent(jButton16, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("tab9", settingsPanel);
-
         updatePanel.setBackground(new java.awt.Color(28, 52, 62));
 
         jTextField13.setEditable(false);
@@ -1378,7 +1417,6 @@ try {
 
         jButton17.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         jButton17.setForeground(new java.awt.Color(0, 255, 255));
-        jButton17.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\Documents\\librarian\\OOP_LIBRARY_MANAGEMENT_SYSTEM\\UserInterface\\icons\\log out.png")); // NOI18N
         jButton17.setText("LOG OUT");
         jButton17.setBorderPainted(false);
         jButton17.setContentAreaFilled(false);
@@ -1478,7 +1516,7 @@ try {
     }//GEN-LAST:event_jButton14ActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        jTabbedPane1.setSelectedIndex(8);
+        jTabbedPane1.setSelectedIndex(7);
         
     }//GEN-LAST:event_updateButtonActionPerformed
  
@@ -1501,10 +1539,6 @@ try {
     private void jTextField13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField13ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField13ActionPerformed
-
-    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
-        dispose();
-    }//GEN-LAST:event_jButton16ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         dispose();
@@ -1611,29 +1645,20 @@ try {
     }//GEN-LAST:event_categoryUpdateActionPerformed
 
     private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
+
+        String title = titleUpdate.getText();
+        String author = authorUpdate.getText();
+        String isbn = isbnUpdate.getText();
+        String category = (String) categoryUpdate.getSelectedItem();
         
-        //pass values from selected row to the text fields
-        bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-           public void actionPerformed(ActionEvent e) {
-                // Get selected row index
-                int selectedRow = bookTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Get values from text fields and combo box
-                    String title = titleUpdate.getText();
-                    String author = authorUpdate.getText();
-                    String isbn = isbnUpdate.getText();
-                    String category = (String) categoryUpdate.getSelectedItem();
-                    
-                    updateDatabase(title, author, isbn, category);
-
-                }
-            }
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-            }
-        });
+            updateDatabase(title, author, isbn, category);
+            
+            System.out.println("New Title: " + title);
+            
+        titleUpdate.setText("");
+        authorUpdate.setText("");
+        isbnUpdate.setText("");
+            
     }//GEN-LAST:event_jButton21ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -1671,7 +1696,6 @@ try {
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton15;
-    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton21;
@@ -1725,7 +1749,6 @@ try {
     private javax.swing.JButton requestsButton;
     private javax.swing.JPanel rightmostPanel;
     private javax.swing.JTextField searchBooks;
-    private javax.swing.JPanel settingsPanel;
     private javax.swing.JTextField titleField;
     private javax.swing.JTextField titleUpdate;
     private javax.swing.JButton updateButton;
@@ -1770,21 +1793,20 @@ try {
             dbConnection con = new dbConnection();
             Connection connection = con.getConnection();
             
-            // Create a PreparedStatement to execute the INSERT query
-            String query = "UPDATE books SET (Title, Author, ISBN, Category) VALUES (?, ?, ?, ?)";
+            // Create a PreparedStatement to execute the UPDATE query
+            String query = "UPDATE books SET title = ?, author = ?, category = ? WHERE isbn = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, title);
             statement.setString(2, author);
-            statement.setString(3, isbn);
-            statement.setString(4, category);
+            statement.setString(3, category);
+            statement.setString(4, isbn);
             
-            
-            // Execute the INSERT query
+            // Execute the UPDATE query
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Book added successfully!");
+                JOptionPane.showMessageDialog(null, "Book updated successfully!");
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to add book.");
+                JOptionPane.showMessageDialog(null, "Failed to update book.");
             }
             
             // Close the connection and statement
@@ -1795,5 +1817,6 @@ try {
             JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
         }
     }
-}
+    }
+
 
