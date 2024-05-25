@@ -38,7 +38,6 @@ public class Librarian extends javax.swing.JFrame {
         dbData();
        populateBooksTableFromDatabase();
        populateReturns();
-       populateLoansTableFromDatabase();
        populateBorrowsTableFromDatabase();
        holds();
        populateReservationTitleTableFromDatabase();
@@ -72,6 +71,7 @@ public class Librarian extends javax.swing.JFrame {
 
 
 private void showReservationDetails() {
+try {
     // Get the selected row index
     int selectedRow = reservationTitleTable.getSelectedRow();
 
@@ -79,38 +79,41 @@ private void showReservationDetails() {
         // Get the title of the selected reservation
         String title = (String) reservationTitleTable.getValueAt(selectedRow, 0);
 
-        try {
-            // Establish a connection to the database
-            dbConnection con = new dbConnection();
-            Connection connection = con.getConnection();
+        // Establish a connection to the database
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
 
-            // Query to get the details of the selected reservation
-            String query = "SELECT name, rn FROM reservation WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, title);
-            ResultSet resultSet = statement.executeQuery();
+        // Prepare the query to retrieve reservation details
+        String query = "SELECT name, rn, sched FROM reservation WHERE title = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, title);
+        ResultSet resultSet = statement.executeQuery();
 
-            DefaultTableModel model = (DefaultTableModel) requestTable.getModel();
-            model.setRowCount(0);
+        // Clear existing rows from requestTable
+        DefaultTableModel model = (DefaultTableModel) requestTable.getModel();
+        model.setRowCount(0);
 
-            // Populate the requestTable with data from the result set
-            while (resultSet.next()) {
-                String name = resultSet.getString("name");
-                int reserveNumber = resultSet.getInt("rn");
-                model.addRow(new Object[]{name, reserveNumber});
-            }
+        // Populate the requestTable with data from the result set
+        while (resultSet.next()) {
+            String userName = resultSet.getString("name");
+            int reserveNumber = resultSet.getInt("rn");
+            java.sql.Date sched = resultSet.getDate("sched");
 
-            // Close the resources
-            resultSet.close();
-            statement.close();
-            connection.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+            // Add the user name, reservation number, and schedule date to requestTable
+            model.addRow(new Object[]{userName, reserveNumber, sched});
         }
+
+        // Close the resources
+        resultSet.close();
+        statement.close();
+        connection.close(); // Close the connection
     } else {
         JOptionPane.showMessageDialog(this, "Please select a title from the table.");
     }
+} catch (SQLException ex) {
+    ex.printStackTrace();
+    JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+            }
 }
     
     private void populateReservationTitleTableFromDatabase() {
@@ -361,44 +364,6 @@ try {
 }
   
   
-    private void populateLoansTableFromDatabase() {
-    try {
-        // Establish a database connection
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-        
-        if (connection != null) {
-            
-
-            PreparedStatement statement = connection.prepareStatement("SELECT title,dor,rn,name FROM reservation");
-            ResultSet resultSet = statement.executeQuery();
-            
-            
-            // Clear existing rows from borrowsTable
-            DefaultTableModel model = (DefaultTableModel) loansTable.getModel();
-            model.setRowCount(0);
-            
-            // Add fetched data to borrowsTable
-            while (resultSet.next()) {
-                String title = resultSet.getString("title");
-                String dor = resultSet.getString("dor");
-                String rn = resultSet.getString("rn");
-                String name = resultSet.getString("name");
-                
-                
-                // Add a row to the borrowsTable
-                model.addRow(new Object[]{title, dor, rn, name});
-            }
-            
-            // Close the connection
-            connection.close();
-        } else {
-            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    } catch (SQLException ex) {
-        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
  
                      
     /**
@@ -448,7 +413,7 @@ try {
         reservePanel = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         requestTable = new javax.swing.JTable();
-        jButton20 = new javax.swing.JButton();
+        confirmBorrow = new javax.swing.JButton();
         requestSearch = new javax.swing.JTextField();
         jButton22 = new javax.swing.JButton();
         loansPanel = new javax.swing.JPanel();
@@ -484,7 +449,7 @@ try {
         returnsButton = new javax.swing.JButton();
         addBooksButton = new javax.swing.JButton();
         booksButton = new javax.swing.JButton();
-        loansButton = new javax.swing.JButton();
+        paymentsButton = new javax.swing.JButton();
         jTextField2 = new javax.swing.JTextField();
         jTextField21 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -967,11 +932,11 @@ try {
 
             },
             new String [] {
-                "Username", "Reservation Number"
+                "Username", "Reservation Number", "Scheduled Date"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -982,11 +947,16 @@ try {
         requestTable.getTableHeader().setReorderingAllowed(false);
         requestTable.setDefaultEditor(Object.class, null);
 
-        jButton20.setBackground(new java.awt.Color(49, 98, 103));
-        jButton20.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton20.setForeground(new java.awt.Color(0, 255, 255));
-        jButton20.setText("CONFIRM BORROW");
-        jButton20.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmBorrow.setBackground(new java.awt.Color(49, 98, 103));
+        confirmBorrow.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        confirmBorrow.setForeground(new java.awt.Color(0, 255, 255));
+        confirmBorrow.setText("CONFIRM BORROW");
+        confirmBorrow.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmBorrow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmBorrowActionPerformed(evt);
+            }
+        });
 
         requestSearch.setBackground(new java.awt.Color(255, 255, 255));
         requestSearch.setText("Search");
@@ -1011,7 +981,7 @@ try {
                 .addGap(20, 20, 20)
                 .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton20, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(confirmBorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26))
             .addGroup(reservePanelLayout.createSequentialGroup()
                 .addContainerGap()
@@ -1030,7 +1000,7 @@ try {
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton20, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(confirmBorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(24, 24, 24))
             .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1511,16 +1481,16 @@ try {
             }
         });
 
-        loansButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        loansButton.setForeground(new java.awt.Color(255, 255, 255));
-        loansButton.setText("Payments");
-        loansButton.setBorder(null);
-        loansButton.setBorderPainted(false);
-        loansButton.setContentAreaFilled(false);
-        loansButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        loansButton.addActionListener(new java.awt.event.ActionListener() {
+        paymentsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
+        paymentsButton.setForeground(new java.awt.Color(255, 255, 255));
+        paymentsButton.setText("Payments");
+        paymentsButton.setBorder(null);
+        paymentsButton.setBorderPainted(false);
+        paymentsButton.setContentAreaFilled(false);
+        paymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        paymentsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loansButtonActionPerformed(evt);
+                paymentsButtonActionPerformed(evt);
             }
         });
 
@@ -1584,6 +1554,11 @@ try {
         jButton17.setBorderPainted(false);
         jButton17.setContentAreaFilled(false);
         jButton17.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton17.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton17ActionPerformed(evt);
+            }
+        });
 
         borrowsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         borrowsButton.setForeground(new java.awt.Color(255, 255, 255));
@@ -1611,7 +1586,7 @@ try {
                             .addComponent(jButton17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(holdsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-                                .addComponent(loansButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(paymentsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(addBooksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(returnsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(booksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1647,7 +1622,7 @@ try {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addBooksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(loansButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(paymentsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(holdsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(161, 161, 161)
@@ -1676,9 +1651,9 @@ try {
     }//GEN-LAST:event_booksButtonActionPerformed
 
             
-    private void loansButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loansButtonActionPerformed
+    private void paymentsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(5);
-    }//GEN-LAST:event_loansButtonActionPerformed
+    }//GEN-LAST:event_paymentsButtonActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         jTabbedPane1.setSelectedIndex(7);
@@ -1859,7 +1834,7 @@ try {
     }//GEN-LAST:event_jButton24ActionPerformed
 
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
-     try {
+       try {
         // Establish a database connection
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
@@ -1900,7 +1875,7 @@ try {
                     insertHistoryStmt.executeUpdate();
                 }
 
-                // Check and update 'nr' and 'status' in 'books' table
+                // Check and update status in 'books' table
                 try (PreparedStatement selectBookStmt = connection.prepareStatement("SELECT nr FROM books WHERE Title = ?")) {
                     selectBookStmt.setString(1, title);
                     ResultSet rs = selectBookStmt.executeQuery();
@@ -1915,26 +1890,17 @@ try {
                                 updateBookStmt.executeUpdate();
                             }
                         } else {
-                            // Decrement nr
-                            nr--;
-
-                            // Update nr and status in the books table based on new nr value
-                            String newStatus = (nr == 0) ? "Borrowed" : "Reserved";
-                            try (PreparedStatement updateBookStmt = connection.prepareStatement("UPDATE books SET nr = ?, status = ? WHERE Title = ?")) {
-                                updateBookStmt.setInt(1, nr);
-                                updateBookStmt.setString(2, newStatus);
-                                updateBookStmt.setString(3, title);
+                            // Update status in the books table without changing nr
+                            String newStatus = "Reserved"; // or any other status logic you need
+                            try (PreparedStatement updateBookStmt = connection.prepareStatement("UPDATE books SET status = ? WHERE Title = ?")) {
+                                updateBookStmt.setString(1, newStatus);
+                                updateBookStmt.setString(2, title);
                                 updateBookStmt.executeUpdate();
                             }
                         }
                     }
                 }
 
-                // Decrement 'rn' in 'reservation' table
-                try (PreparedStatement updateReservationStmt = connection.prepareStatement("UPDATE reservation SET rn = rn - 1 WHERE Title = ?")) {
-                    updateReservationStmt.setString(1, title);
-                    updateReservationStmt.executeUpdate();
-                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1953,7 +1919,6 @@ try {
     }
 
     populateReturns();
-    
     }//GEN-LAST:event_confirmButtonActionPerformed
 
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
@@ -1967,71 +1932,94 @@ try {
     }//GEN-LAST:event_borrowsButtonActionPerformed
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
-    try {
-        // Get the selected row index
-        int selectedRow = reservationTitleTable.getSelectedRow();
+try {
+    // Get the selected row index from reservationTitleTable
+    int selectedRow = reservationTitleTable.getSelectedRow();
+
+    if (selectedRow >= 0) {
+        // Get the title of the selected reservation from reservationTitleTable
+        String title = reservationTitleTable.getValueAt(selectedRow, 0).toString(); // Assuming title is a String
+        System.out.println("Selected Title: " + title);
+
+        // Get the selected row index from requestTable
+        int requestSelectedRow = requestTable.getSelectedRow();
         
-        if (selectedRow >= 0) {
-            // Get the title of the selected reservation
-            String title = (String) reservationTitleTable.getValueAt(selectedRow, 0);
-            
+        if (requestSelectedRow >= 0) {
+            // Get the name of the selected reservation from requestTable
+            String name = requestTable.getValueAt(requestSelectedRow, 0).toString(); // Assuming userName is a String
+            System.out.println("Selected User: " + name);
+
             // Establish a connection to the database
             dbConnection con = new dbConnection();
             Connection connection = con.getConnection();
             
-            // Prepare the notification message query
-            String query = "SELECT name, rn FROM reservation WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, title);
-            ResultSet resultSet = statement.executeQuery();
+            // Calculate tomorrow's date
+            java.sql.Date tomorrow = new java.sql.Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
 
-            // Clear existing rows from requestTable
-            DefaultTableModel model = (DefaultTableModel) requestTable.getModel();
-            model.setRowCount(0);
+            // Update the reservation table with the scheduled date if it's not null
+            String updateQuery = "UPDATE reservation SET sched = ? WHERE title = ? AND name = ?";
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+            updateStatement.setDate(1, tomorrow);
+            updateStatement.setString(2, title);
+            updateStatement.setString(3, name);
+            int rowsUpdated = updateStatement.executeUpdate();
+            updateStatement.close();
 
-            // Iterate over the result set and send notifications
-            while (resultSet.next()) {
-                String userName = resultSet.getString("name");
-                int reserveNumber = resultSet.getInt("rn");
-
-                // Compose the notification message
-                String message = "Hello, " + userName + ", the book \"" + title + "\" is already available for you to borrow. "
-                        + "Please come to the library as soon "
-                        + "as possible. Your schedule to claim the book is tomorrow. "
-                        + "If you fail to come, your reservation will be cancelled. "
-                        + "Thank you and more power. - Librarian";
+            if (rowsUpdated>0) {
+                // Display success message
+                JOptionPane.showMessageDialog(this, "Scheduled date updated successfully for " + name);
+                
+                // Send notification to the user
+                String notificationMessage = "Hello, " + name + ", the book \"" + title + "\" is already available for you to borrow. "
+                        + "Please come to the library as soon as possible. Your schedule to claim the book is tomorrow. "
+                        + "If you fail to come, your reservation will be cancelled. Thank you and more power. - Librarian";
 
                 // Insert the notification into the database
-                String insertQuery = "INSERT INTO notifs (name, notif) VALUES (?, ?)";
-                PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
-                insertStatement.setString(1, userName);
-                insertStatement.setString(2, message);
+                String insertNotificationQuery = "INSERT INTO notifs (name, notif) VALUES (?, ?)";
+                PreparedStatement insertNotificationStatement = connection.prepareStatement(insertNotificationQuery);
+                insertNotificationStatement.setString(1, name);
+                insertNotificationStatement.setString(2, notificationMessage);
+                int notificationsInserted = insertNotificationStatement.executeUpdate();
+                insertNotificationStatement.close();
 
-                // Execute the insert and check the result
-                int rowsInserted = insertStatement.executeUpdate();
-                if (rowsInserted > 0) {
-                    System.out.println("Notification sent successfully to: " + userName);
+                if (notificationsInserted > 0) {
+                    System.out.println("Notification sent successfully to: " + name);
                 } else {
-                    System.err.println("Failed to send notification to: " + userName);
+                    System.err.println("Failed to send notification to: " + name);
                 }
-                insertStatement.close();
 
-                // Add the user name and reservation number to requestTable
-                model.addRow(new Object[]{userName, reserveNumber});
+                // Refresh the reservation details display
+                showReservationDetails();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to update scheduled date for " + name);
             }
 
-            // Close the resources
-            resultSet.close();
-            statement.close();
-            connection.close(); // Close the connection
+            // Close the connection
+            connection.close();
         } else {
-            JOptionPane.showMessageDialog(this, "Please select a title from the table.");
+            JOptionPane.showMessageDialog(this, "Please select a reservation from the table.");
         }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a title from the table.");
     }
+} catch (SQLException ex) {
+    ex.printStackTrace();
+    JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+} catch (Exception e) {
+    e.printStackTrace();
+    JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+}
+
     }//GEN-LAST:event_jButton22ActionPerformed
+
+    private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
+        dispose();
+        new LogIn().setVisible(true);
+    }//GEN-LAST:event_jButton17ActionPerformed
+
+    private void confirmBorrowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmBorrowActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_confirmBorrowActionPerformed
 
     
     
@@ -2052,6 +2040,7 @@ try {
     private javax.swing.JTable borrowsTable;
     private javax.swing.JComboBox<String> categoryComboBox;
     private javax.swing.JComboBox<String> categoryUpdate;
+    private javax.swing.JButton confirmBorrow;
     private javax.swing.JButton confirmButton;
     private javax.swing.JButton holdsButton;
     private javax.swing.JTextField holdsSearch;
@@ -2060,7 +2049,6 @@ try {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
@@ -2097,11 +2085,11 @@ try {
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JPanel loanManagementPanel;
-    private javax.swing.JButton loansButton;
     private javax.swing.JTable loansManagementTable;
     private javax.swing.JPanel loansPanel;
     private javax.swing.JTextField loansSearch;
     private javax.swing.JTable loansTable;
+    private javax.swing.JButton paymentsButton;
     private javax.swing.JButton refreshButton;
     private javax.swing.JButton removeButton;
     private javax.swing.JTextField requestSearch;
