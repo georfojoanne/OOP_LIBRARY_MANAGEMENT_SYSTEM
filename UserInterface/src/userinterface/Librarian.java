@@ -1900,20 +1900,41 @@ try {
                     insertHistoryStmt.executeUpdate();
                 }
 
-                // Decrement 'nr' column in 'books' table
-                try (PreparedStatement decrementNrStmt = connection.prepareStatement("UPDATE books SET nr = nr - 1 WHERE Title = ?")) {
-                    decrementNrStmt.setString(1, title);
-                    decrementNrStmt.executeUpdate();
+                // Check and update 'nr' and 'status' in 'books' table
+                try (PreparedStatement selectBookStmt = connection.prepareStatement("SELECT nr FROM books WHERE Title = ?")) {
+                    selectBookStmt.setString(1, title);
+                    ResultSet rs = selectBookStmt.executeQuery();
+                    
+                    if (rs.next()) {
+                        int nr = rs.getInt("nr");
+
+                        if (nr == 0) {
+                            // Update status to Available
+                            try (PreparedStatement updateBookStmt = connection.prepareStatement("UPDATE books SET status = 'Available' WHERE Title = ?")) {
+                                updateBookStmt.setString(1, title);
+                                updateBookStmt.executeUpdate();
+                            }
+                        } else {
+                            // Decrement nr
+                            nr--;
+
+                            // Update nr and status in the books table based on new nr value
+                            String newStatus = (nr == 0) ? "Borrowed" : "Reserved";
+                            try (PreparedStatement updateBookStmt = connection.prepareStatement("UPDATE books SET nr = ?, status = ? WHERE Title = ?")) {
+                                updateBookStmt.setInt(1, nr);
+                                updateBookStmt.setString(2, newStatus);
+                                updateBookStmt.setString(3, title);
+                                updateBookStmt.executeUpdate();
+                            }
+                        }
+                    }
                 }
 
-                // Update 'status' column in 'books' table based on 'nr' value
-                try (PreparedStatement updateStatusStmt = connection.prepareStatement("UPDATE books SET status = CASE WHEN nr >= 2 THEN 'Reserved' WHEN nr = 1 THEN 'Borrowed' ELSE 'Available' END WHERE Title = ?")) {
-                    updateStatusStmt.setString(1, title);
-                    updateStatusStmt.executeUpdate();
+                // Decrement 'rn' in 'reservation' table
+                try (PreparedStatement updateReservationStmt = connection.prepareStatement("UPDATE reservation SET rn = rn - 1 WHERE Title = ?")) {
+                    updateReservationStmt.setString(1, title);
+                    updateReservationStmt.executeUpdate();
                 }
-                
-                // implement the notify
-                
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1932,6 +1953,7 @@ try {
     }
 
     populateReturns();
+    
     }//GEN-LAST:event_confirmButtonActionPerformed
 
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
@@ -1974,8 +1996,10 @@ try {
 
                 // Compose the notification message
                 String message = "Hello, " + userName + ", the book \"" + title + "\" is already available for you to borrow. "
-                        + "Please come to the library as soon as possible. Your schedule to claim the book is tomorrow. "
-                        + "If you fail to come, your reservation will be cancelled. Thank you and more power. - Librarian";
+                        + "Please come to the library as soon "
+                        + "as possible. Your schedule to claim the book is tomorrow. "
+                        + "If you fail to come, your reservation will be cancelled. "
+                        + "Thank you and more power. - Librarian";
 
                 // Insert the notification into the database
                 String insertQuery = "INSERT INTO notifs (name, notif) VALUES (?, ?)";

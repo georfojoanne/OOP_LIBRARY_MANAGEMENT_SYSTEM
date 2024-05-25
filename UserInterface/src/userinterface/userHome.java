@@ -9,7 +9,11 @@ import java.sql.*;
 import java.time.LocalDate;
 import javax.swing.JOptionPane;
 import java.awt.Color;
+import java.awt.Component;
 import java.sql.PreparedStatement;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableCellRenderer;
 
 
 
@@ -37,16 +41,99 @@ public class userHome extends javax.swing.JFrame  {
            
                
                retrieveUserInfo(userName.getText());
+                notifs();
+                enableWordWrapForAllColumns(notifsTable);
                
              
                 
-             
-               
-                
-              
+            
            
           
     }
+    
+    
+    
+    
+    public static void enableWordWrapForAllColumns(JTable table) {
+        // Create a custom cell renderer
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            private JTextArea textArea = new JTextArea();
+
+            {
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+                // Adjust the text area appearance
+                textArea.setFont(table.getFont());
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                // Set the value to the text area
+                textArea.setText(value != null ? value.toString() : "");
+                // Return the text area as the cell renderer component
+                return textArea;
+            }
+        };
+
+        // Set the custom cell renderer for each column
+        for (int columnIndex = 0; columnIndex < table.getColumnCount(); columnIndex++) {
+            table.getColumnModel().getColumn(columnIndex).setCellRenderer(renderer);
+        }
+    }
+    
+    
+    private void notifs() {
+        try {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            if (connection != null) {
+                try {
+                    // Get the name of the user
+                    String name = userName.getText();
+                    
+                    // Prepare the SQL query to get notifications where the name matches
+                    String sql = "SELECT notif FROM notifs WHERE name = ?";
+                    PreparedStatement pstmt = connection.prepareStatement(sql);
+                    pstmt.setString(1, name);
+                    
+                    // Execute the query
+                    ResultSet rs = pstmt.executeQuery();
+                    
+                    // Clear the existing rows in the notifsTable
+                    DefaultTableModel model = (DefaultTableModel) notifsTable.getModel();
+                    model.setRowCount(0);
+                    
+                    // Iterate through the result set and add data to the notifsTable
+                    while (rs.next()) {
+                        String notif = rs.getString("notif");
+                        model.addRow(new Object[]{notif});
+                    }
+                    
+                    // Close the ResultSet and PreparedStatement
+                    rs.close();
+                    pstmt.close();
+                    
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    // Close the database connection
+                    try {
+                        if (connection != null && !connection.isClosed()) {
+                            connection.close();
+                        }
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            }   } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}
+
     
     
     
@@ -390,7 +477,7 @@ public void getTextFromNameColumn() {
         historyTable = new javax.swing.JTable();
         jPanel10 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        notifsTable = new javax.swing.JTable();
         jPanel11 = new javax.swing.JPanel();
         logOutButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -477,6 +564,7 @@ public void getTextFromNameColumn() {
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
+        xsuerButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
         xsuerButton.setToolTipText("");
         xsuerButton.setBorderPainted(false);
         xsuerButton.setContentAreaFilled(false);
@@ -980,10 +1068,10 @@ public void getTextFromNameColumn() {
 
         jPanel10.setBackground(new java.awt.Color(28, 52, 62));
 
-        jTable2.setBackground(new java.awt.Color(221, 221, 221));
-        jTable2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jTable2.setForeground(new java.awt.Color(0, 0, 0));
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        notifsTable.setBackground(new java.awt.Color(221, 221, 221));
+        notifsTable.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        notifsTable.setForeground(new java.awt.Color(0, 0, 0));
+        notifsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -999,10 +1087,11 @@ public void getTextFromNameColumn() {
                 return canEdit [columnIndex];
             }
         });
-        jTable2.setGridColor(new java.awt.Color(153, 51, 255));
-        jTable2.setSelectionBackground(new java.awt.Color(255, 255, 204));
-        jTable2.setShowGrid(true);
-        jScrollPane4.setViewportView(jTable2);
+        notifsTable.setGridColor(new java.awt.Color(153, 51, 255));
+        notifsTable.setRowHeight(45);
+        notifsTable.setSelectionBackground(new java.awt.Color(255, 255, 204));
+        notifsTable.setShowGrid(true);
+        jScrollPane4.setViewportView(notifsTable);
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
@@ -1585,11 +1674,7 @@ private void populateBorrowsTableFromDatabase() {
   
     
 
-
-
-  
-    
-    private void removeReservationSelectedRowsFromDatabase() {
+private void removeReservationSelectedRowsFromDatabase() {
     int[] selectedRows = reservationTable.getSelectedRows();
 
     if (selectedRows.length == 0) {
@@ -1614,36 +1699,22 @@ private void populateBorrowsTableFromDatabase() {
                         deleteStatement.setString(2, name);
                         deleteStatement.executeUpdate();
 
-                        // Decrement the nr column value in the books table
-                        PreparedStatement getNrStatement = connection.prepareStatement("SELECT nr FROM books WHERE Title = ?");
-                        getNrStatement.setString(1, title);
-                        ResultSet rsNr = getNrStatement.executeQuery();
+                        // Decrement the rn column value in the reservation table if rn is greater than 0
+                        PreparedStatement getRnStatement = connection.prepareStatement("SELECT rn FROM reservation WHERE title = ?");
+                        getRnStatement.setString(1, title);
+                        ResultSet rsRn = getRnStatement.executeQuery();
 
-                        if (rsNr.next()) {
-                            String nrString = rsNr.getString("nr");
-                            int nr = Integer.parseInt(nrString);
+                        if (rsRn.next()) {
+                            int rn = rsRn.getInt("rn");
 
-                            if (nr > 0) {
-                                nr -= 1;
-                                String updatedNrString = Integer.toString(nr);
-
-                                PreparedStatement updateNrStatement = connection.prepareStatement("UPDATE books SET nr = ? WHERE Title = ?");
-                                updateNrStatement.setString(1, updatedNrString);
-                                updateNrStatement.setString(2, title);
-                                updateNrStatement.executeUpdate();
+                            if (rn > 0) {
+                                rn -= 1;
+                                PreparedStatement updateRnStatement = connection.prepareStatement("UPDATE reservation SET rn = ? WHERE title = ?");
+                                updateRnStatement.setInt(1, rn);
+                                updateRnStatement.setString(2, title);
+                                updateRnStatement.executeUpdate();
                             }
                         }
-
-                        // Decrement rn values in the reservation table for all matching titles
-                        PreparedStatement decrementRnStatement = connection.prepareStatement(
-                            "UPDATE reservation SET rn = rn - 1 WHERE title = ?"
-                        );
-                        
-                        
-                        
-                        decrementRnStatement.setString(1, title);
-                        decrementRnStatement.executeUpdate();
-                        
 
                         // Insert cancellation into history table
                         String status = "Reservation Cancelled";
@@ -1656,45 +1727,76 @@ private void populateBorrowsTableFromDatabase() {
                         pstmt.setString(4, name);
                         pstmt.executeUpdate();
 
+                        // Decrement the nr column value in the books table
+                        PreparedStatement getNrStatement = connection.prepareStatement("SELECT nr FROM books WHERE title = ?");
+                        getNrStatement.setString(1, title);
+                        ResultSet rsNr = getNrStatement.executeQuery();
+
+                        if (rsNr.next()) {
+                            int nr = rsNr.getInt("nr");
+
+                            if (nr > 0) {
+                                nr -= 1;
+                                PreparedStatement updateNrStatement = connection.prepareStatement("UPDATE books SET nr = ? WHERE title = ?");
+                                updateNrStatement.setInt(1, nr);
+                                updateNrStatement.setString(2, title);
+                                updateNrStatement.executeUpdate();
+                            }
+                        }
+
                         // Check if there are any remaining reservations for the same title
                         PreparedStatement checkReservationStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM reservation WHERE title = ?");
                         checkReservationStatement.setString(1, title);
                         ResultSet rsReservationCount = checkReservationStatement.executeQuery();
-                        
-                        
-                        
 
-                        if (rsReservationCount.next()) {
-                            int count = rsReservationCount.getInt("count");
-                            String bookStatus = (count > 0) ? "Reserved" : "Borrowed";
-
-                            // Update the status in the books table
-                            PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE Title = ?");
-                            updateStatusStatement.setString(1, bookStatus);
-                            updateStatusStatement.setString(2, title);
-                            updateStatusStatement.executeUpdate();
-                        } 
-                        
-                        else {
-                            
-                            // If there are no remaining reservations, set status to "Borrowed"
-                            PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE Title = ?");
-                            updateStatusStatement.setString(1, "Available");
-                            updateStatusStatement.setString(2, title);
-                            updateStatusStatement.executeUpdate();
+                        boolean reservationExists = false;
+                        if (rsReservationCount.next() && rsReservationCount.getInt("count") > 0) {
+                            reservationExists = true;
                         }
-                        
-                
-                            
-   
-                        
-                        
+
+                        if (reservationExists) {
+                            // If there are remaining reservations, set status to "Reserved"
+                            PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE title = ?");
+                            updateStatusStatement.setString(1, "Reserved");
+                            updateStatusStatement.setString(2, title);
+                            updateStatusStatement.executeUpdate();
+                        } else {
+                            // Check if there are any matching rows in the "borrows" table
+                            PreparedStatement checkBorrowsStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM borrows WHERE title = ?");
+                            checkBorrowsStatement.setString(1, title);
+                            ResultSet rsBorrowsCount = checkBorrowsStatement.executeQuery();
+
+                            boolean borrowExists = false;
+                            if (rsBorrowsCount.next() && rsBorrowsCount.getInt("count") > 0) {
+                                borrowExists = true;
+                            }
+
+                            if (borrowExists) {
+                                // If there are matching rows in the "borrows" table, set status to "Borrowed"
+                                PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE title = ?");
+                                updateStatusStatement.setString(1, "Borrowed");
+                                updateStatusStatement.setString(2, title);
+                                updateStatusStatement.executeUpdate();
+                            } else {
+                                // If there are no matching rows in either table, set status to "Available"
+                                PreparedStatement updateStatusStatement = connection.prepareStatement("UPDATE books SET status = ? WHERE title = ?");
+                                updateStatusStatement.setString(1, "Available");
+                                updateStatusStatement.setString(2, title);
+                                updateStatusStatement.executeUpdate();
+                            }
+
+                            // Close result sets and statements
+                            rsBorrowsCount.close();
+                            checkBorrowsStatement.close();
+                        }
 
                         // Close result sets and statements
                         rsNr.close();
                         getNrStatement.close();
                         rsReservationCount.close();
                         checkReservationStatement.close();
+                        rsRn.close();
+                        getRnStatement.close();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
@@ -1714,8 +1816,6 @@ private void populateBorrowsTableFromDatabase() {
     }
 }
 
-    
-    
     
     
     
@@ -2272,11 +2372,11 @@ private void populateBorrowsTableFromDatabase() {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane2;
-    private javax.swing.JTable jTable2;
     private java.awt.Panel leftPanel;
     private javax.swing.JButton logOutButton;
     private javax.swing.JLabel name;
     private javax.swing.JButton notificationsButton;
+    private javax.swing.JTable notifsTable;
     private java.awt.Panel panel2;
     private javax.swing.JLabel profile;
     private javax.swing.JButton reservationButton;
