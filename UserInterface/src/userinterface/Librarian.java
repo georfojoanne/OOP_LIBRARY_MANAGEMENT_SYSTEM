@@ -314,7 +314,7 @@ try {
         if (connection != null) {
             
 
-            PreparedStatement statement = connection.prepareStatement("SELECT Title, Author, ISBN, Category FROM books");
+            PreparedStatement statement = connection.prepareStatement("SELECT Title, Author, ISBN, Category, status, nr FROM books");
             ResultSet resultSet = statement.executeQuery();
             
             
@@ -328,10 +328,12 @@ try {
                 String Author = resultSet.getString("Author");
                 String ISBN = resultSet.getString("ISBN");
                 String Category = resultSet.getString("Category");
+                String status = resultSet.getString("status");
+                String nr = resultSet.getString("nr");
                 
                 
                 // Add a row to the borrowsTable
-                model.addRow(new Object[]{Title, Author, ISBN, Category});
+                model.addRow(new Object[]{Title, Author, ISBN, Category, status, nr});
             }
             
             // Close the connection
@@ -363,13 +365,13 @@ try {
         jLabel3 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         booksPanel = new javax.swing.JPanel();
-        searchBooks = new javax.swing.JTextField();
         removeButton = new javax.swing.JButton();
         updateButton = new javax.swing.JButton();
         refreshButton = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         bookTable = new javax.swing.JTable();
-        jButton2 = new javax.swing.JButton();
+        searchButtonBooks = new javax.swing.JButton();
+        searchBooks = new javax.swing.JTextField();
         returnsPanel = new javax.swing.JPanel();
         confirmButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -428,7 +430,7 @@ try {
         borrowsPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         borrowsTable = new javax.swing.JTable();
-        searchBooks1 = new javax.swing.JTextField();
+        search = new javax.swing.JTextField();
         jButton30 = new javax.swing.JButton();
         rightmostPanel = new javax.swing.JPanel();
         returnsButton = new javax.swing.JButton();
@@ -496,10 +498,6 @@ try {
         booksPanel.setBackground(new java.awt.Color(28, 52, 62));
         booksPanel.setForeground(new java.awt.Color(159, 212, 179));
 
-        searchBooks.setBackground(new java.awt.Color(255, 255, 255));
-        searchBooks.setText("Search");
-        searchBooks = new PlaceholderTextField("Search");
-
         removeButton.setBackground(new java.awt.Color(49, 98, 103));
         removeButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         removeButton.setForeground(new java.awt.Color(0, 255, 255));
@@ -539,11 +537,11 @@ try {
 
             },
             new String [] {
-                "Title", "Author", "ISBN", "Category"
+                "Title", "Author", "ISBN", "Category", "Status", "# of Reservations"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -554,7 +552,18 @@ try {
         bookTable.setDefaultEditor(Object.class, null);
         jScrollPane5.setViewportView(bookTable);
 
-        jButton2.setText("jButton2");
+        searchButtonBooks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        searchButtonBooks.setBorderPainted(false);
+        searchButtonBooks.setContentAreaFilled(false);
+        searchButtonBooks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonBooksActionPerformed(evt);
+            }
+        });
+
+        searchBooks.setBackground(new java.awt.Color(255, 255, 255));
+        searchBooks.setText("jTextField1");
+        searchBooks = new PlaceholderTextField("Search");
 
         javax.swing.GroupLayout booksPanelLayout = new javax.swing.GroupLayout(booksPanel);
         booksPanel.setLayout(booksPanelLayout);
@@ -571,21 +580,24 @@ try {
                         .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane5)
                     .addGroup(booksPanelLayout.createSequentialGroup()
-                        .addComponent(searchBooks, javax.swing.GroupLayout.PREFERRED_SIZE, 562, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton2)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(searchBooks)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchButtonBooks, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         booksPanelLayout.setVerticalGroup(
             booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(booksPanelLayout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(searchBooks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
+                .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(booksPanelLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(searchBooks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, booksPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(searchButtonBooks)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1444,8 +1456,8 @@ try {
         ));
         jScrollPane1.setViewportView(borrowsTable);
 
-        searchBooks1.setBackground(new java.awt.Color(255, 255, 255));
-        searchBooks1.setText("Search");
+        search.setBackground(new java.awt.Color(255, 255, 255));
+        search.setText("Search");
         searchBooks = new PlaceholderTextField("Search");
 
         jButton30.setBackground(new java.awt.Color(49, 98, 103));
@@ -1466,7 +1478,7 @@ try {
             .addGroup(borrowsPanelLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(searchBooks1, javax.swing.GroupLayout.PREFERRED_SIZE, 562, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(search, javax.swing.GroupLayout.PREFERRED_SIZE, 562, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(14, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
@@ -1478,7 +1490,7 @@ try {
             borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(borrowsPanelLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
-                .addComponent(searchBooks1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 526, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2295,6 +2307,79 @@ try {
         populateBorrowsTableFromDatabase();
     }//GEN-LAST:event_jButton30ActionPerformed
 
+    private void searchButtonBooksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonBooksActionPerformed
+
+        
+        String searchText = searchBooks.getText();
+                System.out.println(searchText);
+
+    // Check if the search text is the placeholder
+    if (searchText.isEmpty()||searchText.equals("Search")) {
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        // Establish a connection to your database
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        // Create a SQL query to search for books
+        String query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? OR category LIKE ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        // Use the search text in the query with wildcards for advanced search
+        String searchQuery = "%" + searchText + "%";
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
+
+        // Print the query for debugging
+        System.out.println("Executing query: " + statement.toString());
+        
+        // Execute the query
+        ResultSet resultSet = statement.executeQuery();
+        
+        // Clear the table before adding new rows
+        DefaultTableModel model = (DefaultTableModel) bookTable.getModel();
+        model.setRowCount(0);
+        
+        // Debug statement to check if the query returns any results
+        boolean hasResults = false;
+        
+        // Populate the table with the search results
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("title");
+            String author = resultSet.getString("author");
+            String isbn = resultSet.getString("isbn");
+            String category = resultSet.getString("category");
+            String status = resultSet.getString("status");
+            int nr = resultSet.getInt("nr");
+            
+            // Add row to the table model
+            model.addRow(new Object[]{title, author, isbn, category, status, nr});
+            
+            // Print each result for debugging
+            System.out.println("Title: " + title + ", Author: " + author + ", ISBN: " + isbn + ", Category: " + category + ", Status: " + status + ", Nr: " + nr);
+        }
+        
+        // Check if results were found
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found.");
+        }
+        
+        // Close the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_searchButtonBooksActionPerformed
+
     
     
 
@@ -2323,7 +2408,6 @@ try {
     private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton17;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
@@ -2380,8 +2464,9 @@ try {
     private javax.swing.JPanel returnsPanel;
     private javax.swing.JTable returnsTable;
     private javax.swing.JPanel rightmostPanel;
+    private javax.swing.JTextField search;
     private javax.swing.JTextField searchBooks;
-    private javax.swing.JTextField searchBooks1;
+    private javax.swing.JButton searchButtonBooks;
     private javax.swing.JTextField titleField;
     private javax.swing.JTextField titleUpdate;
     private javax.swing.JButton updateButton;

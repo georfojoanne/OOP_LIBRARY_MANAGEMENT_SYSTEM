@@ -32,5 +32,9 @@ public class PlaceholderTextField extends JTextField {
             }
         });
     }
+    
+        public String getPlaceholder() {
+        return this.placeholder;
+    }
 
 }
