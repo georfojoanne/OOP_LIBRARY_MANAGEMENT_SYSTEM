@@ -371,7 +371,7 @@ try {
         jScrollPane5 = new javax.swing.JScrollPane();
         bookTable = new javax.swing.JTable();
         searchButtonBooks = new javax.swing.JButton();
-        searchBooks = new javax.swing.JTextField();
+        searchBookTitle = new javax.swing.JTextField();
         returnsPanel = new javax.swing.JPanel();
         confirmButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -561,9 +561,9 @@ try {
             }
         });
 
-        searchBooks.setBackground(new java.awt.Color(255, 255, 255));
-        searchBooks.setText("jTextField1");
-        searchBooks = new PlaceholderTextField("Search");
+        searchBookTitle.setBackground(new java.awt.Color(255, 255, 255));
+        searchBookTitle.setText("jTextField1");
+        searchBookTitle = new PlaceholderTextField("Search");
 
         javax.swing.GroupLayout booksPanelLayout = new javax.swing.GroupLayout(booksPanel);
         booksPanel.setLayout(booksPanelLayout);
@@ -580,7 +580,7 @@ try {
                         .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane5)
                     .addGroup(booksPanelLayout.createSequentialGroup()
-                        .addComponent(searchBooks)
+                        .addComponent(searchBookTitle)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(searchButtonBooks, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -591,7 +591,7 @@ try {
                 .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(booksPanelLayout.createSequentialGroup()
                         .addGap(20, 20, 20)
-                        .addComponent(searchBooks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(searchBookTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, booksPanelLayout.createSequentialGroup()
                         .addContainerGap()
@@ -1458,7 +1458,7 @@ try {
 
         search.setBackground(new java.awt.Color(255, 255, 255));
         search.setText("Search");
-        searchBooks = new PlaceholderTextField("Search");
+        searchBookTitle = new PlaceholderTextField("Search");
 
         jButton30.setBackground(new java.awt.Color(49, 98, 103));
         jButton30.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -2310,7 +2310,7 @@ try {
     private void searchButtonBooksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonBooksActionPerformed
 
         
-        String searchText = searchBooks.getText();
+        String searchText = searchBookTitle.getText();
                 System.out.println(searchText);
 
     // Check if the search text is the placeholder
@@ -2465,7 +2465,7 @@ try {
     private javax.swing.JTable returnsTable;
     private javax.swing.JPanel rightmostPanel;
     private javax.swing.JTextField search;
-    private javax.swing.JTextField searchBooks;
+    private javax.swing.JTextField searchBookTitle;
     private javax.swing.JButton searchButtonBooks;
     private javax.swing.JTextField titleField;
     private javax.swing.JTextField titleUpdate;
