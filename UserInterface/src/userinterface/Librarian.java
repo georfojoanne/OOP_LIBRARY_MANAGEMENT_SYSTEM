@@ -413,7 +413,7 @@ try {
         jButton26 = new javax.swing.JButton();
         jScrollPane6 = new javax.swing.JScrollPane();
         loansManagementTable = new javax.swing.JTable();
-        jTextField25 = new javax.swing.JTextField();
+        loanManagement = new javax.swing.JTextField();
         updatePanel = new javax.swing.JPanel();
         jTextField13 = new javax.swing.JTextField();
         jTextField14 = new javax.swing.JTextField();
@@ -430,8 +430,8 @@ try {
         borrowsPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         borrowsTable = new javax.swing.JTable();
-        search = new javax.swing.JTextField();
         jButton30 = new javax.swing.JButton();
+        bSearch = new javax.swing.JTextField();
         rightmostPanel = new javax.swing.JPanel();
         returnsButton = new javax.swing.JButton();
         addBooksButton = new javax.swing.JButton();
@@ -555,6 +555,7 @@ try {
         searchButtonBooks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
         searchButtonBooks.setBorderPainted(false);
         searchButtonBooks.setContentAreaFilled(false);
+        searchButtonBooks.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         searchButtonBooks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchButtonBooksActionPerformed(evt);
@@ -562,7 +563,7 @@ try {
         });
 
         searchBookTitle.setBackground(new java.awt.Color(255, 255, 255));
-        searchBookTitle.setText("jTextField1");
+        searchBookTitle.setText("Search");
         searchBookTitle = new PlaceholderTextField("Search");
 
         javax.swing.GroupLayout booksPanelLayout = new javax.swing.GroupLayout(booksPanel);
@@ -590,13 +591,13 @@ try {
             .addGroup(booksPanelLayout.createSequentialGroup()
                 .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(booksPanelLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(searchBookTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15))
+                        .addGap(12, 12, 12)
+                        .addComponent(searchButtonBooks)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, booksPanelLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(searchButtonBooks)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addComponent(searchBookTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)))
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(booksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -654,6 +655,11 @@ try {
         borrowsSearch.setBackground(new java.awt.Color(255, 255, 255));
         borrowsSearch.setText("Search");
         borrowsSearch = new PlaceholderTextField("Search");
+        borrowsSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrowsSearchActionPerformed(evt);
+            }
+        });
 
         confirmButton1.setBackground(new java.awt.Color(49, 98, 103));
         confirmButton1.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -671,26 +677,26 @@ try {
         returnsPanelLayout.setHorizontalGroup(
             returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(returnsPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(borrowsSearch)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE))
-                .addContainerGap())
-            .addGroup(returnsPanelLayout.createSequentialGroup()
-                .addGap(40, 40, 40)
+                .addGap(31, 31, 31)
                 .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
                 .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40))
+            .addGroup(returnsPanelLayout.createSequentialGroup()
+                .addGap(9, 9, 9)
+                .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 665, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         returnsPanelLayout.setVerticalGroup(
             returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, returnsPanelLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addContainerGap(11, Short.MAX_VALUE)
                 .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -773,8 +779,8 @@ try {
             .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(reservationPanelLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(holdsSearch)
-                    .addContainerGap()))
+                    .addComponent(holdsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 638, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(46, Short.MAX_VALUE)))
         );
         reservationPanelLayout.setVerticalGroup(
             reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1028,18 +1034,18 @@ try {
                         .addComponent(confirmBorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(55, 55, 55)
                         .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservePanelLayout.createSequentialGroup()
+                        .addComponent(requestSearch)
+                        .addGap(44, 44, 44)))
                 .addContainerGap())
-            .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(reservePanelLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(requestSearch)
-                    .addContainerGap()))
         );
         reservePanelLayout.setVerticalGroup(
             reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(reservePanelLayout.createSequentialGroup()
-                .addGap(44, 44, 44)
+                .addGap(10, 10, 10)
+                .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1047,11 +1053,6 @@ try {
                     .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(24, 24, 24))
-            .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(reservePanelLayout.createSequentialGroup()
-                    .addGap(16, 16, 16)
-                    .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(607, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("tab6", reservePanel);
@@ -1120,7 +1121,9 @@ try {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton28, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(loansSearch, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addGroup(loansPanelLayout.createSequentialGroup()
+                        .addComponent(loansSearch)
+                        .addGap(44, 44, 44)))
                 .addContainerGap())
         );
         loansPanelLayout.setVerticalGroup(
@@ -1128,8 +1131,8 @@ try {
             .addGroup(loansPanelLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addComponent(loansSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+                .addGap(13, 13, 13)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton27, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1184,8 +1187,9 @@ try {
         loansManagementTable.setDefaultEditor(Object.class, null);
         jScrollPane6.setViewportView(loansManagementTable);
 
-        jTextField25.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField25.setText("Search");
+        loanManagement.setBackground(new java.awt.Color(255, 255, 255));
+        loanManagement.setText("Search");
+        loanManagement = new PlaceholderTextField("Search");
 
         javax.swing.GroupLayout loanManagementPanelLayout = new javax.swing.GroupLayout(loanManagementPanel);
         loanManagementPanel.setLayout(loanManagementPanelLayout);
@@ -1198,29 +1202,24 @@ try {
                     .addGroup(loanManagementPanelLayout.createSequentialGroup()
                         .addComponent(jButton25, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
-                        .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, loanManagementPanelLayout.createSequentialGroup()
+                        .addComponent(loanManagement)
+                        .addGap(44, 44, 44)))
                 .addContainerGap())
-            .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jTextField25)
-                    .addContainerGap()))
         );
         loanManagementPanelLayout.setVerticalGroup(
             loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+                .addGap(15, 15, 15)
+                .addComponent(loanManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton25, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14))
-            .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                    .addGap(17, 17, 17)
-                    .addComponent(jTextField25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(606, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("tab8", loanManagementPanel);
@@ -1456,10 +1455,6 @@ try {
         ));
         jScrollPane1.setViewportView(borrowsTable);
 
-        search.setBackground(new java.awt.Color(255, 255, 255));
-        search.setText("Search");
-        searchBookTitle = new PlaceholderTextField("Search");
-
         jButton30.setBackground(new java.awt.Color(49, 98, 103));
         jButton30.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton30.setForeground(new java.awt.Color(0, 255, 255));
@@ -1471,28 +1466,34 @@ try {
             }
         });
 
+        bSearch.setBackground(new java.awt.Color(255, 255, 255));
+        bSearch.setText("Search");
+        bSearch = new PlaceholderTextField("Search");
+
         javax.swing.GroupLayout borrowsPanelLayout = new javax.swing.GroupLayout(borrowsPanel);
         borrowsPanel.setLayout(borrowsPanelLayout);
         borrowsPanelLayout.setHorizontalGroup(
             borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(borrowsPanelLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(search, javax.swing.GroupLayout.PREFERRED_SIZE, 562, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(14, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(259, 259, 259))
+            .addGroup(borrowsPanelLayout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
+                        .addComponent(bSearch)
+                        .addGap(44, 44, 44)))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         borrowsPanelLayout.setVerticalGroup(
             borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(borrowsPanelLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
-                .addComponent(search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 526, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(bSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 536, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -2308,9 +2309,10 @@ try {
     }//GEN-LAST:event_jButton30ActionPerformed
 
     private void searchButtonBooksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonBooksActionPerformed
-
         
-        String searchText = searchBookTitle.getText();
+        searchBookTitle.requestFocus();
+        
+        String searchText = searchBookTitle.getText().trim();
                 System.out.println(searchText);
 
     // Check if the search text is the placeholder
@@ -2380,6 +2382,10 @@ try {
     }
     }//GEN-LAST:event_searchButtonBooksActionPerformed
 
+    private void borrowsSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowsSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_borrowsSearchActionPerformed
+
     
     
 
@@ -2390,6 +2396,7 @@ try {
     private javax.swing.JButton addButton;
     private javax.swing.JTextField authorAdd;
     private javax.swing.JTextField authorUpdate;
+    private javax.swing.JTextField bSearch;
     private javax.swing.JTable bookTable;
     private javax.swing.JButton booksButton;
     private javax.swing.JPanel booksPanel;
@@ -2440,11 +2447,11 @@ try {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField20;
     private javax.swing.JTextField jTextField21;
-    private javax.swing.JTextField jTextField25;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
+    private javax.swing.JTextField loanManagement;
     private javax.swing.JPanel loanManagementPanel;
     private javax.swing.JTable loansManagementTable;
     private javax.swing.JPanel loansPanel;
@@ -2464,7 +2471,6 @@ try {
     private javax.swing.JPanel returnsPanel;
     private javax.swing.JTable returnsTable;
     private javax.swing.JPanel rightmostPanel;
-    private javax.swing.JTextField search;
     private javax.swing.JTextField searchBookTitle;
     private javax.swing.JButton searchButtonBooks;
     private javax.swing.JTextField titleField;
