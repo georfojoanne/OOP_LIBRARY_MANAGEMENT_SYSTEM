@@ -11,7 +11,9 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,47 +41,99 @@ public class Librarian extends javax.swing.JFrame {
        checkAndCancelOverdueReservations();
        populateLoansTable();
        checkForOverdueAndUpdateUserInfo();
+       populateLoansManagementTableForOverdueBooks();
               
           
     }
     
-private static void checkForOverdueAndUpdateUserInfo() { //make sure it increments for the user, debug
+    private void populateLoansManagementTableForOverdueBooks() {
     try {
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
 
-        // Step 1: Fetch overdue borrows with their overdue duration and calculate loan amount
-        String query = "SELECT title, dob, name, DATEDIFF(CURDATE(), dor) AS overdue_days FROM borrows WHERE dor < CURDATE()";
+        String query = "SELECT title, dor, name, loan, overdueDays FROM borrows WHERE dor < CURDATE()";
+        PreparedStatement statement = connection.prepareStatement(query);
+        ResultSet resultSet = statement.executeQuery();
+        
+        DefaultTableModel model = (DefaultTableModel) loansManagementTable.getModel();
+            model.setRowCount(0);
+
+        while (resultSet.next()) {
+            String title = resultSet.getString("title");
+            Date dor = resultSet.getDate("dor");
+            String name = resultSet.getString("name");
+            int fee = resultSet.getInt("loan");
+            int overdueDays = resultSet.getInt("overdueDays");
+
+            if (overdueDays > 0) {
+                model.addRow(new Object[]{name, title, dor, fee});
+            }
+        }
+
+        resultSet.close();
+        statement.close();
+        connection.close();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+    
+private static void checkForOverdueAndUpdateUserInfo() { //I have to update this cause it keeps incrementing in the userinfo instead of just once
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        String query = "SELECT title, dob, dor, name, DATEDIFF(CURDATE(), dor) AS overdue_days, loan, last_updated FROM borrows WHERE dor < CURDATE()";
         PreparedStatement statement = connection.prepareStatement(query);
         ResultSet resultSet = statement.executeQuery();
 
-        // Step 2: Update loan amount for each book in the borrows table and userinfo table
-        String updateBorrowsQuery = "UPDATE borrows SET loan = ? WHERE title = ? AND dob = ? AND name = ?";
-        String updateUserInfoQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
+        String updateBorrowsQuery = "UPDATE borrows SET loan = ?, overdueDays = ?, last_updated = CURDATE() WHERE title = ? AND dob = ? AND name = ?";
         PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
-        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
+
+        // Map to accumulate total fines for each user hashmap and maps are:
+        Map<String, Integer> userFines = new HashMap<>();
 
         while (resultSet.next()) {
             String title = resultSet.getString("title");
             Date dob = resultSet.getDate("dob");
             String name = resultSet.getString("name");
             int overdueDays = resultSet.getInt("overdue_days");
+            int loan = resultSet.getInt("loan");
 
-            // Calculate fine based on overdue duration (10 per 7 days)
-            int fine = (overdueDays / 7) * 10;
+            // Calculate fine based on overdue duration (10 per 7 days, including the first overdue period)
+            int fine = 10;
+            if (overdueDays > 0) {
+                fine += ((overdueDays / 7) * 10);
+            }
 
-            // Update loan amount for the book in borrows table
-            int loanAmount = fine;
-            updateBorrowsStatement.setInt(1, loanAmount);
-            updateBorrowsStatement.setString(2, title);
-            updateBorrowsStatement.setDate(3, (java.sql.Date) dob);
-            updateBorrowsStatement.setString(4, name);
+            // Update loan amount and overdue days for the book in borrows table
+            updateBorrowsStatement.setInt(1, fine);
+            updateBorrowsStatement.setInt(2, overdueDays);
+            updateBorrowsStatement.setString(3, title);
+            updateBorrowsStatement.setDate(4, new java.sql.Date(dob.getTime()));
+            updateBorrowsStatement.setString(5, name);
             updateBorrowsStatement.executeUpdate();
 
-            // Update loan amount for the user in userinfo table
-            updateUserInfoStatement.setInt(1, loanAmount);
+            // Accumulate the fine for the user
+            userFines.put(name, userFines.getOrDefault(name, 0) + fine);
+        }
+
+        // Step 3: Update loan amount for each user in the userinfo table
+        String updateUserInfoQuery = "UPDATE userinfo SET loan = loan + ? WHERE name = ?";
+        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
+
+        for (Map.Entry<String, Integer> entry : userFines.entrySet()) {
+            String name = entry.getKey();
+            int totalFine = entry.getValue();
+
+            updateUserInfoStatement.setInt(1, totalFine);
             updateUserInfoStatement.setString(2, name);
-            updateUserInfoStatement.executeUpdate();
+            int updatedRows = updateUserInfoStatement.executeUpdate();
+            if (updatedRows == 0) {
+                // If no rows were updated, print a warning
+                System.out.println("Warning: No rows updated in userinfo table for user: " + name);
+            }
         }
 
         // Close resources
@@ -93,6 +147,7 @@ private static void checkForOverdueAndUpdateUserInfo() { //make sure it incremen
         e.printStackTrace();
     }
 }
+
    
     public void populateLoansTable(){
         try {
@@ -562,6 +617,7 @@ try {
         returnsTable = new javax.swing.JTable();
         borrowsSearch = new javax.swing.JTextField();
         confirmButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         reservationPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         reservationTitleTable = new javax.swing.JTable();
@@ -593,7 +649,7 @@ try {
         jScrollPane7 = new javax.swing.JScrollPane();
         loansTable = new javax.swing.JTable();
         loanManagementPanel = new javax.swing.JPanel();
-        jButton25 = new javax.swing.JButton();
+        confirmPayment = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
         jScrollPane6 = new javax.swing.JScrollPane();
         loansManagementTable = new javax.swing.JTable();
@@ -857,6 +913,15 @@ try {
             }
         });
 
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout returnsPanelLayout = new javax.swing.GroupLayout(returnsPanel);
         returnsPanel.setLayout(returnsPanelLayout);
         returnsPanelLayout.setHorizontalGroup(
@@ -864,23 +929,30 @@ try {
             .addGroup(returnsPanelLayout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40))
             .addGroup(returnsPanelLayout.createSequentialGroup()
                 .addGap(9, 9, 9)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(returnsPanelLayout.createSequentialGroup()
+                        .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 665, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
         returnsPanelLayout.setVerticalGroup(
             returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, returnsPanelLayout.createSequentialGroup()
-                .addContainerGap(11, Short.MAX_VALUE)
-                .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton2)
+                    .addGroup(returnsPanelLayout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 554, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1329,17 +1401,27 @@ try {
 
         loanManagementPanel.setBackground(new java.awt.Color(28, 52, 62));
 
-        jButton25.setBackground(new java.awt.Color(49, 98, 103));
-        jButton25.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton25.setForeground(new java.awt.Color(0, 255, 255));
-        jButton25.setText("CONFIRM PAYMENT");
-        jButton25.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmPayment.setBackground(new java.awt.Color(49, 98, 103));
+        confirmPayment.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        confirmPayment.setForeground(new java.awt.Color(0, 255, 255));
+        confirmPayment.setText("CONFIRM PAYMENT");
+        confirmPayment.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmPayment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmPaymentActionPerformed(evt);
+            }
+        });
 
         jButton26.setBackground(new java.awt.Color(49, 98, 103));
         jButton26.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton26.setForeground(new java.awt.Color(0, 255, 255));
-        jButton26.setText("NOTIFY USER");
+        jButton26.setText("REFRESH");
         jButton26.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton26.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton26ActionPerformed(evt);
+            }
+        });
 
         loansManagementTable.setBackground(new java.awt.Color(220, 220, 250));
         loansManagementTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1382,7 +1464,7 @@ try {
                 .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane6)
                     .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                        .addComponent(jButton25, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(confirmPayment, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
                         .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, loanManagementPanelLayout.createSequentialGroup()
@@ -1399,7 +1481,7 @@ try {
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton25, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(confirmPayment, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14))
         );
@@ -2621,6 +2703,137 @@ try {
     }
     }//GEN-LAST:event_jButton31ActionPerformed
 
+    private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
+        populateLoansManagementTableForOverdueBooks();
+    }//GEN-LAST:event_jButton26ActionPerformed
+//i have issue with the userinfo again huhu
+    private void confirmPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPaymentActionPerformed
+    int selectedRow = loansManagementTable.getSelectedRow();
+    if (selectedRow != -1) {
+        String title = (String) loansManagementTable.getValueAt(selectedRow, 1); // Assuming title is at index 1
+        String name = (String) loansManagementTable.getValueAt(selectedRow, 0); // Assuming name is at index 0
+        int feePaid = (int) loansManagementTable.getValueAt(selectedRow, 3); // Assuming fee is at index 3
+
+        try {
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+
+            // Clear loan, overdueDays, and last_updated, and extend dor by 7 days
+            String updateBorrowsQuery = "UPDATE borrows SET loan = 0, overdueDays = 0, last_updated = NULL, dor = DATE_ADD(dor, INTERVAL 7 DAY) WHERE title = ? AND name = ?";
+            PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
+            updateBorrowsStatement.setString(1, title);
+            updateBorrowsStatement.setString(2, name);
+            updateBorrowsStatement.executeUpdate();
+
+            // Update history table
+            String insertHistoryQuery = "INSERT INTO history (title, status, date, name, amount) VALUES (?, 'Overdue Paid', ?, ?, ?)";
+            PreparedStatement insertHistoryStatement = connection.prepareStatement(insertHistoryQuery);
+            insertHistoryStatement.setString(1, title);
+            insertHistoryStatement.setString(2, new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            insertHistoryStatement.setString(3, name);
+            insertHistoryStatement.setInt(4, feePaid);
+            insertHistoryStatement.executeUpdate();
+
+            // Decrement fee paid from the loan column in userinfo table
+            String updateUserInfoQuery = "UPDATE userinfo SET loan = loan - ? WHERE name = ?";
+            PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
+            updateUserInfoStatement.setInt(1, feePaid);
+            updateUserInfoStatement.setString(2, name);
+            updateUserInfoStatement.executeUpdate();
+
+            JOptionPane.showMessageDialog(null, "Payment confirmed successfully!");
+
+            // Refresh loansManagementTable
+            populateLoansManagementTableForOverdueBooks();
+
+            // Close resources
+            updateBorrowsStatement.close();
+            insertHistoryStatement.close();
+            updateUserInfoStatement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select a row from the table first.");
+    }        
+    }//GEN-LAST:event_confirmPaymentActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        borrowsSearch.requestFocus();
+        
+        String searchText = borrowsSearch.getText().trim();
+                System.out.println(searchText);
+
+    // Check if the search text is the placeholder
+    if (searchText.isEmpty()||searchText.equals("Search")) {
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        // Establish a connection to your database
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        // Create a SQL query to search for books
+        String query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? OR category LIKE ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        // Use the search text in the query with wildcards for advanced search
+        String searchQuery = "%" + searchText + "%";
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
+
+        // Print the query for debugging
+        System.out.println("Executing query: " + statement.toString());
+        
+        // Execute the query
+        ResultSet resultSet = statement.executeQuery();
+        
+        // Clear the table before adding new rows
+        DefaultTableModel model = (DefaultTableModel) returnsTable.getModel();
+        model.setRowCount(0);
+        
+        // Debug statement to check if the query returns any results
+        boolean hasResults = false;
+        
+        // Populate the table with the search results
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("title");
+            String author = resultSet.getString("author");
+            String isbn = resultSet.getString("isbn");
+            String category = resultSet.getString("category");
+            String status = resultSet.getString("status");
+            int nr = resultSet.getInt("nr");
+            
+            // Add row to the table model
+            model.addRow(new Object[]{title, author, isbn, category, status, nr});
+            
+            // Print each result for debugging
+            System.out.println("Title: " + title + ", Author: " + author + ", ISBN: " + isbn + ", Category: " + category + ", Status: " + status + ", Nr: " + nr);
+        }
+        
+        // Check if results were found
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found.");
+        }
+        
+        // Close the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     
     
 
@@ -2644,17 +2857,18 @@ try {
     private javax.swing.JButton confirmBorrow;
     private javax.swing.JButton confirmButton;
     private javax.swing.JButton confirmButton1;
+    private javax.swing.JButton confirmPayment;
     private javax.swing.JButton holdsButton;
     private javax.swing.JTextField holdsSearch;
     private javax.swing.JTextField isbnAdd;
     private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
-    private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
