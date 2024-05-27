@@ -37,10 +37,100 @@ public class Librarian extends javax.swing.JFrame {
        populateReservationTitleTableFromDatabase();
        bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
        checkAndCancelOverdueReservations();
+       populateLoansTable();
+       checkForOverdueAndUpdateUserInfo();
               
           
     }
+    
+private static void checkForOverdueAndUpdateUserInfo() { //make sure it increments for the user, debug
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Step 1: Fetch overdue borrows with their overdue duration and calculate loan amount
+        String query = "SELECT title, dob, name, DATEDIFF(CURDATE(), dor) AS overdue_days FROM borrows WHERE dor < CURDATE()";
+        PreparedStatement statement = connection.prepareStatement(query);
+        ResultSet resultSet = statement.executeQuery();
+
+        // Step 2: Update loan amount for each book in the borrows table and userinfo table
+        String updateBorrowsQuery = "UPDATE borrows SET loan = ? WHERE title = ? AND dob = ? AND name = ?";
+        String updateUserInfoQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
+        PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
+        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
+
+        while (resultSet.next()) {
+            String title = resultSet.getString("title");
+            Date dob = resultSet.getDate("dob");
+            String name = resultSet.getString("name");
+            int overdueDays = resultSet.getInt("overdue_days");
+
+            // Calculate fine based on overdue duration (10 per 7 days)
+            int fine = (overdueDays / 7) * 10;
+
+            // Update loan amount for the book in borrows table
+            int loanAmount = fine;
+            updateBorrowsStatement.setInt(1, loanAmount);
+            updateBorrowsStatement.setString(2, title);
+            updateBorrowsStatement.setDate(3, (java.sql.Date) dob);
+            updateBorrowsStatement.setString(4, name);
+            updateBorrowsStatement.executeUpdate();
+
+            // Update loan amount for the user in userinfo table
+            updateUserInfoStatement.setInt(1, loanAmount);
+            updateUserInfoStatement.setString(2, name);
+            updateUserInfoStatement.executeUpdate();
+        }
+
+        // Close resources
+        resultSet.close();
+        statement.close();
+        updateBorrowsStatement.close();
+        updateUserInfoStatement.close();
+        connection.close();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
    
+    public void populateLoansTable(){
+        try {
+        // Get the database connection
+        dbConnection conn = new dbConnection();
+        Connection connection = conn.getConnection();
+        
+        if (connection != null) {
+            // SQL query to select records with status "Overdue Paid"
+            String selectQuery = "SELECT name, title, date, amount FROM history WHERE status = 'Overdue Paid'";
+            PreparedStatement statement = connection.prepareStatement(selectQuery);
+            ResultSet resultSet = statement.executeQuery();
+            
+            // Clear existing rows from loansTable
+            DefaultTableModel model = (DefaultTableModel) loansTable.getModel();
+            model.setRowCount(0);
+            
+            // Add fetched data to loansTable
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String title = resultSet.getString("title");
+                String date = resultSet.getString("date");
+                int amount = resultSet.getInt("amount");
+                
+                // Add a row to the loansTable
+                model.addRow(new Object[]{name, title, date, amount});
+            }
+            
+            // Close the connection
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+    
     public static void checkAndCancelOverdueReservations() {
         Connection connection = null;
         PreparedStatement selectStmt = null;
@@ -526,6 +616,7 @@ try {
         borrowsTable = new javax.swing.JTable();
         jButton30 = new javax.swing.JButton();
         bSearch = new javax.swing.JTextField();
+        jButton31 = new javax.swing.JButton();
         rightmostPanel = new javax.swing.JPanel();
         returnsButton = new javax.swing.JButton();
         addBooksButton = new javax.swing.JButton();
@@ -1156,7 +1247,7 @@ try {
         jButton27.setBackground(new java.awt.Color(49, 98, 103));
         jButton27.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton27.setForeground(new java.awt.Color(0, 255, 255));
-        jButton27.setText("MANAGE");
+        jButton27.setText("MANAGE PAYMENTS");
         jButton27.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton27.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1167,7 +1258,7 @@ try {
         jButton28.setBackground(new java.awt.Color(49, 98, 103));
         jButton28.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton28.setForeground(new java.awt.Color(0, 255, 255));
-        jButton28.setText("CANCEL");
+        jButton28.setText("REFRESH");
         jButton28.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         loansSearch.setBackground(new java.awt.Color(255, 255, 255));
@@ -1181,7 +1272,7 @@ try {
 
             },
             new String [] {
-                "Username", "Book", "Due Date", "Fee"
+                "Username", "Book", "Paid Date", "Paid Fee"
             }
         ) {
             Class[] types = new Class [] {
@@ -1253,10 +1344,7 @@ try {
         loansManagementTable.setBackground(new java.awt.Color(220, 220, 250));
         loansManagementTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Username", "Book", "Due Date", "Fee"
@@ -1564,14 +1652,21 @@ try {
         bSearch.setText("Search");
         bSearch = new PlaceholderTextField("Search");
 
+        jButton31.setBackground(new java.awt.Color(49, 98, 103));
+        jButton31.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jButton31.setForeground(new java.awt.Color(0, 255, 255));
+        jButton31.setText("OVERDUES");
+        jButton31.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton31ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout borrowsPanelLayout = new javax.swing.GroupLayout(borrowsPanel);
         borrowsPanel.setLayout(borrowsPanelLayout);
         borrowsPanelLayout.setHorizontalGroup(
             borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(259, 259, 259))
             .addGroup(borrowsPanelLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1580,6 +1675,12 @@ try {
                         .addComponent(bSearch)
                         .addGap(44, 44, 44)))
                 .addContainerGap(14, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
+                .addGap(108, 108, 108)
+                .addComponent(jButton31, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(109, 109, 109))
         );
         borrowsPanelLayout.setVerticalGroup(
             borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1587,10 +1688,12 @@ try {
                 .addGap(19, 19, 19)
                 .addComponent(bSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 536, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton31, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab9", borrowsPanel);
@@ -2481,6 +2584,43 @@ try {
         // TODO add your handling code here:
     }//GEN-LAST:event_borrowsSearchActionPerformed
 
+    private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
+        try {
+        // Establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        if (connection != null) {
+            // Prepare the SQL query to select only overdue books
+            String query = "SELECT title, dob, dor, name FROM borrows WHERE dor < CURRENT_DATE";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            
+            // Clear existing rows from borrowsTable
+            DefaultTableModel model = (DefaultTableModel) borrowsTable.getModel();
+            model.setRowCount(0);
+            
+            // Add fetched data to borrowsTable
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String dob = resultSet.getString("dob");
+                String dor = resultSet.getString("dor");
+                String name = resultSet.getString("name");
+                
+                // Add a row to the borrowsTable
+                model.addRow(new Object[]{title, dob, dor, name});
+            }
+            
+            // Close the connection
+            connection.close();
+        } else {
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }//GEN-LAST:event_jButton31ActionPerformed
+
     
     
 
@@ -2520,6 +2660,7 @@ try {
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton30;
+    private javax.swing.JButton jButton31;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

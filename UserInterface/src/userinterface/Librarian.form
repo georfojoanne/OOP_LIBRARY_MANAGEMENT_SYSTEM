@@ -1198,7 +1198,7 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="0" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="MANAGE"/>
+                <Property name="text" type="java.lang.String" value="MANAGE PAYMENTS"/>
                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
                   <Color id="Hand Cursor"/>
                 </Property>
@@ -1218,7 +1218,7 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="0" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="CANCEL"/>
+                <Property name="text" type="java.lang.String" value="REFRESH"/>
                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
                   <Color id="Hand Cursor"/>
                 </Property>
@@ -1254,8 +1254,8 @@
                       <Table columnCount="4" rowCount="0">
                         <Column editable="false" title="Username" type="java.lang.String"/>
                         <Column editable="false" title="Book" type="java.lang.String"/>
-                        <Column editable="true" title="Due Date" type="java.lang.String"/>
-                        <Column editable="true" title="Fee" type="java.lang.Float"/>
+                        <Column editable="true" title="Paid Date" type="java.lang.String"/>
+                        <Column editable="true" title="Paid Fee" type="java.lang.Float"/>
                       </Table>
                     </Property>
                     <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor" preCode="loansTable.getTableHeader().setReorderingAllowed(false);&#xa;loansTable.setDefaultEditor(Object.class, null);">
@@ -1391,7 +1391,7 @@
                       <Color blue="fa" green="dc" red="dc" type="rgb"/>
                     </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                      <Table columnCount="4" rowCount="4">
+                      <Table columnCount="4" rowCount="0">
                         <Column editable="false" title="Username" type="java.lang.String"/>
                         <Column editable="false" title="Book" type="java.lang.String"/>
                         <Column editable="true" title="Due Date" type="java.lang.String"/>
@@ -1821,11 +1821,6 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="jButton30" min="-2" pref="162" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="259" max="-2" attributes="0"/>
-                  </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -1837,6 +1832,13 @@
                       </Group>
                       <EmptySpace pref="14" max="32767" attributes="0"/>
                   </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace min="-2" pref="108" max="-2" attributes="0"/>
+                      <Component id="jButton31" min="-2" pref="162" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="jButton30" min="-2" pref="162" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="109" max="-2" attributes="0"/>
+                  </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -1845,10 +1847,13 @@
                       <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
                       <Component id="bSearch" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" min="-2" pref="536" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jButton30" min="-2" pref="48" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" min="-2" pref="515" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jButton30" alignment="3" min="-2" pref="48" max="-2" attributes="0"/>
+                          <Component id="jButton31" alignment="3" min="-2" pref="48" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="9" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1905,6 +1910,26 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="bSearch = new PlaceholderTextField(&quot;Search&quot;);"/>
               </AuxValues>
+            </Component>
+            <Component class="javax.swing.JButton" name="jButton31">
+              <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="67" green="62" red="31" type="rgb"/>
+                </Property>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Microsoft JhengHei UI" size="18" style="1"/>
+                </Property>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="ff" green="ff" red="0" type="rgb"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="OVERDUES"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton31ActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
