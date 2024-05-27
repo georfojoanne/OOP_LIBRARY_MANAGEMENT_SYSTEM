@@ -82,6 +82,12 @@ public class userHome extends javax.swing.JFrame  {
     }
     
     
+    
+    
+    
+    
+    
+    
     private void notifs() {
         try {
             // Establish a database connection
@@ -149,6 +155,13 @@ public class userHome extends javax.swing.JFrame  {
 
         // Get the selected rows from the borrowsTable
         int[] selectedRows = borrowsTable.getSelectedRows();
+        
+        
+        
+    if (selectedRows.length == 0) {
+        JOptionPane.showMessageDialog(null, "Please select a book.", "No Book Selected", JOptionPane.WARNING_MESSAGE);
+    }
+ 
 
         // Get the username
         String name = userName.getText();
@@ -1949,34 +1962,72 @@ private void removeReservationSelectedRowsFromDatabase() {
 
         String searchText = searchBook.getText().trim(); // Get the text entered in the searchBook field
 
-        // If the search text is empty, do nothing
-        if (searchText.isEmpty()) {
-            
-            return;
-        }
+       
+    // Check if the search text is the placeholder
+    if (searchText.isEmpty()||searchText.equals("Search")) {
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        // Establish a connection to your database
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
         
+        // Create a SQL query to search for books
+        String query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? OR category LIKE ?";
+        PreparedStatement statement = connection.prepareStatement(query);
         
+        // Use the search text in the query with wildcards for advanced search
+        String searchQuery = "%" + searchText + "%";
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
 
+        // Print the query for debugging
+        System.out.println("Executing query: " + statement.toString());
+        
+        // Execute the query
+        ResultSet resultSet = statement.executeQuery();
+        
+        // Clear the table before adding new rows
         DefaultTableModel model = (DefaultTableModel) searchBookTable.getModel();
-
-        // Iterate over each row in the searchBookTable
-        for (int i = 0; i < model.getRowCount(); i++) {
-            // Iterate over each column in the current row
-            for (int j = 0; j < model.getColumnCount(); j++) {
-                Object cellValue = model.getValueAt(i, j);
-                // Check if the cell value contains the search text
-                if (cellValue != null && cellValue.toString().toLowerCase().contains(searchText.toLowerCase())) {
-                    // Move the row to the top (insert it at index 0)
-                    Object[] rowData = new Object[model.getColumnCount()];
-                    for (int k = 0; k < model.getColumnCount(); k++) {
-                        rowData[k] = model.getValueAt(i, k);
-                    }
-                    model.removeRow(i);
-                    model.insertRow(0, rowData);
-                    return; // Stop searching after finding the first match
-                }
-            }
+        model.setRowCount(0);
+        
+        // Debug statement to check if the query returns any results
+        boolean hasResults = false;
+        
+        // Populate the table with the search results
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("title");
+            String author = resultSet.getString("author");
+            String isbn = resultSet.getString("isbn");
+            String category = resultSet.getString("category");
+            String status = resultSet.getString("status");
+            int nr = resultSet.getInt("nr");
+            
+            // Add row to the table model
+            model.addRow(new Object[]{title, author, isbn, category, status, nr});
+            
+            // Print each result for debugging
+            System.out.println("Title: " + title + ", Author: " + author + ", ISBN: " + isbn + ", Category: " + category + ", Status: " + status + ", Nr: " + nr);
         }
+        
+        // Check if results were found
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found.");
+        }
+        
+        // Close the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
 
     }//GEN-LAST:event_searchButtonActionPerformed
    
