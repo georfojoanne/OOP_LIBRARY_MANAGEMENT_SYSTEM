@@ -491,6 +491,7 @@ public void getTextFromNameColumn() {
         notifications = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         notifsTable = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
         settings = new javax.swing.JPanel();
         logOutButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -1106,21 +1107,40 @@ public void getTextFromNameColumn() {
         notifsTable.setShowGrid(true);
         jScrollPane4.setViewportView(notifsTable);
 
+        jButton1.setBackground(new java.awt.Color(0, 102, 102));
+        jButton1.setForeground(new java.awt.Color(102, 255, 255));
+        jButton1.setText("R E F R E S H");
+        jButton1.setRequestFocusEnabled(false);
+        jButton1.setRolloverEnabled(false);
+        jButton1.setVerifyInputWhenFocusTarget(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout notificationsLayout = new javax.swing.GroupLayout(notifications);
         notifications.setLayout(notificationsLayout);
         notificationsLayout.setHorizontalGroup(
             notificationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(notificationsLayout.createSequentialGroup()
-                .addGap(44, 44, 44)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(notificationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(notificationsLayout.createSequentialGroup()
+                        .addGap(44, 44, 44)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(notificationsLayout.createSequentialGroup()
+                        .addGap(282, 282, 282)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(47, Short.MAX_VALUE))
         );
         notificationsLayout.setVerticalGroup(
             notificationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(notificationsLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(76, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 582, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addContainerGap(78, Short.MAX_VALUE))
         );
 
         tabs.addTab("tab5", notifications);
@@ -2385,6 +2405,10 @@ private void removeReservationSelectedRowsFromDatabase() {
               populateBorrowsTableFromDatabase();
     }//GEN-LAST:event_updateButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        notifs();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2402,6 +2426,7 @@ private void removeReservationSelectedRowsFromDatabase() {
     private javax.swing.JButton historyButton;
     private javax.swing.JTable historyTable;
     private javax.swing.JLabel id;
+    private javax.swing.JButton jButton1;
     private javax.swing.JColorChooser jColorChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
