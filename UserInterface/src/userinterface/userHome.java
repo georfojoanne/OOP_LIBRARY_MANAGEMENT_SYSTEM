@@ -430,7 +430,6 @@ public void getTextFromNameColumn() {
     Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
 }                
         
-        
                     
                      
     }
