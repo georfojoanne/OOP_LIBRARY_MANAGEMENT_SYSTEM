@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -42,6 +43,7 @@ public class Librarian extends javax.swing.JFrame {
        populateLoansTable();
        checkForOverdueAndUpdateUserInfo();
        populateLoansManagementTableForOverdueBooks();
+       updateUserInfoLoans();
               
           
     }
@@ -79,7 +81,90 @@ public class Librarian extends javax.swing.JFrame {
     }
 }
     
-private static void checkForOverdueAndUpdateUserInfo() { //I have to update this cause it keeps incrementing in the userinfo instead of just once
+    private static void updateUserInfoLoans() {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Query to get the sum of loans for each user from the borrows table
+        String sumLoansQuery = "SELECT name, SUM(loan) as totalLoan FROM borrows GROUP BY name";
+        PreparedStatement sumLoansStatement = connection.prepareStatement(sumLoansQuery);
+        ResultSet resultSet = sumLoansStatement.executeQuery();
+
+        // Query to update the loan amount for each user in the userinfo table
+        String updateUserInfoQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
+        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
+
+        while (resultSet.next()) {
+            String name = resultSet.getString("name");
+            int totalLoan = resultSet.getInt("totalLoan");
+
+            updateUserInfoStatement.setInt(1, totalLoan);
+            updateUserInfoStatement.setString(2, name);
+            int updatedRows = updateUserInfoStatement.executeUpdate();
+            if (updatedRows == 0) {
+                // If no rows were updated, print a warning
+                System.out.println("Warning: No rows updated in userinfo table for user: " + name);
+            }
+        }
+
+        // Close resources
+        resultSet.close();
+        sumLoansStatement.close();
+        updateUserInfoStatement.close();
+        connection.close();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+    
+    private static void checkForOverdueAndUpdateUserInfo() {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        String query = "SELECT title, dob, dor, name, DATEDIFF(CURDATE(), dor) AS overdue_days, loan, last_updated FROM borrows WHERE dor < CURDATE()";
+        PreparedStatement statement = connection.prepareStatement(query);
+        ResultSet resultSet = statement.executeQuery();
+
+        String updateBorrowsQuery = "UPDATE borrows SET loan = ?, overdueDays = ?, last_updated = CURDATE() WHERE title = ? AND dob = ? AND name = ?";
+        PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
+
+        while (resultSet.next()) {
+            String title = resultSet.getString("title");
+            Date dob = resultSet.getDate("dob");
+            String name = resultSet.getString("name");
+            int overdueDays = resultSet.getInt("overdue_days");
+            int loan = resultSet.getInt("loan");
+
+            // Calculate fine based on overdue duration (10 per 7 days, including the first overdue period)
+            int fine = 10;
+            if (overdueDays > 0) {
+                fine += ((overdueDays / 7) * 10);
+            }
+
+            // Update loan amount and overdue days for the book in borrows table
+            updateBorrowsStatement.setInt(1, fine);
+            updateBorrowsStatement.setInt(2, overdueDays);
+            updateBorrowsStatement.setString(3, title);
+            updateBorrowsStatement.setDate(4, new java.sql.Date(dob.getTime()));
+            updateBorrowsStatement.setString(5, name);
+            updateBorrowsStatement.executeUpdate();
+        }
+
+        // Close resources
+        resultSet.close();
+        statement.close();
+        updateBorrowsStatement.close();
+        connection.close();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+    
+/*private static void checkForOverdueAndUpdateUserInfo() { //I have to update this cause it keeps incrementing in the userinfo instead of just once
     try {
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
@@ -146,7 +231,7 @@ private static void checkForOverdueAndUpdateUserInfo() { //I have to update this
     } catch (SQLException e) {
         e.printStackTrace();
     }
-}
+}*/
 
    
     public void populateLoansTable(){
@@ -602,6 +687,7 @@ try {
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jButton6 = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         booksPanel = new javax.swing.JPanel();
         removeButton = new javax.swing.JButton();
@@ -622,8 +708,9 @@ try {
         jScrollPane3 = new javax.swing.JScrollPane();
         reservationTitleTable = new javax.swing.JTable();
         reserveButton = new javax.swing.JButton();
-        holdsSearch = new javax.swing.JTextField();
+        reservationTitleSearch = new javax.swing.JTextField();
         reserveButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         addBookPanel = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
@@ -642,12 +729,14 @@ try {
         requestSearch = new javax.swing.JTextField();
         jButton22 = new javax.swing.JButton();
         jButton29 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         loansPanel = new javax.swing.JPanel();
         jButton27 = new javax.swing.JButton();
         jButton28 = new javax.swing.JButton();
         loansSearch = new javax.swing.JTextField();
         jScrollPane7 = new javax.swing.JScrollPane();
         loansTable = new javax.swing.JTable();
+        jButton5 = new javax.swing.JButton();
         loanManagementPanel = new javax.swing.JPanel();
         confirmPayment = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
@@ -706,6 +795,13 @@ try {
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/LIB.ITT.png"))); // NOI18N
 
+        jButton6.setText("minimize");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -715,8 +811,11 @@ try {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 736, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 645, Short.MAX_VALUE)
+                .addComponent(jButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -725,8 +824,10 @@ try {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel1)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 60));
@@ -927,37 +1028,39 @@ try {
         returnsPanelLayout.setHorizontalGroup(
             returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(returnsPanelLayout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(40, 40, 40))
-            .addGroup(returnsPanelLayout.createSequentialGroup()
-                .addGap(9, 9, 9)
+                .addContainerGap()
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(returnsPanelLayout.createSequentialGroup()
-                        .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 665, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(16, Short.MAX_VALUE))
+                        .addGap(41, 41, 41)
+                        .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(29, 29, 29)
+                        .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(returnsPanelLayout.createSequentialGroup()
+                        .addGap(0, 10, Short.MAX_VALUE)
+                        .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 668, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(returnsPanelLayout.createSequentialGroup()
+                                .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)))
+                        .addContainerGap(12, Short.MAX_VALUE))))
         );
         returnsPanelLayout.setVerticalGroup(
             returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, returnsPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(19, Short.MAX_VALUE)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton2)
-                    .addGroup(returnsPanelLayout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 554, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
+                    .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15))
+                .addGap(29, 29, 29))
         );
 
         jTabbedPane1.addTab("tab2", returnsPanel);
@@ -996,25 +1099,34 @@ try {
         reserveButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         reserveButton.setForeground(new java.awt.Color(0, 255, 255));
         reserveButton.setText("RESERVES");
-        reserveButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reserveButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         reserveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reserveButtonActionPerformed(evt);
             }
         });
 
-        holdsSearch.setBackground(new java.awt.Color(255, 255, 255));
-        holdsSearch.setText("Search");
-        holdsSearch = new PlaceholderTextField("Search");
+        reservationTitleSearch.setBackground(new java.awt.Color(255, 255, 255));
+        reservationTitleSearch.setText("Search");
+        reservationTitleSearch = new PlaceholderTextField("Search");
 
         reserveButton1.setBackground(new java.awt.Color(49, 98, 103));
         reserveButton1.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         reserveButton1.setForeground(new java.awt.Color(0, 255, 255));
         reserveButton1.setText("REFRESH");
-        reserveButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reserveButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         reserveButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reserveButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        jButton3.setBorderPainted(false);
+        jButton3.setContentAreaFilled(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
             }
         });
 
@@ -1031,28 +1143,33 @@ try {
                         .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservationPanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton3)))
                 .addContainerGap())
             .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(reservationPanelLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(holdsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 638, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(reservationTitleSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 638, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(46, Short.MAX_VALUE)))
         );
         reservationPanelLayout.setVerticalGroup(
             reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(reservationPanelLayout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(7, 7, 7)
+                .addComponent(jButton3)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 492, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(23, 23, 23))
             .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(reservationPanelLayout.createSequentialGroup()
                     .addGap(16, 16, 16)
-                    .addComponent(holdsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(reservationTitleSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(607, Short.MAX_VALUE)))
         );
 
@@ -1278,6 +1395,15 @@ try {
             }
         });
 
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        jButton4.setBorderPainted(false);
+        jButton4.setContentAreaFilled(false);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout reservePanelLayout = new javax.swing.GroupLayout(reservePanel);
         reservePanel.setLayout(reservePanelLayout);
         reservePanelLayout.setHorizontalGroup(
@@ -1294,16 +1420,22 @@ try {
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservePanelLayout.createSequentialGroup()
                         .addComponent(requestSearch)
-                        .addGap(44, 44, 44)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)))
                 .addContainerGap())
         );
         reservePanelLayout.setVerticalGroup(
             reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(reservePanelLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+                .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(reservePanelLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(reservePanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton4)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmBorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1332,6 +1464,11 @@ try {
         jButton28.setForeground(new java.awt.Color(0, 255, 255));
         jButton28.setText("REFRESH");
         jButton28.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton28.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton28ActionPerformed(evt);
+            }
+        });
 
         loansSearch.setBackground(new java.awt.Color(255, 255, 255));
         loansSearch.setText("Search");
@@ -1366,6 +1503,15 @@ try {
         loansTable.getTableHeader().setReorderingAllowed(false);
         loansTable.setDefaultEditor(Object.class, null);
 
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        jButton5.setBorderPainted(false);
+        jButton5.setContentAreaFilled(false);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout loansPanelLayout = new javax.swing.GroupLayout(loansPanel);
         loansPanel.setLayout(loansPanelLayout);
         loansPanelLayout.setHorizontalGroup(
@@ -1380,15 +1526,21 @@ try {
                     .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(loansPanelLayout.createSequentialGroup()
                         .addComponent(loansSearch)
-                        .addGap(44, 44, 44)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5)))
                 .addContainerGap())
         );
         loansPanelLayout.setVerticalGroup(
             loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loansPanelLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(loansSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
+                .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(loansPanelLayout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addComponent(loansSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(loansPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton5)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -2779,7 +2931,7 @@ try {
         Connection connection = con.getConnection();
         
         // Create a SQL query to search for books
-        String query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? OR category LIKE ?";
+        String query = "SELECT * FROM returns WHERE name LIKE ? OR title LIKE ? OR dob LIKE ? OR dor LIKE ?";
         PreparedStatement statement = connection.prepareStatement(query);
         
         // Use the search text in the query with wildcards for advanced search
@@ -2805,18 +2957,15 @@ try {
         // Populate the table with the search results
         while (resultSet.next()) {
             hasResults = true;
+            String name = resultSet.getString("name");
             String title = resultSet.getString("title");
-            String author = resultSet.getString("author");
-            String isbn = resultSet.getString("isbn");
-            String category = resultSet.getString("category");
-            String status = resultSet.getString("status");
-            int nr = resultSet.getInt("nr");
+            String dob = resultSet.getString("dob");
+            String dor = resultSet.getString("dor");
+
             
             // Add row to the table model
-            model.addRow(new Object[]{title, author, isbn, category, status, nr});
-            
-            // Print each result for debugging
-            System.out.println("Title: " + title + ", Author: " + author + ", ISBN: " + isbn + ", Category: " + category + ", Status: " + status + ", Nr: " + nr);
+            model.addRow(new Object[]{title, dob, dor, name});
+
         }
         
         // Check if results were found
@@ -2833,6 +2982,145 @@ try {
         JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
     }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+                
+        reservationTitleSearch.requestFocus();
+        
+        String searchText = reservationTitleSearch.getText().trim();
+                System.out.println(searchText);
+
+    // Check if the search text is the placeholder
+    if (searchText.isEmpty()||searchText.equals("Search")) {
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        // Establish a connection to your database
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        // Create a SQL query to search for books
+        String query = "SELECT * FROM reservation WHERE title LIKE ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        // Use the search text in the query with wildcards for advanced search
+        String searchQuery = "%" + searchText + "%";
+        statement.setString(1, searchQuery);
+
+        
+        // Execute the query
+        ResultSet resultSet = statement.executeQuery();
+        
+        // Clear the table before adding new rows
+        DefaultTableModel model = (DefaultTableModel) reservationTitleTable.getModel();
+        model.setRowCount(0);
+        
+        // Debug statement to check if the query returns any results
+        boolean hasResults = false;
+        
+        // Populate the table with the search results
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("title");
+            
+            // Add row to the table model
+            model.addRow(new Object[]{title});
+
+        }
+        
+        // Check if results were found
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found.");
+        }
+        
+        // Close the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+                        
+        requestSearch.requestFocus();
+        
+        String searchText = requestSearch.getText().trim();
+                System.out.println(searchText);
+
+    // Check if the search text is the placeholder
+    if (searchText.isEmpty()||searchText.equals("Search")) {
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        // Establish a connection to your database
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        // Create a SQL query to search for books
+        String query = "SELECT * FROM reservation WHERE name LIKE ? OR rn LIKE ? OR sched LIKE ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        // Use the search text in the query with wildcards for advanced search
+        String searchQuery = "%" + searchText + "%";
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        
+        // Execute the query
+        ResultSet resultSet = statement.executeQuery();
+        
+        // Clear the table before adding new rows
+        DefaultTableModel model = (DefaultTableModel) requestTable.getModel();
+        model.setRowCount(0);
+        
+        // Debug statement to check if the query returns any results
+        boolean hasResults = false;
+        
+        // Populate the table with the search results
+        while (resultSet.next()) {
+            hasResults = true;
+            String name = resultSet.getString("name");
+            String rn = resultSet.getString("rn");
+            String sched = resultSet.getString("sched");
+            
+            // Add row to the table model
+            model.addRow(new Object[]{name,rn, sched});
+
+        }
+        
+        // Check if results were found
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found.");
+        }
+        
+        // Close the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        setState(JFrame. ICONIFIED);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton28ActionPerformed
+        populateLoansTable();
+    }//GEN-LAST:event_jButton28ActionPerformed
 
     
     
@@ -2859,7 +3147,6 @@ try {
     private javax.swing.JButton confirmButton1;
     private javax.swing.JButton confirmPayment;
     private javax.swing.JButton holdsButton;
-    private javax.swing.JTextField holdsSearch;
     private javax.swing.JTextField isbnAdd;
     private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
@@ -2873,8 +3160,12 @@ try {
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton29;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton30;
     private javax.swing.JButton jButton31;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -2913,6 +3204,7 @@ try {
     private javax.swing.JTextField requestSearch;
     private javax.swing.JTable requestTable;
     private javax.swing.JPanel reservationPanel;
+    private javax.swing.JTextField reservationTitleSearch;
     private javax.swing.JTable reservationTitleTable;
     private javax.swing.JButton reserveButton;
     private javax.swing.JButton reserveButton1;
