@@ -2,6 +2,7 @@
 package userinterface;
 
 
+import java.awt.Color;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.CYAN;
 import java.util.logging.Level;
@@ -27,6 +28,8 @@ public class admins extends javax.swing.JFrame {
          librarianTable();
          books();
          dashBoard();
+         earnings();
+         totalEarnings();
         
         
     }
@@ -354,14 +357,15 @@ private void books() {
         jLabel4 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         librarianButton = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        dashButton = new javax.swing.JButton();
+        uiButton = new javax.swing.JButton();
+        userButton = new javax.swing.JButton();
+        libButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jButton7 = new javax.swing.JButton();
+        liButton = new javax.swing.JButton();
+        earningsButton = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel5 = new javax.swing.JPanel();
@@ -429,12 +433,18 @@ private void books() {
         jScrollPane1 = new javax.swing.JScrollPane();
         booksTable = new javax.swing.JTable();
         jButton6 = new javax.swing.JButton();
+        panel3 = new java.awt.Panel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        earningsTable = new javax.swing.JTable();
+        updateButton = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        earningsField = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(900, 730));
-        setPreferredSize(new java.awt.Dimension(930, 700));
-        setResizable(false);
+        setUndecorated(true);
+        setPreferredSize(new java.awt.Dimension(900, 700));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(10, 29, 36));
@@ -463,86 +473,93 @@ private void books() {
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
+        jButton1.setFocusable(false);
+        jButton1.setRequestFocusEnabled(false);
+        jButton1.setRolloverEnabled(false);
+        jButton1.setVerifyInputWhenFocusTarget(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 10, 70, 50));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 30, 70, 50));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 940, 120));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 960, 120));
 
         librarianButton.setBackground(new java.awt.Color(10, 29, 36));
         librarianButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton2.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("DASHBOARD");
-        jButton2.setBorder(null);
-        jButton2.setBorderPainted(false);
-        jButton2.setContentAreaFilled(false);
-        jButton2.setDefaultCapable(false);
-        jButton2.setFocusPainted(false);
-        jButton2.setVerifyInputWhenFocusTarget(false);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        dashButton.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
+        dashButton.setForeground(new java.awt.Color(255, 255, 255));
+        dashButton.setText("DASHBOARD");
+        dashButton.setBorder(null);
+        dashButton.setBorderPainted(false);
+        dashButton.setContentAreaFilled(false);
+        dashButton.setDefaultCapable(false);
+        dashButton.setFocusPainted(false);
+        dashButton.setRequestFocusEnabled(false);
+        dashButton.setVerifyInputWhenFocusTarget(false);
+        dashButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                dashButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 230, 150, -1));
+        librarianButton.add(dashButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 150, -1));
 
-        jButton3.setFont(new java.awt.Font("Stylus BT", 1, 19)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("USER INTERFACE");
-        jButton3.setBorder(null);
-        jButton3.setBorderPainted(false);
-        jButton3.setContentAreaFilled(false);
-        jButton3.setFocusPainted(false);
-        jButton3.setFocusable(false);
-        jButton3.setRequestFocusEnabled(false);
-        jButton3.setRolloverEnabled(false);
-        jButton3.setVerifyInputWhenFocusTarget(false);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        uiButton.setFont(new java.awt.Font("Stylus BT", 1, 19)); // NOI18N
+        uiButton.setForeground(new java.awt.Color(255, 255, 255));
+        uiButton.setText("USER INTERFACE");
+        uiButton.setBorder(null);
+        uiButton.setBorderPainted(false);
+        uiButton.setContentAreaFilled(false);
+        uiButton.setFocusPainted(false);
+        uiButton.setFocusable(false);
+        uiButton.setRequestFocusEnabled(false);
+        uiButton.setRolloverEnabled(false);
+        uiButton.setVerifyInputWhenFocusTarget(false);
+        uiButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                uiButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 200, -1));
+        librarianButton.add(uiButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 360, 200, -1));
 
-        jButton4.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("USER");
-        jButton4.setBorder(null);
-        jButton4.setBorderPainted(false);
-        jButton4.setContentAreaFilled(false);
-        jButton4.setFocusPainted(false);
-        jButton4.setRequestFocusEnabled(false);
-        jButton4.setRolloverEnabled(false);
-        jButton4.setVerifyInputWhenFocusTarget(false);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        userButton.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
+        userButton.setForeground(new java.awt.Color(255, 255, 255));
+        userButton.setText("USER");
+        userButton.setBorder(null);
+        userButton.setBorderPainted(false);
+        userButton.setContentAreaFilled(false);
+        userButton.setFocusPainted(false);
+        userButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        userButton.setRequestFocusEnabled(false);
+        userButton.setRolloverEnabled(false);
+        userButton.setVerifyInputWhenFocusTarget(false);
+        userButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                userButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 150, -1));
+        librarianButton.add(userButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 150, -1));
 
-        jButton5.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("LIBRARIAN");
-        jButton5.setBorder(null);
-        jButton5.setBorderPainted(false);
-        jButton5.setContentAreaFilled(false);
-        jButton5.setFocusPainted(false);
-        jButton5.setFocusable(false);
-        jButton5.setRequestFocusEnabled(false);
-        jButton5.setRolloverEnabled(false);
-        jButton5.setVerifyInputWhenFocusTarget(false);
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        libButton.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
+        libButton.setForeground(new java.awt.Color(255, 255, 255));
+        libButton.setText("LIBRARIAN");
+        libButton.setBorder(null);
+        libButton.setBorderPainted(false);
+        libButton.setContentAreaFilled(false);
+        libButton.setFocusPainted(false);
+        libButton.setFocusable(false);
+        libButton.setRequestFocusEnabled(false);
+        libButton.setRolloverEnabled(false);
+        libButton.setVerifyInputWhenFocusTarget(false);
+        libButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                libButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 150, -1));
+        librarianButton.add(libButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 190, 150, -1));
 
         jLabel6.setFont(new java.awt.Font("Stylus BT", 0, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
@@ -553,24 +570,42 @@ private void books() {
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("ADMIN");
         librarianButton.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 50, 70, 30));
-        librarianButton.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 190, 10));
+        librarianButton.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 10));
 
-        jButton7.setFont(new java.awt.Font("Stylus BT", 1, 17)); // NOI18N
-        jButton7.setForeground(java.awt.Color.white);
-        jButton7.setText("LIBRARIAN INTERFACE");
-        jButton7.setBorderPainted(false);
-        jButton7.setContentAreaFilled(false);
-        jButton7.setFocusPainted(false);
-        jButton7.setFocusable(false);
-        jButton7.setRequestFocusEnabled(false);
-        jButton7.setRolloverEnabled(false);
-        jButton7.setVerifyInputWhenFocusTarget(false);
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        liButton.setFont(new java.awt.Font("Stylus BT", 1, 17)); // NOI18N
+        liButton.setForeground(java.awt.Color.white);
+        liButton.setText("LIBRARIAN INTERFACE");
+        liButton.setBorderPainted(false);
+        liButton.setContentAreaFilled(false);
+        liButton.setFocusPainted(false);
+        liButton.setFocusable(false);
+        liButton.setRequestFocusEnabled(false);
+        liButton.setRolloverEnabled(false);
+        liButton.setVerifyInputWhenFocusTarget(false);
+        liButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
+                liButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(-40, 340, 270, -1));
+        librarianButton.add(liButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 410, 250, -1));
+
+        earningsButton.setFont(new java.awt.Font("Stylus BT", 1, 21)); // NOI18N
+        earningsButton.setForeground(java.awt.Color.white);
+        earningsButton.setText("EARNINGS");
+        earningsButton.setBorder(null);
+        earningsButton.setBorderPainted(false);
+        earningsButton.setContentAreaFilled(false);
+        earningsButton.setFocusPainted(false);
+        earningsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        earningsButton.setRequestFocusEnabled(false);
+        earningsButton.setRolloverEnabled(false);
+        earningsButton.setVerifyInputWhenFocusTarget(false);
+        earningsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                earningsButtonActionPerformed(evt);
+            }
+        });
+        librarianButton.add(earningsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 300, -1, -1));
 
         jButton8.setBackground(new java.awt.Color(0, 73, 73));
         jButton8.setFont(new java.awt.Font("Stylus BT", 1, 24)); // NOI18N
@@ -583,7 +618,7 @@ private void books() {
         });
         librarianButton.add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 540, -1, -1));
 
-        getContentPane().add(librarianButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 190, 620));
+        getContentPane().add(librarianButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 650));
 
         jTabbedPane1.setBackground(new java.awt.Color(28, 68, 74));
 
@@ -595,6 +630,11 @@ private void books() {
         remButton1.setForeground(new java.awt.Color(0, 255, 255));
         remButton1.setText("REMOVE");
         remButton1.setBorderPainted(false);
+        remButton1.setFocusPainted(false);
+        remButton1.setFocusable(false);
+        remButton1.setRequestFocusEnabled(false);
+        remButton1.setRolloverEnabled(false);
+        remButton1.setVerifyInputWhenFocusTarget(false);
         remButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 remButton1ActionPerformed(evt);
@@ -653,6 +693,12 @@ private void books() {
         addUser.setForeground(new java.awt.Color(0, 255, 255));
         addUser.setText("ADD");
         addUser.setBorderPainted(false);
+        addUser.setDefaultCapable(false);
+        addUser.setFocusPainted(false);
+        addUser.setFocusable(false);
+        addUser.setRequestFocusEnabled(false);
+        addUser.setRolloverEnabled(false);
+        addUser.setVerifyInputWhenFocusTarget(false);
         addUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addUserActionPerformed(evt);
@@ -694,6 +740,11 @@ private void books() {
         removeLibrarian.setForeground(new java.awt.Color(0, 255, 255));
         removeLibrarian.setText("REMOVE");
         removeLibrarian.setBorderPainted(false);
+        removeLibrarian.setFocusPainted(false);
+        removeLibrarian.setFocusable(false);
+        removeLibrarian.setRequestFocusEnabled(false);
+        removeLibrarian.setRolloverEnabled(false);
+        removeLibrarian.setVerifyInputWhenFocusTarget(false);
         removeLibrarian.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeLibrarianActionPerformed(evt);
@@ -780,6 +831,13 @@ private void books() {
         cancelUser.setForeground(new java.awt.Color(0, 255, 255));
         cancelUser.setText("CANCEL");
         cancelUser.setBorderPainted(false);
+        cancelUser.setDefaultCapable(false);
+        cancelUser.setFocusPainted(false);
+        cancelUser.setFocusable(false);
+        cancelUser.setOpaque(false);
+        cancelUser.setRequestFocusEnabled(false);
+        cancelUser.setRolloverEnabled(false);
+        cancelUser.setVerifyInputWhenFocusTarget(false);
         cancelUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelUserActionPerformed(evt);
@@ -801,6 +859,12 @@ private void books() {
         updateUser.setForeground(new java.awt.Color(0, 255, 255));
         updateUser.setText("UPDATE");
         updateUser.setBorderPainted(false);
+        updateUser.setDefaultCapable(false);
+        updateUser.setFocusPainted(false);
+        updateUser.setFocusable(false);
+        updateUser.setRequestFocusEnabled(false);
+        updateUser.setRolloverEnabled(false);
+        updateUser.setVerifyInputWhenFocusTarget(false);
         updateUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateUserActionPerformed(evt);
@@ -831,6 +895,11 @@ private void books() {
         updateLibrarian.setForeground(new java.awt.Color(0, 255, 255));
         updateLibrarian.setText("UPDATE");
         updateLibrarian.setBorderPainted(false);
+        updateLibrarian.setFocusPainted(false);
+        updateLibrarian.setFocusable(false);
+        updateLibrarian.setRequestFocusEnabled(false);
+        updateLibrarian.setRolloverEnabled(false);
+        updateLibrarian.setVerifyInputWhenFocusTarget(false);
         updateLibrarian.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateLibrarianActionPerformed(evt);
@@ -887,6 +956,13 @@ private void books() {
         cancelLibrarian.setForeground(new java.awt.Color(0, 255, 255));
         cancelLibrarian.setText("CANCEL");
         cancelLibrarian.setBorderPainted(false);
+        cancelLibrarian.setDefaultCapable(false);
+        cancelLibrarian.setFocusPainted(false);
+        cancelLibrarian.setFocusable(false);
+        cancelLibrarian.setOpaque(false);
+        cancelLibrarian.setRequestFocusEnabled(false);
+        cancelLibrarian.setRolloverEnabled(false);
+        cancelLibrarian.setVerifyInputWhenFocusTarget(false);
         cancelLibrarian.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelLibrarianActionPerformed(evt);
@@ -983,7 +1059,45 @@ private void books() {
 
         jTabbedPane1.addTab("tab7", panel1);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, 750, 640));
+        panel3.setBackground(new java.awt.Color(28, 68, 74));
+        panel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        earningsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Book Title", "Date", "Name", "Amount Paid"
+            }
+        ));
+        jScrollPane2.setViewportView(earningsTable);
+        if (earningsTable.getColumnModel().getColumnCount() > 0) {
+            earningsTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+        }
+
+        panel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 700, 490));
+
+        updateButton.setBackground(new java.awt.Color(10, 36, 36));
+        updateButton.setForeground(new java.awt.Color(0, 255, 255));
+        updateButton.setText("u p d a t e");
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateButtonActionPerformed(evt);
+            }
+        });
+        panel3.add(updateButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 560, 260, 30));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(51, 255, 255));
+        jLabel9.setText("TOTAL EARNINGS :");
+        panel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+
+        earningsField.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        panel3.add(earningsField, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 20, 220, -1));
+
+        jTabbedPane1.addTab("tab6", panel3);
+
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, 760, 650));
         setJMenuBar(jMenuBar1);
 
         pack();
@@ -995,25 +1109,57 @@ private void books() {
         dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-                  jTabbedPane1.setSelectedIndex(4);    
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void dashButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashButtonActionPerformed
+                  jTabbedPane1.setSelectedIndex(4); 
+                   userButton.setForeground(new Color(225,225,225));
+                     libButton.setForeground(new Color(225,225,255));
+                     dashButton.setForeground(new Color(0,225,255));                   
+                     earningsButton.setForeground(new Color(225,225,255));
+                     uiButton.setForeground(new Color(225,225,255));
+                     liButton.setForeground(new Color(225,225,255));
+                   
+        
+    }//GEN-LAST:event_dashButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void uiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiButtonActionPerformed
                   
         new LogIn().setVisible(true);
+                    userButton.setForeground(new Color(225,225,225));
+                     libButton.setForeground(new Color(225,225,255));
+                     dashButton.setForeground(new Color(225,225,255));                   
+                     earningsButton.setForeground(new Color(225,225,255));
+                     uiButton.setForeground(new Color(0,225,255));
+                     liButton.setForeground(new Color(225,225,255));
                 
         
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_uiButtonActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
         jTabbedPane1.setSelectedIndex(0);
+        
+                     userButton.setForeground(new Color(0,225,225));
+                     libButton.setForeground(new Color(225,225,255));
+                     dashButton.setForeground(new Color(225,225,255));                   
+                     earningsButton.setForeground(new Color(225,225,255));
+                     uiButton.setForeground(new Color(225,225,255));
+                     liButton.setForeground(new Color(225,225,255));
+                   
+        
      
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_userButtonActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-                     jTabbedPane1.setSelectedIndex(1);                                  
-    }//GEN-LAST:event_jButton5ActionPerformed
+    private void libButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_libButtonActionPerformed
+                     jTabbedPane1.setSelectedIndex(1);  
+                     
+                      userButton.setForeground(new Color(225,225,225));
+                     libButton.setForeground(new Color(0,225,255));
+                     dashButton.setForeground(new Color(225,225,255));                   
+                     earningsButton.setForeground(new Color(225,225,255));
+                     uiButton.setForeground(new Color(225,225,255));
+                     liButton.setForeground(new Color(225,225,255));
+                   
+        
+    }//GEN-LAST:event_libButtonActionPerformed
 
     private void cancelLibrarianActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelLibrarianActionPerformed
        libName.setText("");
@@ -1418,11 +1564,17 @@ private void books() {
       dashBoard();
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void liButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_liButtonActionPerformed
       
         new LogIn().setVisible(true);
+        userButton.setForeground(new Color(225,225,225));
+                     libButton.setForeground(new Color(225,225,255));
+                     dashButton.setForeground(new Color(225,225,255));                   
+                     earningsButton.setForeground(new Color(225,225,255));
+                     uiButton.setForeground(new Color(225,225,255));
+                     liButton.setForeground(new Color(0,225,255));
         
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }//GEN-LAST:event_liButtonActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         dispose();
@@ -1430,6 +1582,108 @@ private void books() {
 
         new LogIn().setVisible(true);
     }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void earnings() {
+        try {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            if (connection != null) {
+                String selectQuery = "SELECT title, date, name, amount FROM history WHERE status = 'Overdue Paid'";
+                
+                try (PreparedStatement selectStmt = connection.prepareStatement(selectQuery);
+                        ResultSet resultSet = selectStmt.executeQuery()) {
+                    
+                    // Get the table model of the earningsTable
+                    DefaultTableModel model = (DefaultTableModel) earningsTable.getModel();
+                    
+                    // Clear existing rows
+                    model.setRowCount(0);
+                    
+                    // Add rows to the table model
+                    while (resultSet.next()) {
+                        String title = resultSet.getString("title");
+                        String date = resultSet.getString("date");
+                        String name = resultSet.getString("name");
+                        double amount = resultSet.getDouble("amount");
+                        
+                        // Add the row to the model
+                        model.addRow(new Object[]{title, date, name, amount});
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (connection != null && !connection.isClosed()) {
+                            connection.close();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                System.out.println("Failed to establish a database connection.");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+
+    private void totalEarnings() {
+        try {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            if (connection != null) {
+                String sumQuery = "SELECT SUM(amount) AS totalEarnings FROM history WHERE status = 'Overdue Paid'";
+                
+                try (PreparedStatement sumStmt = connection.prepareStatement(sumQuery);
+                        ResultSet resultSet = sumStmt.executeQuery()) {
+                    
+                    if (resultSet.next()) {
+                        double totalEarnings = resultSet.getDouble("totalEarnings");
+                        
+                        // Display the total earnings in the JTextField
+                        earningsField.setText(String.valueOf(totalEarnings));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (connection != null && !connection.isClosed()) {
+                            connection.close();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                System.out.println("Failed to establish a database connection.");
+            }   } catch (SQLException ex) {
+            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}
+
+    
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        earnings();
+        totalEarnings();
+    }//GEN-LAST:event_updateButtonActionPerformed
+
+    private void earningsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_earningsButtonActionPerformed
+                  jTabbedPane1.setSelectedIndex(5);  
+                   userButton.setForeground(new Color(225,225,225));
+                     libButton.setForeground(new Color(225,225,255));
+                     dashButton.setForeground(new Color(225,225,255));                   
+                     earningsButton.setForeground(new Color(0,225,255));
+                     uiButton.setForeground(new Color(225,225,255));
+                     liButton.setForeground(new Color(225,225,255));
+                   
+        
+    }//GEN-LAST:event_earningsButtonActionPerformed
 
     
     
@@ -1448,17 +1702,16 @@ private void books() {
     private javax.swing.JTable booksTable;
     private javax.swing.JButton cancelLibrarian;
     private javax.swing.JButton cancelUser;
+    private javax.swing.JButton dashButton;
+    private javax.swing.JButton earningsButton;
+    private javax.swing.JTextField earningsField;
+    private javax.swing.JTable earningsTable;
     private javax.swing.JTextField ecategory;
     private javax.swing.JLabel english;
     private javax.swing.JTextField faculties;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton28;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
@@ -1479,6 +1732,7 @@ private void books() {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -1486,12 +1740,15 @@ private void books() {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextField29;
+    private javax.swing.JButton liButton;
+    private javax.swing.JButton libButton;
     private javax.swing.JTextField libContact;
     private javax.swing.JTextField libEmail;
     private javax.swing.JTextField libId;
@@ -1509,6 +1766,7 @@ private void books() {
     private javax.swing.JLabel numUser;
     private java.awt.Panel panel1;
     private java.awt.Panel panel2;
+    private java.awt.Panel panel3;
     private javax.swing.JButton remButton1;
     private javax.swing.JButton removeLibrarian;
     private javax.swing.JComboBox<String> roleCb;
@@ -1517,9 +1775,12 @@ private void books() {
     private javax.swing.JButton searchUser;
     private javax.swing.JTextField searchUserField;
     private javax.swing.JTextField students;
+    private javax.swing.JButton uiButton;
+    private javax.swing.JButton updateButton;
     private javax.swing.JButton updateLibrarian;
     private javax.swing.JButton updateUser;
     private javax.swing.JTextField user;
+    private javax.swing.JButton userButton;
     private javax.swing.JTable userTable;
     private javax.swing.JTextField users;
     // End of variables declaration//GEN-END:variables
