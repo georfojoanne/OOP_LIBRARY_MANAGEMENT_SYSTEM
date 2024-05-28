@@ -131,7 +131,6 @@ public class LogIn extends javax.swing.JFrame {
         });
         panel2.add(logInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(251, 267, 112, 19));
 
-        eyeButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\eye.png")); // NOI18N
         eyeButton.setBorderPainted(false);
         eyeButton.setContentAreaFilled(false);
         eyeButton.setFocusPainted(false);
@@ -156,11 +155,8 @@ public class LogIn extends javax.swing.JFrame {
         jLabel6.setForeground(new java.awt.Color(216, 208, 208));
         jLabel6.setText("TO INFINITE KNOWLEDGE");
         panel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, 150, -1));
-
-        jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\libitz.png")); // NOI18N
         panel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, -1));
 
-        jButton1.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\Documents\\librarian\\OOP_LIBRARY_MANAGEMENT_SYSTEM\\UserInterface\\icons\\Xbang.png")); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -172,9 +168,7 @@ public class LogIn extends javax.swing.JFrame {
         panel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 10, 40, -1));
 
         panel1.add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 0, 440, 400));
-
-        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\ASUS\\OneDrive\\JavaPractice\\UserInterface\\icons\\libitnice2.gif")); // NOI18N
-        panel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 400));
+        panel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 260, 400));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

@@ -834,7 +834,6 @@ private void books() {
         cancelUser.setDefaultCapable(false);
         cancelUser.setFocusPainted(false);
         cancelUser.setFocusable(false);
-        cancelUser.setOpaque(false);
         cancelUser.setRequestFocusEnabled(false);
         cancelUser.setRolloverEnabled(false);
         cancelUser.setVerifyInputWhenFocusTarget(false);
@@ -959,7 +958,6 @@ private void books() {
         cancelLibrarian.setDefaultCapable(false);
         cancelLibrarian.setFocusPainted(false);
         cancelLibrarian.setFocusable(false);
-        cancelLibrarian.setOpaque(false);
         cancelLibrarian.setRequestFocusEnabled(false);
         cancelLibrarian.setRolloverEnabled(false);
         cancelLibrarian.setVerifyInputWhenFocusTarget(false);
