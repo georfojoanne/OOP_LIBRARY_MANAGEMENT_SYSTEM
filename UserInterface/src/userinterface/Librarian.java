@@ -36,9 +36,7 @@ public class Librarian extends javax.swing.JFrame {
        bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
        checkAndCancelOverdueReservations();
        populateLoansTable();
-       checkForOverdueAndUpdateUserInfo();
        populateLoansManagementTableForOverdueBooks();
-       updateUserInfoLoans();
               
           
     }
@@ -75,159 +73,6 @@ public class Librarian extends javax.swing.JFrame {
         e.printStackTrace();
     }
 }
-    
-    private static void updateUserInfoLoans() {
-    try {
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-
-        // Query to get the sum of loans for each user from the borrows table
-        String sumLoansQuery = "SELECT name, SUM(loan) as totalLoan FROM borrows GROUP BY name";
-        PreparedStatement sumLoansStatement = connection.prepareStatement(sumLoansQuery);
-        ResultSet resultSet = sumLoansStatement.executeQuery();
-
-        // Query to update the loan amount for each user in the userinfo table
-        String updateUserInfoQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
-        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
-
-        while (resultSet.next()) {
-            String name = resultSet.getString("name");
-            int totalLoan = resultSet.getInt("totalLoan");
-
-            updateUserInfoStatement.setInt(1, totalLoan);
-            updateUserInfoStatement.setString(2, name);
-            int updatedRows = updateUserInfoStatement.executeUpdate();
-            if (updatedRows == 0) {
-                // If no rows were updated, print a warning
-                System.out.println("Warning: No rows updated in userinfo table for user: " + name);
-            }
-        }
-
-        // Close resources
-        resultSet.close();
-        sumLoansStatement.close();
-        updateUserInfoStatement.close();
-        connection.close();
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
-    
-    private static void checkForOverdueAndUpdateUserInfo() {
-    try {
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-
-        String query = "SELECT title, dob, dor, name, DATEDIFF(CURDATE(), dor) AS overdue_days, loan, last_updated FROM borrows WHERE dor < CURDATE()";
-        PreparedStatement statement = connection.prepareStatement(query);
-        ResultSet resultSet = statement.executeQuery();
-
-        String updateBorrowsQuery = "UPDATE borrows SET loan = ?, overdueDays = ?, last_updated = CURDATE() WHERE title = ? AND dob = ? AND name = ?";
-        PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
-
-        while (resultSet.next()) {
-            String title = resultSet.getString("title");
-            Date dob = resultSet.getDate("dob");
-            String name = resultSet.getString("name");
-            int overdueDays = resultSet.getInt("overdue_days");
-            int loan = resultSet.getInt("loan");
-
-            // Calculate fine based on overdue duration (10 per 7 days, including the first overdue period)
-            int fine = 10;
-            if (overdueDays > 0) {
-                fine += ((overdueDays / 7) * 10);
-            }
-
-            // Update loan amount and overdue days for the book in borrows table
-            updateBorrowsStatement.setInt(1, fine);
-            updateBorrowsStatement.setInt(2, overdueDays);
-            updateBorrowsStatement.setString(3, title);
-            updateBorrowsStatement.setDate(4, new java.sql.Date(dob.getTime()));
-            updateBorrowsStatement.setString(5, name);
-            updateBorrowsStatement.executeUpdate();
-        }
-
-        // Close resources
-        resultSet.close();
-        statement.close();
-        updateBorrowsStatement.close();
-        connection.close();
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
-    
-/*private static void checkForOverdueAndUpdateUserInfo() { //I have to update this cause it keeps incrementing in the userinfo instead of just once
-    try {
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-
-        String query = "SELECT title, dob, dor, name, DATEDIFF(CURDATE(), dor) AS overdue_days, loan, last_updated FROM borrows WHERE dor < CURDATE()";
-        PreparedStatement statement = connection.prepareStatement(query);
-        ResultSet resultSet = statement.executeQuery();
-
-        String updateBorrowsQuery = "UPDATE borrows SET loan = ?, overdueDays = ?, last_updated = CURDATE() WHERE title = ? AND dob = ? AND name = ?";
-        PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
-
-        // Map to accumulate total fines for each user hashmap and maps are:
-        Map<String, Integer> userFines = new HashMap<>();
-
-        while (resultSet.next()) {
-            String title = resultSet.getString("title");
-            Date dob = resultSet.getDate("dob");
-            String name = resultSet.getString("name");
-            int overdueDays = resultSet.getInt("overdue_days");
-            int loan = resultSet.getInt("loan");
-
-            // Calculate fine based on overdue duration (10 per 7 days, including the first overdue period)
-            int fine = 10;
-            if (overdueDays > 0) {
-                fine += ((overdueDays / 7) * 10);
-            }
-
-            // Update loan amount and overdue days for the book in borrows table
-            updateBorrowsStatement.setInt(1, fine);
-            updateBorrowsStatement.setInt(2, overdueDays);
-            updateBorrowsStatement.setString(3, title);
-            updateBorrowsStatement.setDate(4, new java.sql.Date(dob.getTime()));
-            updateBorrowsStatement.setString(5, name);
-            updateBorrowsStatement.executeUpdate();
-
-            // Accumulate the fine for the user
-            userFines.put(name, userFines.getOrDefault(name, 0) + fine);
-        }
-
-        // Step 3: Update loan amount for each user in the userinfo table
-        String updateUserInfoQuery = "UPDATE userinfo SET loan = loan + ? WHERE name = ?";
-        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
-
-        for (Map.Entry<String, Integer> entry : userFines.entrySet()) {
-            String name = entry.getKey();
-            int totalFine = entry.getValue();
-
-            updateUserInfoStatement.setInt(1, totalFine);
-            updateUserInfoStatement.setString(2, name);
-            int updatedRows = updateUserInfoStatement.executeUpdate();
-            if (updatedRows == 0) {
-                // If no rows were updated, print a warning
-                System.out.println("Warning: No rows updated in userinfo table for user: " + name);
-            }
-        }
-
-        // Close resources
-        resultSet.close();
-        statement.close();
-        updateBorrowsStatement.close();
-        updateUserInfoStatement.close();
-        connection.close();
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}*/
-
    
     public void populateLoansTable(){
         try {
@@ -705,6 +550,7 @@ try {
         reserveButton = new javax.swing.JButton();
         reservationTitleSearch = new javax.swing.JTextField();
         reserveButton1 = new javax.swing.JButton();
+        reservationTitleSearchButton = new javax.swing.JButton();
         addBookPanel = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
@@ -723,18 +569,21 @@ try {
         requestSearch = new javax.swing.JTextField();
         jButton22 = new javax.swing.JButton();
         jButton29 = new javax.swing.JButton();
+        reserveSearch = new javax.swing.JButton();
         loansPanel = new javax.swing.JPanel();
         jButton27 = new javax.swing.JButton();
         jButton28 = new javax.swing.JButton();
         loansSearch = new javax.swing.JTextField();
         jScrollPane7 = new javax.swing.JScrollPane();
         loansTable = new javax.swing.JTable();
+        paymentSearch = new javax.swing.JButton();
         loanManagementPanel = new javax.swing.JPanel();
         confirmPayment = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
         jScrollPane6 = new javax.swing.JScrollPane();
         loansManagementTable = new javax.swing.JTable();
         loanManagement = new javax.swing.JTextField();
+        loanManagementSearchButton = new javax.swing.JButton();
         updatePanel = new javax.swing.JPanel();
         jTextField13 = new javax.swing.JTextField();
         jTextField14 = new javax.swing.JTextField();
@@ -752,8 +601,9 @@ try {
         jScrollPane1 = new javax.swing.JScrollPane();
         borrowsTable = new javax.swing.JTable();
         jButton30 = new javax.swing.JButton();
-        bSearch = new javax.swing.JTextField();
         jButton31 = new javax.swing.JButton();
+        borrowsSearchButton = new javax.swing.JButton();
+        bSearch = new javax.swing.JTextField();
         rightmostPanel = new javax.swing.JPanel();
         returnsButton = new javax.swing.JButton();
         addBooksButton = new javax.swing.JButton();
@@ -778,7 +628,7 @@ try {
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -1062,6 +912,7 @@ try {
         jTabbedPane1.addTab("tab2", returnsPanel);
 
         reservationPanel.setBackground(new java.awt.Color(28, 52, 62));
+        reservationPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         reservationTitleTable.setBackground(new java.awt.Color(220, 220, 250));
         reservationTitleTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1091,6 +942,8 @@ try {
         reservationTitleTable.setDefaultEditor(Object.class, null);
         jScrollPane3.setViewportView(reservationTitleTable);
 
+        reservationPanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 54, 678, 510));
+
         reserveButton.setBackground(new java.awt.Color(49, 98, 103));
         reserveButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         reserveButton.setForeground(new java.awt.Color(0, 255, 255));
@@ -1101,10 +954,12 @@ try {
                 reserveButtonActionPerformed(evt);
             }
         });
+        reservationPanel.add(reserveButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(43, 582, 287, 42));
 
         reservationTitleSearch.setBackground(new java.awt.Color(255, 255, 255));
         reservationTitleSearch.setText("Search");
         reservationTitleSearch = new PlaceholderTextField("Search");
+        reservationPanel.add(reservationTitleSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
         reserveButton1.setBackground(new java.awt.Color(49, 98, 103));
         reserveButton1.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1116,41 +971,17 @@ try {
                 reserveButton1ActionPerformed(evt);
             }
         });
+        reservationPanel.add(reserveButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(365, 582, 287, 42));
 
-        javax.swing.GroupLayout reservationPanelLayout = new javax.swing.GroupLayout(reservationPanel);
-        reservationPanel.setLayout(reservationPanelLayout);
-        reservationPanelLayout.setHorizontalGroup(
-            reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(reservationPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(reservationPanelLayout.createSequentialGroup()
-                        .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
-                            .addGroup(reservationPanelLayout.createSequentialGroup()
-                                .addGap(37, 37, 37)
-                                .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(35, 35, 35)
-                                .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())
-                    .addGroup(reservationPanelLayout.createSequentialGroup()
-                        .addComponent(reservationTitleSearch)
-                        .addGap(60, 60, 60))))
-        );
-        reservationPanelLayout.setVerticalGroup(
-            reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(reservationPanelLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(reservationTitleSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(9, 9, 9))
-        );
+        reservationTitleSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        reservationTitleSearchButton.setBorderPainted(false);
+        reservationTitleSearchButton.setContentAreaFilled(false);
+        reservationTitleSearchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reservationTitleSearchButtonActionPerformed(evt);
+            }
+        });
+        reservationPanel.add(reservationTitleSearchButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, -1, -1));
 
         jTabbedPane1.addTab("tab3", reservationPanel);
 
@@ -1250,7 +1081,7 @@ try {
         isbnAdd.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 12)); // NOI18N
         isbnAdd = new PlaceholderTextField("Enter ISBN here");
 
-        categoryComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ENGLISH", "SCIENCE ", "MATH" }));
+        categoryComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "English", "Science", "Math" }));
         categoryComboBox.setSelectedItem(categoryComboBox.getSelectedItem());
         categoryComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1315,6 +1146,7 @@ try {
         jTabbedPane1.addTab("tab5", addBookPanel);
 
         reservePanel.setBackground(new java.awt.Color(28, 52, 62));
+        reservePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         requestTable.setBackground(new java.awt.Color(220, 220, 250));
         requestTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1337,6 +1169,8 @@ try {
         requestTable.getTableHeader().setReorderingAllowed(false);
         requestTable.setDefaultEditor(Object.class, null);
 
+        reservePanel.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 55, 678, 500));
+
         confirmBorrow.setBackground(new java.awt.Color(49, 98, 103));
         confirmBorrow.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         confirmBorrow.setForeground(new java.awt.Color(0, 255, 255));
@@ -1347,10 +1181,12 @@ try {
                 confirmBorrowActionPerformed(evt);
             }
         });
+        reservePanel.add(confirmBorrow, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 573, 242, 48));
 
         requestSearch.setBackground(new java.awt.Color(255, 255, 255));
         requestSearch.setText("Search");
         requestSearch = new PlaceholderTextField("Search");
+        reservePanel.add(requestSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 634, -1));
 
         jButton22.setBackground(new java.awt.Color(49, 98, 103));
         jButton22.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1362,6 +1198,7 @@ try {
                 jButton22ActionPerformed(evt);
             }
         });
+        reservePanel.add(jButton22, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 573, 162, 48));
 
         jButton29.setBackground(new java.awt.Color(49, 98, 103));
         jButton29.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1373,44 +1210,22 @@ try {
                 jButton29ActionPerformed(evt);
             }
         });
+        reservePanel.add(jButton29, new org.netbeans.lib.awtextra.AbsoluteConstraints(522, 573, 162, 48));
 
-        javax.swing.GroupLayout reservePanelLayout = new javax.swing.GroupLayout(reservePanel);
-        reservePanel.setLayout(reservePanelLayout);
-        reservePanelLayout.setHorizontalGroup(
-            reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(reservePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(reservePanelLayout.createSequentialGroup()
-                        .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(confirmBorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(55, 55, 55)
-                        .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservePanelLayout.createSequentialGroup()
-                        .addComponent(requestSearch)
-                        .addGap(44, 44, 44)))
-                .addContainerGap())
-        );
-        reservePanelLayout.setVerticalGroup(
-            reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(reservePanelLayout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(confirmBorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton22, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24))
-        );
+        reserveSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        reserveSearch.setBorderPainted(false);
+        reserveSearch.setContentAreaFilled(false);
+        reserveSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reserveSearchActionPerformed(evt);
+            }
+        });
+        reservePanel.add(reserveSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, -1, -1));
 
         jTabbedPane1.addTab("tab6", reservePanel);
 
         loansPanel.setBackground(new java.awt.Color(28, 52, 62));
+        loansPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButton27.setBackground(new java.awt.Color(49, 98, 103));
         jButton27.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1422,6 +1237,7 @@ try {
                 jButton27ActionPerformed(evt);
             }
         });
+        loansPanel.add(jButton27, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 575, 406, 48));
 
         jButton28.setBackground(new java.awt.Color(49, 98, 103));
         jButton28.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1433,10 +1249,12 @@ try {
                 jButton28ActionPerformed(evt);
             }
         });
+        loansPanel.add(jButton28, new org.netbeans.lib.awtextra.AbsoluteConstraints(424, 575, 260, 48));
 
         loansSearch.setBackground(new java.awt.Color(255, 255, 255));
         loansSearch.setText("Search");
         loansSearch = new PlaceholderTextField("Search");
+        loansPanel.add(loansSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
         loansTable.setBackground(new java.awt.Color(220, 220, 250));
         loansTable.setForeground(new java.awt.Color(0, 0, 0));
@@ -1467,40 +1285,22 @@ try {
         loansTable.getTableHeader().setReorderingAllowed(false);
         loansTable.setDefaultEditor(Object.class, null);
 
-        javax.swing.GroupLayout loansPanelLayout = new javax.swing.GroupLayout(loansPanel);
-        loansPanel.setLayout(loansPanelLayout);
-        loansPanelLayout.setHorizontalGroup(
-            loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loansPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(loansPanelLayout.createSequentialGroup()
-                        .addComponent(jButton27, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton28, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(loansPanelLayout.createSequentialGroup()
-                        .addComponent(loansSearch)
-                        .addGap(44, 44, 44)))
-                .addContainerGap())
-        );
-        loansPanelLayout.setVerticalGroup(
-            loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loansPanelLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(loansSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton27, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton28, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(22, 22, 22))
-        );
+        loansPanel.add(jScrollPane7, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 51, 678, 512));
+
+        paymentSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        paymentSearch.setBorderPainted(false);
+        paymentSearch.setContentAreaFilled(false);
+        paymentSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                paymentSearchActionPerformed(evt);
+            }
+        });
+        loansPanel.add(paymentSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, -1, -1));
 
         jTabbedPane1.addTab("tab7", loansPanel);
 
         loanManagementPanel.setBackground(new java.awt.Color(28, 52, 62));
+        loanManagementPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         confirmPayment.setBackground(new java.awt.Color(49, 98, 103));
         confirmPayment.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1512,6 +1312,7 @@ try {
                 confirmPaymentActionPerformed(evt);
             }
         });
+        loanManagementPanel.add(confirmPayment, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 583, 260, 48));
 
         jButton26.setBackground(new java.awt.Color(49, 98, 103));
         jButton26.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1523,6 +1324,7 @@ try {
                 jButton26ActionPerformed(evt);
             }
         });
+        loanManagementPanel.add(jButton26, new org.netbeans.lib.awtextra.AbsoluteConstraints(424, 583, 260, 48));
 
         loansManagementTable.setBackground(new java.awt.Color(220, 220, 250));
         loansManagementTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1552,40 +1354,22 @@ try {
         loansManagementTable.setDefaultEditor(Object.class, null);
         jScrollPane6.setViewportView(loansManagementTable);
 
+        loanManagementPanel.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 51, 678, 526));
+
         loanManagement.setBackground(new java.awt.Color(255, 255, 255));
         loanManagement.setText("Search");
         loanManagement = new PlaceholderTextField("Search");
+        loanManagementPanel.add(loanManagement, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
-        javax.swing.GroupLayout loanManagementPanelLayout = new javax.swing.GroupLayout(loanManagementPanel);
-        loanManagementPanel.setLayout(loanManagementPanelLayout);
-        loanManagementPanelLayout.setHorizontalGroup(
-            loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane6)
-                    .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                        .addComponent(confirmPayment, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
-                        .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, loanManagementPanelLayout.createSequentialGroup()
-                        .addComponent(loanManagement)
-                        .addGap(44, 44, 44)))
-                .addContainerGap())
-        );
-        loanManagementPanelLayout.setVerticalGroup(
-            loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loanManagementPanelLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(loanManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(loanManagementPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(confirmPayment, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(14, 14, 14))
-        );
+        loanManagementSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        loanManagementSearchButton.setBorderPainted(false);
+        loanManagementSearchButton.setContentAreaFilled(false);
+        loanManagementSearchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loanManagementSearchButtonActionPerformed(evt);
+            }
+        });
+        loanManagementPanel.add(loanManagementSearchButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, -1, -1));
 
         jTabbedPane1.addTab("tab8", loanManagementPanel);
 
@@ -1681,7 +1465,7 @@ try {
         categoryUpdate.setBackground(new java.awt.Color(156, 153, 255));
         categoryUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 14)); // NOI18N
         categoryUpdate.setForeground(new java.awt.Color(0, 0, 0));
-        categoryUpdate.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ENGLISH", "SCIENCE ", "MATH" }));
+        categoryUpdate.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "English", "Science", "Math" }));
         categoryUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 categoryUpdateActionPerformed(evt);
@@ -1806,6 +1590,7 @@ try {
         jTabbedPane1.addTab("tab4", updatePanel);
 
         borrowsPanel.setBackground(new java.awt.Color(28, 52, 62));
+        borrowsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         borrowsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1820,6 +1605,8 @@ try {
         ));
         jScrollPane1.setViewportView(borrowsTable);
 
+        borrowsPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 61, 660, 497));
+
         jButton30.setBackground(new java.awt.Color(49, 98, 103));
         jButton30.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton30.setForeground(new java.awt.Color(0, 255, 255));
@@ -1830,10 +1617,7 @@ try {
                 jButton30ActionPerformed(evt);
             }
         });
-
-        bSearch.setBackground(new java.awt.Color(255, 255, 255));
-        bSearch.setText("Search");
-        bSearch = new PlaceholderTextField("Search");
+        borrowsPanel.add(jButton30, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 576, 162, 48));
 
         jButton31.setBackground(new java.awt.Color(49, 98, 103));
         jButton31.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -1845,39 +1629,27 @@ try {
                 jButton31ActionPerformed(evt);
             }
         });
+        borrowsPanel.add(jButton31, new org.netbeans.lib.awtextra.AbsoluteConstraints(124, 576, 162, 48));
 
-        javax.swing.GroupLayout borrowsPanelLayout = new javax.swing.GroupLayout(borrowsPanel);
-        borrowsPanel.setLayout(borrowsPanelLayout);
-        borrowsPanelLayout.setHorizontalGroup(
-            borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(borrowsPanelLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
-                        .addComponent(bSearch)
-                        .addGap(44, 44, 44)))
-                .addContainerGap(14, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, borrowsPanelLayout.createSequentialGroup()
-                .addGap(108, 108, 108)
-                .addComponent(jButton31, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(109, 109, 109))
-        );
-        borrowsPanelLayout.setVerticalGroup(
-            borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(borrowsPanelLayout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(bSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(borrowsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton30, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton31, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(9, Short.MAX_VALUE))
-        );
+        borrowsSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        borrowsSearchButton.setBorderPainted(false);
+        borrowsSearchButton.setContentAreaFilled(false);
+        borrowsSearchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrowsSearchButtonActionPerformed(evt);
+            }
+        });
+        borrowsPanel.add(borrowsSearchButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, -1, 40));
+
+        bSearch.setBackground(new java.awt.Color(255, 255, 255));
+        bSearch.setText("Search");
+        bSearch = new PlaceholderTextField("Search");
+        bSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSearchActionPerformed(evt);
+            }
+        });
+        borrowsPanel.add(bSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
         jTabbedPane1.addTab("tab9", borrowsPanel);
 
@@ -1891,7 +1663,7 @@ try {
         returnsButton.setBorder(null);
         returnsButton.setBorderPainted(false);
         returnsButton.setContentAreaFilled(false);
-        returnsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        returnsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         returnsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 returnsButtonActionPerformed(evt);
@@ -1904,7 +1676,7 @@ try {
         addBooksButton.setBorder(null);
         addBooksButton.setBorderPainted(false);
         addBooksButton.setContentAreaFilled(false);
-        addBooksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        addBooksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         addBooksButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addBooksButtonActionPerformed(evt);
@@ -1918,7 +1690,7 @@ try {
         booksButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         booksButton.setBorderPainted(false);
         booksButton.setContentAreaFilled(false);
-        booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         booksButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 booksButtonActionPerformed(evt);
@@ -1931,7 +1703,7 @@ try {
         paymentsButton.setBorder(null);
         paymentsButton.setBorderPainted(false);
         paymentsButton.setContentAreaFilled(false);
-        paymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        paymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         paymentsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 paymentsButtonActionPerformed(evt);
@@ -1985,7 +1757,7 @@ try {
         holdsButton.setBorder(null);
         holdsButton.setBorderPainted(false);
         holdsButton.setContentAreaFilled(false);
-        holdsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        holdsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         holdsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 holdsButtonActionPerformed(evt);
@@ -2010,7 +1782,7 @@ try {
         borrowsButton.setBorder(null);
         borrowsButton.setBorderPainted(false);
         borrowsButton.setContentAreaFilled(false);
-        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         borrowsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 borrowsButtonActionPerformed(evt);
@@ -2940,6 +2712,285 @@ try {
         populateLoansTable();
     }//GEN-LAST:event_jButton28ActionPerformed
 
+    private void bSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bSearchActionPerformed
+//this action performed for button reservation title search sorts the data and presents the requested search
+    private void reservationTitleSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservationTitleSearchButtonActionPerformed
+        
+        reservationTitleSearch.requestFocus(); //this is a debugging measure because the placeholder could interfere with the value passed to the searchText
+        
+        String searchText = reservationTitleSearch.getText().trim(); //from the text field named reservationTitleSearch, the value is passed to searchText
+
+    if (searchText.isEmpty()||searchText.equals("Search")) { //debug to make sure that the text field has a value in it
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection(); //connection to database
+        
+        String query = "SELECT * FROM reservation WHERE title LIKE ?"; //query to retrieve the data which is 'LIKE' the searchText
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        String searchQuery = "%" + searchText + "%"; //these are called wildcards for advanced searching
+        statement.setString(1, searchQuery);
+
+        ResultSet resultSet = statement.executeQuery(); //this executes the query
+
+        DefaultTableModel model = (DefaultTableModel) reservationTitleTable.getModel();
+        model.setRowCount(0); //clears the table
+        
+        boolean hasResults = false;
+        
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("title");
+            
+            model.addRow(new Object[]{title}); //here it populates the table based on the result set
+
+        }
+        
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found."); //if no results found, JOption Pane presents
+        }
+        
+        // closes the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_reservationTitleSearchButtonActionPerformed
+
+    private void reserveSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSearchActionPerformed
+
+        requestSearch.requestFocus(); //this is a debugging measure because the placeholder could interfere with the value passed to the searchText
+
+        String searchText = requestSearch.getText().trim(); //from the text field named reservationTitleSearch, the value is passed to searchText
+
+        if (searchText.isEmpty()||searchText.equals("Search")) { //debug to make sure that the text field has a value in it
+            JOptionPane.showMessageDialog(this, "Please enter text to search.");
+            return;
+        }
+
+        try {
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection(); //connection to database
+
+            String query = "SELECT * FROM reservation WHERE name LIKE ? or rn LIKE = ? or sched LIKE = ?"; //query to retrieve the data which is 'LIKE' the searchText
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            String searchQuery = "%" + searchText + "%"; //these are called wildcards for advanced searching
+            statement.setString(1, searchQuery);
+            statement.setString(2, searchQuery);
+            statement.setString(3, searchQuery);
+
+            ResultSet resultSet = statement.executeQuery(); //this executes the query
+
+            DefaultTableModel model = (DefaultTableModel) requestTable.getModel();
+            model.setRowCount(0); //clears the table
+
+            boolean hasResults = false;
+
+            while (resultSet.next()) {
+                hasResults = true;
+                String name = resultSet.getString("name");
+                String rn = resultSet.getString("rn");
+                String sched = resultSet.getString("sched");
+
+                model.addRow(new Object[]{name, rn, sched}); //here it populates the table based on the result set
+
+            }
+
+            if (!hasResults) {
+                JOptionPane.showMessageDialog(this, "No results found."); //if no results found, JOption Pane presents
+            }
+
+            // closes the result set, statement, and connection
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+        }
+    }//GEN-LAST:event_reserveSearchActionPerformed
+
+    private void borrowsSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowsSearchButtonActionPerformed
+              
+        bSearch.requestFocus(); //this is a debugging measure because the placeholder could interfere with the value passed to the searchText
+        
+        String searchText = bSearch.getText().trim(); //from the text field named reservationTitleSearch, the value is passed to searchText
+
+    if (searchText.isEmpty()||searchText.equals("Search")) { //debug to make sure that the text field has a value in it
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection(); //connection to database
+        
+        String query = "SELECT * FROM borrows WHERE title LIKE ? or dob LIKE ? or dor LIKE ? or name LIKE ?"; //query to retrieve the data which is 'LIKE' the searchText
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        String searchQuery = "%" + searchText + "%"; //these are called wildcards for advanced searching
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
+
+        ResultSet resultSet = statement.executeQuery(); //this executes the query
+
+        DefaultTableModel model = (DefaultTableModel) borrowsTable.getModel();
+        model.setRowCount(0); //clears the table
+        
+        boolean hasResults = false;
+        
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("title");
+            String dob = resultSet.getString("dob");
+            String dor = resultSet.getString("dor");
+            String name = resultSet.getString("name");
+            
+            
+            model.addRow(new Object[]{title, dob, dor, name}); //here it populates the table based on the result set
+
+        }
+        
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found."); //if no results found, JOption Pane presents
+        }
+        
+        // closes the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_borrowsSearchButtonActionPerformed
+
+    private void paymentSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentSearchActionPerformed
+              
+        loansSearch.requestFocus(); //this is a debugging measure because the placeholder could interfere with the value passed to the searchText
+        
+        String searchText = loansSearch.getText().trim(); //from the text field named reservationTitleSearch, the value is passed to searchText
+
+    if (searchText.isEmpty()||searchText.equals("Search")) { //debug to make sure that the text field has a value in it
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection(); //connection to database
+        
+        String query = "SELECT * FROM history WHERE title LIKE ? or date LIKE ? or name LIKE ? or amount LIKE ? WHERE status = 'Overdue Paid' "; //query to retrieve the data which is 'LIKE' the searchText
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        String searchQuery = "%" + searchText + "%"; //these are called wildcards for advanced searching
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
+
+        ResultSet resultSet = statement.executeQuery(); //this executes the query
+
+        DefaultTableModel model = (DefaultTableModel) loansTable.getModel();
+        model.setRowCount(0); //clears the table
+        
+        boolean hasResults = false;
+        
+        while (resultSet.next()) {
+            hasResults = true;
+            String name = resultSet.getString("name");
+            String title = resultSet.getString("title");
+            String date = resultSet.getString("date");
+            String amount = resultSet.getString("amount");
+            
+            
+            model.addRow(new Object[]{name, title, date, amount}); //here it populates the table based on the result set
+
+        }
+        
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found."); //if no results found, JOption Pane presents
+        }
+        
+        // closes the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_paymentSearchActionPerformed
+
+    private void loanManagementSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loanManagementSearchButtonActionPerformed
+              
+        loanManagement.requestFocus(); //this is a debugging measure because the placeholder could interfere with the value passed to the searchText
+        
+        String searchText = loanManagement.getText().trim(); //from the text field named reservationTitleSearch, the value is passed to searchText
+
+    if (searchText.isEmpty()||searchText.equals("Search")) { //debug to make sure that the text field has a value in it
+        JOptionPane.showMessageDialog(this, "Please enter text to search.");
+        return;
+    }
+    
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection(); //connection to database
+        
+        String query = "SELECT * FROM borrows WHERE title LIKE ? or dor LIKE ? or name LIKE ? or loan LIKE ? WHERE dor < CURDATE()"; //query to retrieve the data which is 'LIKE' the searchText
+        PreparedStatement statement = connection.prepareStatement(query);
+        
+        String searchQuery = "%" + searchText + "%"; //these are called wildcards for advanced searching
+        statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
+
+        ResultSet resultSet = statement.executeQuery(); //this executes the query
+
+        DefaultTableModel model = (DefaultTableModel) loansManagementTable.getModel();
+        model.setRowCount(0); //clears the table
+        
+        boolean hasResults = false;
+        
+        while (resultSet.next()) {
+            hasResults = true;
+            String title = resultSet.getString("name");
+            String dor = resultSet.getString("dor");
+            String name = resultSet.getString("name");
+            String loan = resultSet.getString("loan");
+            
+            
+            model.addRow(new Object[]{name, title, dor, loan}); //here it populates the table based on the result set
+
+        }
+        
+        if (!hasResults) {
+            JOptionPane.showMessageDialog(this, "No results found."); //if no results found, JOption Pane presents
+        }
+        
+        // closes the result set, statement, and connection
+        resultSet.close();
+        statement.close();
+        connection.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_loanManagementSearchButtonActionPerformed
+
     
     
 
@@ -2957,6 +3008,7 @@ try {
     private javax.swing.JButton borrowsButton;
     private javax.swing.JPanel borrowsPanel;
     private javax.swing.JTextField borrowsSearch;
+    private javax.swing.JButton borrowsSearchButton;
     private javax.swing.JTable borrowsTable;
     private javax.swing.JComboBox<String> categoryComboBox;
     private javax.swing.JComboBox<String> categoryUpdate;
@@ -3009,10 +3061,12 @@ try {
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField loanManagement;
     private javax.swing.JPanel loanManagementPanel;
+    private javax.swing.JButton loanManagementSearchButton;
     private javax.swing.JTable loansManagementTable;
     private javax.swing.JPanel loansPanel;
     private javax.swing.JTextField loansSearch;
     private javax.swing.JTable loansTable;
+    private javax.swing.JButton paymentSearch;
     private javax.swing.JButton paymentsButton;
     private javax.swing.JButton refreshButton;
     private javax.swing.JButton removeButton;
@@ -3020,10 +3074,12 @@ try {
     private javax.swing.JTable requestTable;
     private javax.swing.JPanel reservationPanel;
     private javax.swing.JTextField reservationTitleSearch;
+    private javax.swing.JButton reservationTitleSearchButton;
     private javax.swing.JTable reservationTitleTable;
     private javax.swing.JButton reserveButton;
     private javax.swing.JButton reserveButton1;
     private javax.swing.JPanel reservePanel;
+    private javax.swing.JButton reserveSearch;
     private javax.swing.JButton returnsButton;
     private javax.swing.JPanel returnsPanel;
     private javax.swing.JTable returnsTable;

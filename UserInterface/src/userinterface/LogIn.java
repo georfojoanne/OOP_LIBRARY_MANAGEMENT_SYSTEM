@@ -290,13 +290,89 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
 }
 
     
+    private static void checkForOverdueAndUpdateUserInfo() { //checks for all overdues and puts fines automatically
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        String query = "SELECT title, dob, dor, name, DATEDIFF(CURDATE(), dor) AS overdue_days, loan, last_updated FROM borrows WHERE dor < CURDATE()";
+        PreparedStatement statement = connection.prepareStatement(query);
+        ResultSet resultSet = statement.executeQuery();
+
+        String updateBorrowsQuery = "UPDATE borrows SET loan = ?, overdueDays = ?, last_updated = CURDATE() WHERE title = ? AND dob = ? AND name = ?";
+        PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
+
+        while (resultSet.next()) {
+            String title = resultSet.getString("title");
+            java.util.Date dob = resultSet.getDate("dob");
+            String name = resultSet.getString("name");
+            int overdueDays = resultSet.getInt("overdue_days");
+            int loan = resultSet.getInt("loan");
+
+            // Calculate fine based on overdue duration (10 per 7 days, including the first overdue period)
+            int fine = 10;
+            if (overdueDays > 0) {
+                fine += ((overdueDays / 7) * 10);
+            }
+
+            // Update loan amount and overdue days for the book in borrows table
+            updateBorrowsStatement.setInt(1, fine);
+            updateBorrowsStatement.setInt(2, overdueDays);
+            updateBorrowsStatement.setString(3, title);
+            updateBorrowsStatement.setDate(4, new java.sql.Date(dob.getTime()));
+            updateBorrowsStatement.setString(5, name);
+            updateBorrowsStatement.executeUpdate();
+        }
+
+        // Close resources
+        resultSet.close();
+        statement.close();
+        updateBorrowsStatement.close();
+        connection.close();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
     
-    
-    
-    
-    
-    
-    
+        
+    private static void updateUserInfoLoans() {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        // Query to get the sum of loans for each user from the borrows table
+        String sumLoansQuery = "SELECT name, SUM(loan) as totalLoan FROM borrows GROUP BY name";
+        PreparedStatement sumLoansStatement = connection.prepareStatement(sumLoansQuery);
+        ResultSet resultSet = sumLoansStatement.executeQuery();
+
+        // Query to update the loan amount for each user in the userinfo table
+        String updateUserInfoQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
+        PreparedStatement updateUserInfoStatement = connection.prepareStatement(updateUserInfoQuery);
+
+        while (resultSet.next()) {
+            String name = resultSet.getString("name");
+            int totalLoan = resultSet.getInt("totalLoan");
+
+            updateUserInfoStatement.setInt(1, totalLoan);
+            updateUserInfoStatement.setString(2, name);
+            int updatedRows = updateUserInfoStatement.executeUpdate();
+            if (updatedRows == 0) {
+                // If no rows were updated, print a warning
+                System.out.println("Warning: No rows updated in userinfo table for user: " + name);
+            }
+        }
+
+        // Close resources
+        resultSet.close();
+        sumLoansStatement.close();
+        updateUserInfoStatement.close();
+        connection.close();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
     
     
     private void logInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInButtonActionPerformed
@@ -434,7 +510,8 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
         
        
        
-        
+        checkForOverdueAndUpdateUserInfo();
+        updateUserInfoLoans();
         
      
         
