@@ -710,7 +710,6 @@ try {
         reserveButton = new javax.swing.JButton();
         reservationTitleSearch = new javax.swing.JTextField();
         reserveButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         addBookPanel = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
@@ -729,14 +728,12 @@ try {
         requestSearch = new javax.swing.JTextField();
         jButton22 = new javax.swing.JButton();
         jButton29 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
         loansPanel = new javax.swing.JPanel();
         jButton27 = new javax.swing.JButton();
         jButton28 = new javax.swing.JButton();
         loansSearch = new javax.swing.JTextField();
         jScrollPane7 = new javax.swing.JScrollPane();
         loansTable = new javax.swing.JTable();
-        jButton5 = new javax.swing.JButton();
         loanManagementPanel = new javax.swing.JPanel();
         confirmPayment = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
@@ -1031,36 +1028,40 @@ try {
                 .addContainerGap()
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(returnsPanelLayout.createSequentialGroup()
-                        .addGap(41, 41, 41)
+                        .addGap(37, 37, 37)
                         .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
+                        .addGap(33, 33, 33)
                         .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(returnsPanelLayout.createSequentialGroup()
-                        .addGap(0, 10, Short.MAX_VALUE)
+                        .addGap(10, 10, 10)
                         .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 668, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(returnsPanelLayout.createSequentialGroup()
-                                .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(6, 6, 6)))
-                        .addContainerGap(12, Short.MAX_VALUE))))
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 668, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 6, Short.MAX_VALUE))
+                            .addGroup(returnsPanelLayout.createSequentialGroup()
+                                .addComponent(borrowsSearch)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())))
         );
         returnsPanelLayout.setVerticalGroup(
             returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, returnsPanelLayout.createSequentialGroup()
-                .addContainerGap(19, Short.MAX_VALUE)
+                .addContainerGap(15, Short.MAX_VALUE)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, returnsPanelLayout.createSequentialGroup()
+                        .addComponent(borrowsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(21, 21, 21))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, returnsPanelLayout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 510, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab2", returnsPanel);
@@ -1121,56 +1122,39 @@ try {
             }
         });
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
-        jButton3.setBorderPainted(false);
-        jButton3.setContentAreaFilled(false);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout reservationPanelLayout = new javax.swing.GroupLayout(reservationPanel);
         reservationPanel.setLayout(reservationPanelLayout);
         reservationPanelLayout.setHorizontalGroup(
             reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(reservationPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+                .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(reservationPanelLayout.createSequentialGroup()
-                        .addGap(46, 46, 46)
-                        .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservationPanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton3)))
-                .addContainerGap())
-            .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(reservationPanelLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(reservationTitleSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 585, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(99, Short.MAX_VALUE)))
+                        .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+                            .addGroup(reservationPanelLayout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(35, 35, 35)
+                                .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(reservationPanelLayout.createSequentialGroup()
+                        .addComponent(reservationTitleSearch)
+                        .addGap(60, 60, 60))))
         );
         reservationPanelLayout.setVerticalGroup(
             reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(reservationPanelLayout.createSequentialGroup()
-                .addGap(7, 7, 7)
-                .addComponent(jButton3)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 492, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(reservationTitleSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(23, 23, 23))
-            .addGroup(reservationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(reservationPanelLayout.createSequentialGroup()
-                    .addGap(16, 16, 16)
-                    .addComponent(reservationTitleSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(607, Short.MAX_VALUE)))
+                    .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(reserveButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9))
         );
 
         jTabbedPane1.addTab("tab3", reservationPanel);
@@ -1395,15 +1379,6 @@ try {
             }
         });
 
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
-        jButton4.setBorderPainted(false);
-        jButton4.setContentAreaFilled(false);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout reservePanelLayout = new javax.swing.GroupLayout(reservePanel);
         reservePanel.setLayout(reservePanelLayout);
         reservePanelLayout.setHorizontalGroup(
@@ -1420,21 +1395,15 @@ try {
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reservePanelLayout.createSequentialGroup()
                         .addComponent(requestSearch)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4)))
+                        .addGap(44, 44, 44)))
                 .addContainerGap())
         );
         reservePanelLayout.setVerticalGroup(
             reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(reservePanelLayout.createSequentialGroup()
-                .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(reservePanelLayout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(reservePanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton4)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(17, 17, 17)
+                .addComponent(requestSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(reservePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1503,15 +1472,6 @@ try {
         loansTable.getTableHeader().setReorderingAllowed(false);
         loansTable.setDefaultEditor(Object.class, null);
 
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
-        jButton5.setBorderPainted(false);
-        jButton5.setContentAreaFilled(false);
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout loansPanelLayout = new javax.swing.GroupLayout(loansPanel);
         loansPanel.setLayout(loansPanelLayout);
         loansPanelLayout.setHorizontalGroup(
@@ -1526,21 +1486,15 @@ try {
                     .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(loansPanelLayout.createSequentialGroup()
                         .addComponent(loansSearch)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton5)))
+                        .addGap(44, 44, 44)))
                 .addContainerGap())
         );
         loansPanelLayout.setVerticalGroup(
             loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loansPanelLayout.createSequentialGroup()
-                .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(loansPanelLayout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(loansSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(loansPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton5)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(16, 16, 16)
+                .addComponent(loansSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(loansPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -2983,137 +2937,6 @@ try {
     }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-                
-        reservationTitleSearch.requestFocus();
-        
-        String searchText = reservationTitleSearch.getText().trim();
-                System.out.println(searchText);
-
-    // Check if the search text is the placeholder
-    if (searchText.isEmpty()||searchText.equals("Search")) {
-        JOptionPane.showMessageDialog(this, "Please enter text to search.");
-        return;
-    }
-    
-    try {
-        // Establish a connection to your database
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-        
-        // Create a SQL query to search for books
-        String query = "SELECT * FROM reservation WHERE title LIKE ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        
-        // Use the search text in the query with wildcards for advanced search
-        String searchQuery = "%" + searchText + "%";
-        statement.setString(1, searchQuery);
-
-        
-        // Execute the query
-        ResultSet resultSet = statement.executeQuery();
-        
-        // Clear the table before adding new rows
-        DefaultTableModel model = (DefaultTableModel) reservationTitleTable.getModel();
-        model.setRowCount(0);
-        
-        // Debug statement to check if the query returns any results
-        boolean hasResults = false;
-        
-        // Populate the table with the search results
-        while (resultSet.next()) {
-            hasResults = true;
-            String title = resultSet.getString("title");
-            
-            // Add row to the table model
-            model.addRow(new Object[]{title});
-
-        }
-        
-        // Check if results were found
-        if (!hasResults) {
-            JOptionPane.showMessageDialog(this, "No results found.");
-        }
-        
-        // Close the result set, statement, and connection
-        resultSet.close();
-        statement.close();
-        connection.close();
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
-    }
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-                        
-        requestSearch.requestFocus();
-        
-        String searchText = requestSearch.getText().trim();
-                System.out.println(searchText);
-
-    // Check if the search text is the placeholder
-    if (searchText.isEmpty()||searchText.equals("Search")) {
-        JOptionPane.showMessageDialog(this, "Please enter text to search.");
-        return;
-    }
-    
-    try {
-        // Establish a connection to your database
-        dbConnection con = new dbConnection();
-        Connection connection = con.getConnection();
-        
-        // Create a SQL query to search for books
-        String query = "SELECT * FROM reservation WHERE name LIKE ? OR rn LIKE ? OR sched LIKE ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        
-        // Use the search text in the query with wildcards for advanced search
-        String searchQuery = "%" + searchText + "%";
-        statement.setString(1, searchQuery);
-        statement.setString(2, searchQuery);
-        statement.setString(3, searchQuery);
-        
-        // Execute the query
-        ResultSet resultSet = statement.executeQuery();
-        
-        // Clear the table before adding new rows
-        DefaultTableModel model = (DefaultTableModel) requestTable.getModel();
-        model.setRowCount(0);
-        
-        // Debug statement to check if the query returns any results
-        boolean hasResults = false;
-        
-        // Populate the table with the search results
-        while (resultSet.next()) {
-            hasResults = true;
-            String name = resultSet.getString("name");
-            String rn = resultSet.getString("rn");
-            String sched = resultSet.getString("sched");
-            
-            // Add row to the table model
-            model.addRow(new Object[]{name,rn, sched});
-
-        }
-        
-        // Check if results were found
-        if (!hasResults) {
-            JOptionPane.showMessageDialog(this, "No results found.");
-        }
-        
-        // Close the result set, statement, and connection
-        resultSet.close();
-        statement.close();
-        connection.close();
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
-    }
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
-
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         setState(JFrame. ICONIFIED);
     }//GEN-LAST:event_jButton6ActionPerformed
@@ -3160,11 +2983,8 @@ try {
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton29;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton30;
     private javax.swing.JButton jButton31;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
