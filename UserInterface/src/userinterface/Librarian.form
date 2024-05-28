@@ -2012,17 +2012,15 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="jTextField15" alignment="0" min="-2" pref="201" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="jTextField15" alignment="0" pref="201" max="32767" attributes="0"/>
                               <Component id="jButton17" alignment="0" min="-2" pref="193" max="-2" attributes="0"/>
-                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                                  <Component id="holdsButton" alignment="0" pref="193" max="32767" attributes="0"/>
-                                  <Component id="paymentsButton" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="addBooksButton" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="returnsButton" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="booksButton" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="borrowsButton" alignment="0" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="booksButton" alignment="0" max="32767" attributes="0"/>
+                              <Component id="returnsButton" alignment="0" max="32767" attributes="0"/>
+                              <Component id="borrowsButton" alignment="0" max="32767" attributes="0"/>
+                              <Component id="addBooksButton" alignment="0" max="32767" attributes="0"/>
+                              <Component id="paymentsButton" alignment="0" max="32767" attributes="0"/>
+                              <Component id="holdsButton" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
