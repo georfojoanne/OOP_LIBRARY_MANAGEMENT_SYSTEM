@@ -385,13 +385,15 @@ private void books() {
         jLabel29 = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
         user = new javax.swing.JTextField();
-        id = new javax.swing.JTextField();
-        email = new javax.swing.JTextField();
-        password = new javax.swing.JTextField();
+        ID = new javax.swing.JTextField();
+        Email = new javax.swing.JTextField();
+        Password = new javax.swing.JTextField();
         jLabel33 = new javax.swing.JLabel();
         cancelUser = new javax.swing.JButton();
-        jComboBox4 = new javax.swing.JComboBox<>();
+        roleCb = new javax.swing.JComboBox<>();
         updateUser = new javax.swing.JButton();
+        Contact = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         jLabel13 = new javax.swing.JLabel();
         updateLibrarian = new javax.swing.JButton();
@@ -428,12 +430,9 @@ private void books() {
         booksTable = new javax.swing.JTable();
         jButton6 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(900, 730));
-        setUndecorated(true);
         setPreferredSize(new java.awt.Dimension(930, 700));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -460,6 +459,7 @@ private void books() {
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 80, -1, -1));
 
         jButton1.setBackground(new java.awt.Color(51, 51, 51));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -468,9 +468,9 @@ private void books() {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 20, 50, 30));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 10, 70, 50));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 940, 100));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 940, 120));
 
         librarianButton.setBackground(new java.awt.Color(10, 29, 36));
         librarianButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -544,10 +544,10 @@ private void books() {
         });
         librarianButton.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 150, -1));
 
-        jLabel6.setFont(new java.awt.Font("Stylus BT", 0, 12)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Stylus BT", 0, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("You are logged in as:");
-        librarianButton.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, -1, -1));
+        librarianButton.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -728,52 +728,52 @@ private void books() {
         jLabel12.setFont(new java.awt.Font("Stylus BT", 1, 36)); // NOI18N
         jLabel12.setForeground(java.awt.Color.white);
         jLabel12.setText("ADD  USER");
-        jPanel10.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 20, -1, -1));
+        jPanel10.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, -1, -1));
 
         jLabel27.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel27.setForeground(java.awt.Color.white);
         jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel27.setText("USER NAME");
         jLabel27.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel10.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 130, 40));
+        jPanel10.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, 120, 30));
 
         jLabel28.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel28.setForeground(java.awt.Color.white);
         jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel28.setText("ID #");
         jLabel28.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel10.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 130, 40));
+        jPanel10.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 130, 120, 30));
 
         jLabel29.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel29.setForeground(java.awt.Color.white);
         jLabel29.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel29.setText("EMAIL");
         jLabel29.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel10.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 250, 130, 40));
+        jPanel10.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, 120, 30));
 
         jLabel30.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel30.setForeground(java.awt.Color.white);
         jLabel30.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel30.setText("PASSWORD");
         jLabel30.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel10.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 130, 40));
-        jPanel10.add(user, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, 460, 40));
+        jPanel10.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 260, 120, 30));
+        jPanel10.add(user, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 70, 460, 40));
 
-        id.addActionListener(new java.awt.event.ActionListener() {
+        ID.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                idActionPerformed(evt);
+                IDActionPerformed(evt);
             }
         });
-        jPanel10.add(id, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 170, 460, 40));
-        jPanel10.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 250, 460, 40));
-        jPanel10.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 330, 460, 40));
+        jPanel10.add(ID, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 130, 460, 40));
+        jPanel10.add(Email, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 200, 460, 40));
+        jPanel10.add(Password, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 260, 460, 40));
 
         jLabel33.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel33.setForeground(java.awt.Color.white);
         jLabel33.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel33.setText("ROLE");
         jLabel33.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel10.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 410, 130, 40));
+        jPanel10.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 410, 120, 30));
 
         cancelUser.setBackground(new java.awt.Color(49, 98, 103));
         cancelUser.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -785,16 +785,16 @@ private void books() {
                 cancelUserActionPerformed(evt);
             }
         });
-        jPanel10.add(cancelUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 470, 120, 40));
+        jPanel10.add(cancelUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 480, 120, 40));
 
-        jComboBox4.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 14)); // NOI18N
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Student", "Faculty" }));
-        jComboBox4.addActionListener(new java.awt.event.ActionListener() {
+        roleCb.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 14)); // NOI18N
+        roleCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Student", "Faculty" }));
+        roleCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox4ActionPerformed(evt);
+                roleCbActionPerformed(evt);
             }
         });
-        jPanel10.add(jComboBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 410, 460, 40));
+        jPanel10.add(roleCb, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 410, 460, 40));
 
         updateUser.setBackground(new java.awt.Color(49, 98, 103));
         updateUser.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
@@ -806,7 +806,15 @@ private void books() {
                 updateUserActionPerformed(evt);
             }
         });
-        jPanel10.add(updateUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 470, 120, 40));
+        jPanel10.add(updateUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 480, 120, 40));
+        jPanel10.add(Contact, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 330, 460, 40));
+
+        jLabel8.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        jLabel8.setForeground(java.awt.Color.white);
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("CONTACT");
+        jLabel8.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
+        jPanel10.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 330, 120, 30));
 
         jTabbedPane1.addTab("tab8", jPanel10);
 
@@ -835,28 +843,28 @@ private void books() {
         jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel31.setText("USER NAME");
         jLabel31.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel11.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, 110, 30));
+        jPanel11.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, 110, 30));
 
         jLabel34.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel34.setForeground(java.awt.Color.white);
         jLabel34.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel34.setText("ID #");
         jLabel34.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel11.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, 110, 30));
+        jPanel11.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, 110, 30));
 
         jLabel35.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel35.setForeground(java.awt.Color.white);
         jLabel35.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel35.setText("EMAIL");
         jLabel35.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel11.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 110, -1));
+        jPanel11.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 240, 110, 30));
 
         jLabel36.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel36.setForeground(java.awt.Color.white);
         jLabel36.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel36.setText("PASSWORD");
         jLabel36.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel11.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 330, 110, -1));
+        jPanel11.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 120, 30));
 
         libName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -888,9 +896,10 @@ private void books() {
 
         jLabel5.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jLabel5.setForeground(java.awt.Color.white);
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("CONTACT");
         jLabel5.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.white));
-        jPanel11.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 90, 30));
+        jPanel11.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, 110, 30));
         jPanel11.add(libPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 320, 460, 40));
 
         jTabbedPane1.addTab("tab9", jPanel11);
@@ -974,14 +983,7 @@ private void books() {
 
         jTabbedPane1.addTab("tab7", panel1);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 750, 630));
-
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
-
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, 750, 640));
         setJMenuBar(jMenuBar1);
 
         pack();
@@ -1014,7 +1016,11 @@ private void books() {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void cancelLibrarianActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelLibrarianActionPerformed
-       
+       libName.setText("");
+    libId.setText("");
+    libEmail.setText("");
+    libPassword.setText("");
+    libContact.setText("");
     }//GEN-LAST:event_cancelLibrarianActionPerformed
 
     private void libEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_libEmailActionPerformed
@@ -1051,7 +1057,7 @@ private void books() {
             
             // Execute the update
             pstmt.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Librarian added successfully.", "Librarian Added", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Librarian added successfully.", "Librarian Added", JOptionPane.INFORMATION_MESSAGE);
             
             // Once data is inserted, refresh the librarianTable
             librarianTable();
@@ -1087,22 +1093,78 @@ private void books() {
     }//GEN-LAST:event_updateLibrarianActionPerformed
 
     private void cancelUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelUserActionPerformed
-     
+     user.setText("");
+    ID.setText("");
+    Email.setText("");
+    Password.setText("");
+    Contact.setText("");     
+    
     }//GEN-LAST:event_cancelUserActionPerformed
 
-    private void idActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idActionPerformed
+    private void IDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IDActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_idActionPerformed
+    }//GEN-LAST:event_IDActionPerformed
 
     
     
     
     
+    private void addUser() {                                          
+    try {                                          
+      
+        // Retrieve data from text fields
+        String name = user.getText();
+        String id = ID.getText();
+        String email = Email.getText();
+        String password = Password.getText();
+        String role = (String) roleCb.getSelectedItem();
+        String contact = Contact.getText();
+        
+        // Use dbConnection to establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        // Execute SQL statement to insert data into the librarian table
+        String query = "INSERT INTO userinfo (name, role, email, Password, id, Contact) VALUES (?, ?, ?, ?, ?,?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, id);
+            pstmt.setString(3, email);
+            pstmt.setString(4, password);
+            pstmt.setString(5, role);
+             pstmt.setString(6, contact);
+            
+            // Execute the update
+            pstmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "User added successfully.", "User Added", JOptionPane.INFORMATION_MESSAGE);
+            
+            // Once data is inserted, refresh the librarianTable
+            userTable();
+            
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // Handle SQL exceptions appropriately
+        } finally {
+            // Close the connection
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                // Handle SQL exceptions appropriately
+            }
+        }
+    } catch (SQLException ex) {
+            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+    }
+} 
+
     
     
     
     private void updateUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateUserActionPerformed
-       
+                    addUser();       
     }//GEN-LAST:event_updateUserActionPerformed
 
     private void jButton28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton28ActionPerformed
@@ -1140,7 +1202,7 @@ private void books() {
             // Execute the update
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Row removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Data removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 // Refresh the librarianTable after removal
                 librarianTable();
             } else {
@@ -1259,13 +1321,71 @@ private void books() {
     
     }//GEN-LAST:event_searchUserActionPerformed
 
-    private void remButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_remButton1ActionPerformed
+    
+    
+    private void removeUser() {                                                
+    try {                                                
+        // Check if a row is selected
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow == -1) { // No row selected
+            JOptionPane.showMessageDialog(this, "Please select a data to remove.", "No data Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         
+        // Retrieve data from the selected row
+        String username = (String) userTable.getValueAt(selectedRow, 0);
+        String password = (String) userTable.getValueAt(selectedRow, 3);
+        
+        // Use dbConnection to establish a database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        
+        // Construct and execute the SQL DELETE statement
+        String query = "DELETE FROM userinfo WHERE name = ? AND Password = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            
+            // Execute the update
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "User removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                // Refresh the librarianTable after removal
+                userTable();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to remove row.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "An error occurred while removing the row.", "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            // Close the connection
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                // Handle SQL exceptions appropriately
+            }
+        }
+    } catch (SQLException ex) {
+            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+
+    
+    
+    
+    
+    
+    private void remButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_remButton1ActionPerformed
+                 removeUser();        
     }//GEN-LAST:event_remButton1ActionPerformed
 
-    private void jComboBox4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox4ActionPerformed
+    private void roleCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roleCbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox4ActionPerformed
+    }//GEN-LAST:event_roleCbActionPerformed
     
     private void addUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUserActionPerformed
                   jTabbedPane1.setSelectedIndex(2);      
@@ -1318,6 +1438,10 @@ private void books() {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField Contact;
+    private javax.swing.JTextField Email;
+    private javax.swing.JTextField ID;
+    private javax.swing.JTextField Password;
     private javax.swing.JButton addLibrarian;
     private javax.swing.JButton addUser;
     private javax.swing.JTextField books;
@@ -1325,10 +1449,8 @@ private void books() {
     private javax.swing.JButton cancelLibrarian;
     private javax.swing.JButton cancelUser;
     private javax.swing.JTextField ecategory;
-    private javax.swing.JTextField email;
     private javax.swing.JLabel english;
     private javax.swing.JTextField faculties;
-    private javax.swing.JTextField id;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton28;
@@ -1338,7 +1460,6 @@ private void books() {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
-    private javax.swing.JComboBox<String> jComboBox4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1357,8 +1478,7 @@ private void books() {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -1389,9 +1509,9 @@ private void books() {
     private javax.swing.JLabel numUser;
     private java.awt.Panel panel1;
     private java.awt.Panel panel2;
-    private javax.swing.JTextField password;
     private javax.swing.JButton remButton1;
     private javax.swing.JButton removeLibrarian;
+    private javax.swing.JComboBox<String> roleCb;
     private javax.swing.JTextField scategory;
     private javax.swing.JLabel science;
     private javax.swing.JButton searchUser;
