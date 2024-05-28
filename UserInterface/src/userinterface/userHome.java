@@ -1,20 +1,22 @@
 package userinterface;
 
 import static java.awt.Color.BLACK;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.table.DefaultTableModel;
-import java.sql.SQLException;
 import java.sql.*;
 import java.time.LocalDate;
-import javax.swing.JOptionPane;
-import java.awt.Color;
 import static java.awt.Color.CYAN;
 import java.awt.Component;
-import java.sql.PreparedStatement;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Color;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 
 
@@ -593,7 +595,7 @@ public void getTextFromNameColumn() {
         });
         panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 10, 50, -1));
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 60));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 30));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
@@ -783,7 +785,8 @@ public void getTextFromNameColumn() {
         searchButton.setForeground(new java.awt.Color(0, 255, 255));
         searchButton.setText("s e a r c h");
         searchButton.setFocusPainted(false);
-        searchButton.setVerifyInputWhenFocusTarget(false);
+        searchButton.setRequestFocusEnabled(false);
+        searchButton.setRolloverEnabled(false);
         searchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchButtonActionPerformed(evt);
@@ -831,7 +834,7 @@ public void getTextFromNameColumn() {
                         .addGap(39, 39, 39)
                         .addGroup(booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(searchBook, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+                                .addComponent(searchBook, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(39, Short.MAX_VALUE))
@@ -1979,17 +1982,16 @@ private void removeReservationSelectedRowsFromDatabase() {
         searchButton.setForeground(new Color(225,225,255));
             updateButton.setForeground(new Color(0, 225, 255));
        
-             searchBook.requestFocus();
-             
-        String searchText = searchBook.getText().trim(); // Get the text entered in the searchBook field
-
-       
+            searchBook.requestFocus();
+        
+        String searchText = searchBook.getText().trim();
+                System.out.println(searchText);
+    
     // Check if the search text is the placeholder
     if (searchText.isEmpty()||searchText.equals("Search")) {
         JOptionPane.showMessageDialog(this, "Please enter text to search.");
         return;
     }
-    
     
     try {
         // Establish a connection to your database
@@ -1997,7 +1999,7 @@ private void removeReservationSelectedRowsFromDatabase() {
         Connection connection = con.getConnection();
         
         // Create a SQL query to search for books
-        String query = "SELECT * FROM books WHERE Title LIKE ? OR Author LIKE ? OR ISBN LIKE ? OR Category LIKE ? OR status LIKE ?  OR nr  LIKE ?";
+        String query = "SELECT * FROM books WHERE Title LIKE ? OR Author LIKE ? OR ISBN LIKE ? OR Category LIKE ?  OR status  LIKE ?  OR nr LIKE ?";
         PreparedStatement statement = connection.prepareStatement(query);
         
         // Use the search text in the query with wildcards for advanced search
@@ -2009,6 +2011,7 @@ private void removeReservationSelectedRowsFromDatabase() {
         statement.setString(5, searchQuery);
         statement.setString(6, searchQuery);
 
+        
         
         // Print the query for debugging
         System.out.println("Executing query: " + statement.toString());
@@ -2031,13 +2034,14 @@ private void removeReservationSelectedRowsFromDatabase() {
             String isbn = resultSet.getString("ISBN");
             String category = resultSet.getString("Category");
             String status = resultSet.getString("status");
-            int nr = resultSet.getInt("nr");
+             String nr = resultSet.getString("nr");
+            
             
             // Add row to the table model
-            model.addRow(new Object[]{title, author, isbn, category, status, nr});
+            model.addRow(new Object[]{title, author, isbn , category ,status, nr});
             
             // Print each result for debugging
-            System.out.println("Title: " + title + ", Author: " + author + ", ISBN: " + isbn + ", Category: " + category + ", Status: " + status + ", Nr: " + nr);
+            System.out.println("Title: " + title + ", Author : " +  author + ", ISBN : " + isbn + ", Category : " + category  + ", Status: " + status + ", Nr: " + nr );
         }
         
         // Check if results were found
@@ -2054,12 +2058,13 @@ private void removeReservationSelectedRowsFromDatabase() {
         JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
     }
 
+
     }//GEN-LAST:event_searchButtonActionPerformed
    
     
     
     private void searchBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBookActionPerformed
-        // TODO add your handling code here:
+                             
     }//GEN-LAST:event_searchBookActionPerformed
 
     private void searchBookFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchBookFocusLost

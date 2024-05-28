@@ -136,7 +136,7 @@
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="210" y="0" width="690" height="60"/>
+          <AbsoluteConstraints x="210" y="0" width="690" height="30"/>
         </Constraint>
       </Constraints>
 
@@ -471,7 +471,7 @@
                               <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="searchBook" pref="633" max="32767" attributes="0"/>
+                                      <Component id="searchBook" min="-2" pref="633" max="-2" attributes="0"/>
                                       <Component id="searchButton" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane5" min="-2" pref="642" max="-2" attributes="0"/>
@@ -634,7 +634,8 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="s e a r c h"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
-                <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
+                <Property name="requestFocusEnabled" type="boolean" value="false"/>
+                <Property name="rolloverEnabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="searchButtonActionPerformed"/>
