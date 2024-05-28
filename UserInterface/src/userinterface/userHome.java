@@ -9,6 +9,10 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.Color;
+import java.awt.Panel;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 
 
@@ -54,7 +60,29 @@ public class userHome extends javax.swing.JFrame  {
           
     }
     
-    
+    public static void makePanelMovable(JFrame frame, Panel panel2) {
+        final Point[] mousePoint = {null}; // Declare mousePoint as an array
+
+        panel2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
+            }
+        });
+
+        panel2.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (mousePoint[0] != null) {
+                    Point currentLocation = frame.getLocation();
+                    Point newLocation = e.getLocationOnScreen();
+                    int deltaX = newLocation.x - mousePoint[0].x - panel2.getLocationOnScreen().x;
+                    int deltaY = newLocation.y - mousePoint[0].y - panel2.getLocationOnScreen().y;
+                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
+                }
+            }
+        });
+    }
     
     
     public static void enableWordWrapForAllColumns(JTable table) {
@@ -594,6 +622,8 @@ public void getTextFromNameColumn() {
             }
         });
         panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 10, 50, -1));
+
+        makePanelMovable(this, panel2);
 
         getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 30));
 

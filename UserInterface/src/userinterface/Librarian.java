@@ -2,6 +2,9 @@ package userinterface;
 
 
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
@@ -16,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 
 public class Librarian extends javax.swing.JFrame {
@@ -37,10 +41,37 @@ public class Librarian extends javax.swing.JFrame {
        checkAndCancelOverdueReservations();
        populateLoansTable();
        populateLoansManagementTableForOverdueBooks();
+       
               
           
     }
     
+      public static void makePanelMovable(JFrame frame, JPanel jPanel1) {
+        final Point[] mousePoint = {null}; // Declare mousePoint as an array
+
+        jPanel1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
+            }
+        });
+
+        jPanel1.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (mousePoint[0] != null) {
+                    Point currentLocation = frame.getLocation();
+                    Point newLocation = e.getLocationOnScreen();
+                    int deltaX = newLocation.x - mousePoint[0].x - jPanel1.getLocationOnScreen().x;
+                    int deltaY = newLocation.y - mousePoint[0].y - jPanel1.getLocationOnScreen().y;
+                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
+                }
+            }
+        });
+    }
+
+
+
     private void populateLoansManagementTableForOverdueBooks() {
     try {
         dbConnection con = new dbConnection();
@@ -669,8 +700,10 @@ try {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        makePanelMovable(this, jPanel1);
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 60));
 
@@ -678,6 +711,7 @@ try {
         jTabbedPane1.setForeground(new java.awt.Color(204, 204, 204));
         jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         jTabbedPane1.setName("Book"); // NOI18N
+        jTabbedPane1.setEnabled(false);
 
         booksPanel.setBackground(new java.awt.Color(28, 52, 62));
         booksPanel.setForeground(new java.awt.Color(159, 212, 179));

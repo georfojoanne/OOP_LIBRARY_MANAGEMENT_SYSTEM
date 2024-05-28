@@ -186,6 +186,110 @@ public class LogIn extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     
+       
+    public static void checkAndCancelOverdueReservations() {
+        Connection connection = null;
+        PreparedStatement selectStmt = null;
+        PreparedStatement deleteStmt = null;
+        PreparedStatement updateRnStmt = null;
+        PreparedStatement insertHistoryStmt = null;
+        PreparedStatement insertNotifStmt = null;
+        PreparedStatement updateNrStmt = null;
+        PreparedStatement checkAndUpdateStatusStmt = null;
+        
+        try {
+            // Establish a connection to the database
+            dbConnection con = new dbConnection();
+            connection = con.getConnection();
+            
+            // Get current date
+            java.sql.Date currentDate = new java.sql.Date(new java.util.Date().getTime());
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            
+
+            // Query to select all overdue reservations
+            String selectQuery = "SELECT title, dor, rn, name, sched FROM reservation WHERE sched < ?";
+            selectStmt = connection.prepareStatement(selectQuery);
+            selectStmt.setDate(1, currentDate);
+
+            ResultSet resultSet = selectStmt.executeQuery();
+
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
+                String dor = resultSet.getString("dor");
+                int rn = resultSet.getInt("rn");
+                String name = resultSet.getString("name");
+                java.util.Date schedDate = resultSet.getDate("sched");
+
+                // Notify the user
+                String notificationMessage = "Dear " + name + ", you have failed to claim your book yesterday. \""
+                        + yesterday + "\"With this, to ensure the book circulation of our beloved library, your reservation is automatically cancelled. - Librarian";
+                // JOptionPane.showMessageDialog(null, notificationMessage); // Commented out to push the notification to the database instead
+
+                // Insert notification into the notifs table
+                String insertNotifQuery = "INSERT INTO notifs (notif, name) VALUES (?, ?)";
+                insertNotifStmt = connection.prepareStatement(insertNotifQuery);
+                insertNotifStmt.setString(1, notificationMessage);
+                insertNotifStmt.setString(2, name);
+                insertNotifStmt.executeUpdate();
+
+                // Delete the reservation
+                String deleteQuery = "DELETE FROM reservation WHERE title = ? AND name = ? AND sched = ?";
+                deleteStmt = connection.prepareStatement(deleteQuery);
+                deleteStmt.setString(1, title);
+                deleteStmt.setString(2, name);
+                deleteStmt.setDate(3, new java.sql.Date(schedDate.getTime()));
+                deleteStmt.executeUpdate();
+
+                // Update rn for other reservations of the same book
+                String updateRnQuery = "UPDATE reservation SET rn = rn - 1 WHERE title = ? AND rn > ?";
+                updateRnStmt = connection.prepareStatement(updateRnQuery);
+                updateRnStmt.setString(1, title);
+                updateRnStmt.setInt(2, rn);
+                updateRnStmt.executeUpdate();
+
+                // Insert into history table
+                String insertHistoryQuery = "INSERT INTO history (title, status, date, name) VALUES (?, ?, ?, ?)";
+                insertHistoryStmt = connection.prepareStatement(insertHistoryQuery);
+                insertHistoryStmt.setString(1, title);
+                insertHistoryStmt.setString(2, "Reservation Cancelled");
+                insertHistoryStmt.setDate(3, currentDate);
+                insertHistoryStmt.setString(4, name);
+                insertHistoryStmt.executeUpdate();
+
+                String updateNrQuery = "UPDATE books SET nr = nr - 1 WHERE title = ?";
+                updateNrStmt = connection.prepareStatement(updateNrQuery);
+                updateNrStmt.setString(1, title);
+                updateNrStmt.executeUpdate();
+
+                // Check and update status in books table if nr is 0
+                String checkAndUpdateStatusQuery = "UPDATE books SET status = 'Available' WHERE title = ? AND nr = 0";
+                checkAndUpdateStatusStmt = connection.prepareStatement(checkAndUpdateStatusQuery);
+                checkAndUpdateStatusStmt.setString(1, title);
+                checkAndUpdateStatusStmt.executeUpdate();
+            }
+
+            // Close the result set
+            resultSet.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
+        } finally {
+            try {
+                // Close the statements and connection
+                if (selectStmt != null) selectStmt.close();
+                if (deleteStmt != null) deleteStmt.close();
+                if (updateRnStmt != null) updateRnStmt.close();
+                if (insertHistoryStmt != null) insertHistoryStmt.close();
+                if (insertNotifStmt != null) insertNotifStmt.close();
+                if (updateNrStmt != null) updateNrStmt.close();
+                if (checkAndUpdateStatusStmt != null) checkAndUpdateStatusStmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
     
     
     

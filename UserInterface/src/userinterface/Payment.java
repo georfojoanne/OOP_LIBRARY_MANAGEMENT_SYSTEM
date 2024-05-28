@@ -433,6 +433,8 @@ try {
     // Get the text from the userField and amountField
     String userText = userField.getText();
     String amountText = amountField.getText();
+    String librarian = "Mikaela";
+    String admin = "Joanne";
     int totalAmount = Integer.parseInt(amountText); // Assuming amountField is for entering a numerical value
 
     if (connection != null) {
@@ -448,10 +450,10 @@ try {
         String insertHistoryQuery = "INSERT INTO history (title, date, status, name, amount) VALUES (?, CURDATE(), ?, ?, ?)";
         PreparedStatement insertStmt = connection.prepareStatement(insertHistoryQuery);
 
-        String updateBorrowsQuery = "UPDATE borrows SET lastUpdated = NULL, overdueDays = 0, dor = DATE_ADD(dor, INTERVAL 7 DAY) WHERE title = ? AND name = ?";
+        String updateBorrowsQuery = "UPDATE borrows SET last_updated = NULL, overdueDays = 0, dor = DATE_ADD(CURDATE(), INTERVAL 7 DAY) WHERE title = ? AND name = ?";
         PreparedStatement updateBorrowsStmt = connection.prepareStatement(updateBorrowsQuery);
 
-        String deleteLoanQuery = "UPDATE borrows SET loan = NULL WHERE title = ? AND name = ?";
+        String deleteLoanQuery = "UPDATE borrows SET loan = 0 WHERE title = ? AND name = ?";
         PreparedStatement deleteLoanStmt = connection.prepareStatement(deleteLoanQuery);
 
         while (overdueBooksResultSet.next()) {
@@ -484,6 +486,24 @@ try {
             PreparedStatement preparedStatementUserInfo = connection.prepareStatement(updateQueryUserInfo);
             preparedStatementUserInfo.setString(1, userText);
             int rowsAffectedUserInfo = preparedStatementUserInfo.executeUpdate();
+
+            // Update the librarian earnings
+            String updateLibrarianEarningsQuery = "UPDATE librarian SET earnings = earnings + ? WHERE User = ?";
+            PreparedStatement updateLibrarianEarningsStmt = connection.prepareStatement(updateLibrarianEarningsQuery);
+            updateLibrarianEarningsStmt.setInt(1, totalAmount);
+            updateLibrarianEarningsStmt.setString(2, librarian); 
+
+            int librarianRowsAffected = updateLibrarianEarningsStmt.executeUpdate();
+            updateLibrarianEarningsStmt.close();
+
+            // Update the admin earnings
+            String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ? WHERE name = ?";
+            PreparedStatement updateAdminEarningsStmt = connection.prepareStatement(updateAdminEarningsQuery);
+            updateAdminEarningsStmt.setInt(1, totalAmount);
+            updateAdminEarningsStmt.setString(2, admin); 
+
+            int adminRowsAffected = updateAdminEarningsStmt.executeUpdate();
+            updateAdminEarningsStmt.close();
 
             if (rowsAffectedUserInfo > 0) {
                 JOptionPane.showMessageDialog(this, "Payment successful. Please log in to your account.", "Success", JOptionPane.INFORMATION_MESSAGE);
