@@ -332,7 +332,7 @@ public class admins extends javax.swing.JFrame {
         searchUserField.setBackground(new java.awt.Color(97, 137, 137));
         searchUserField.setFont(new java.awt.Font("Stylus BT", 0, 14)); // NOI18N
         searchUserField.setForeground(new java.awt.Color(0, 255, 255));
-        searchUserField.setText("Search username here");
+        searchUserField.setText("Search");
         jPanel5.add(searchUserField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 690, 30));
 
         searchUser.setBackground(new java.awt.Color(49, 98, 103));
@@ -812,9 +812,9 @@ public class admins extends javax.swing.JFrame {
         
         String searchText = searchUserField.getText().trim();
                 System.out.println(searchText);
-
+    
     // Check if the search text is the placeholder
-    if (searchText.isEmpty()||searchText.equals("Search username here")) {
+    if (searchText.isEmpty()||searchText.equals("Search")) {
         JOptionPane.showMessageDialog(this, "Please enter text to search.");
         return;
     }
@@ -825,13 +825,22 @@ public class admins extends javax.swing.JFrame {
         Connection connection = con.getConnection();
         
         // Create a SQL query to search for books
-        String query = "SELECT * FROM userinfo WHERE name LIKE ?";
+        String query = "SELECT * FROM userinfo WHERE name LIKE ? OR role LIKE ? OR email LIKE ? OR password LIKE ?  OR id LIKE ?  OR Contact LIKE ?";
         PreparedStatement statement = connection.prepareStatement(query);
         
         // Use the search text in the query with wildcards for advanced search
         String searchQuery = "%" + searchText + "%";
         statement.setString(1, searchQuery);
+        statement.setString(2, searchQuery);
+        statement.setString(3, searchQuery);
+        statement.setString(4, searchQuery);
+        statement.setString(5, searchQuery);
+        statement.setString(6, searchQuery);
 
+        
+        
+        // Print the query for debugging
+        System.out.println("Executing query: " + statement.toString());
         
         // Execute the query
         ResultSet resultSet = statement.executeQuery();
@@ -847,10 +856,18 @@ public class admins extends javax.swing.JFrame {
         while (resultSet.next()) {
             hasResults = true;
             String name = resultSet.getString("name");
+            String role  = resultSet.getString("role");
+            String email = resultSet.getString("email");
+            String password = resultSet.getString("Password");
+            String id = resultSet.getString("id");
+             String contact = resultSet.getString("Contact");
+            
             
             // Add row to the table model
-            model.addRow(new Object[]{name});
-
+            model.addRow(new Object[]{name, id, email, password, role, contact});
+            
+            // Print each result for debugging
+            System.out.println("Name: " + name + ", Role: " +  role + ", Email: " + email+ ", Password : " + password + ", Id: " + id+ ", Contact: " + contact);
         }
         
         // Check if results were found
@@ -866,8 +883,7 @@ public class admins extends javax.swing.JFrame {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
     }
-    
-    
+
     
     }//GEN-LAST:event_searchUserActionPerformed
 

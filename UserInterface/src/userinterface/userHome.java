@@ -9,6 +9,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import javax.swing.JOptionPane;
 import java.awt.Color;
+import static java.awt.Color.CYAN;
 import java.awt.Component;
 import java.sql.PreparedStatement;
 import javax.swing.JTable;
@@ -728,7 +729,7 @@ public void getTextFromNameColumn() {
         searchBook.setBackground(new java.awt.Color(247, 247, 234));
         searchBook.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         searchBook.setForeground(new java.awt.Color(0, 142, 142));
-        searchBook.setText("Search book title");
+        searchBook.setText("Search");
         searchBook.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 searchBookFocusGained(evt);
@@ -1972,13 +1973,14 @@ private void removeReservationSelectedRowsFromDatabase() {
     }//GEN-LAST:event_returnButtonActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-                 dbData();
+                
         reserveButton.setForeground(new Color(0,225,255));
         borrowButton.setForeground(new Color(0,225,255));
         searchButton.setForeground(new Color(225,225,255));
             updateButton.setForeground(new Color(0, 225, 255));
        
-
+             searchBook.requestFocus();
+             
         String searchText = searchBook.getText().trim(); // Get the text entered in the searchBook field
 
        
@@ -1988,13 +1990,14 @@ private void removeReservationSelectedRowsFromDatabase() {
         return;
     }
     
+    
     try {
         // Establish a connection to your database
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
         
         // Create a SQL query to search for books
-        String query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? OR category LIKE ?";
+        String query = "SELECT * FROM books WHERE Title LIKE ? OR Author LIKE ? OR ISBN LIKE ? OR Category LIKE ? OR status LIKE ?  OR nr  LIKE ?";
         PreparedStatement statement = connection.prepareStatement(query);
         
         // Use the search text in the query with wildcards for advanced search
@@ -2003,7 +2006,10 @@ private void removeReservationSelectedRowsFromDatabase() {
         statement.setString(2, searchQuery);
         statement.setString(3, searchQuery);
         statement.setString(4, searchQuery);
+        statement.setString(5, searchQuery);
+        statement.setString(6, searchQuery);
 
+        
         // Print the query for debugging
         System.out.println("Executing query: " + statement.toString());
         
@@ -2020,10 +2026,10 @@ private void removeReservationSelectedRowsFromDatabase() {
         // Populate the table with the search results
         while (resultSet.next()) {
             hasResults = true;
-            String title = resultSet.getString("title");
-            String author = resultSet.getString("author");
-            String isbn = resultSet.getString("isbn");
-            String category = resultSet.getString("category");
+            String title = resultSet.getString("Title");
+            String author = resultSet.getString("Author");
+            String isbn = resultSet.getString("ISBN");
+            String category = resultSet.getString("Category");
             String status = resultSet.getString("status");
             int nr = resultSet.getInt("nr");
             
@@ -2060,8 +2066,8 @@ private void removeReservationSelectedRowsFromDatabase() {
         // in completion with placeholder
 
         if (searchBook.getText().equals(""))   {
-            searchBook.setText("Search book title");
-            searchBook.setForeground(BLACK);
+            searchBook.setText("Search");
+            searchBook.setForeground(CYAN);
         }
 
     }//GEN-LAST:event_searchBookFocusLost
@@ -2069,7 +2075,7 @@ private void removeReservationSelectedRowsFromDatabase() {
     private void searchBookFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchBookFocusGained
         // set placeholder search a book titile here
 
-        if (searchBook.getText().equals("Search book title"))   {
+        if (searchBook.getText().equals("Search"))   {
             searchBook.setText("");
             searchBook.setForeground(BLACK);
         }
