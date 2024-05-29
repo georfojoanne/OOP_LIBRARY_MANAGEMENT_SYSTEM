@@ -641,7 +641,7 @@ public void getTextFromNameColumn() {
 
         makePanelMovable(this, panel2);
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 60));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 40));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
@@ -780,7 +780,7 @@ public void getTextFromNameColumn() {
 
         books.setBackground(new java.awt.Color(28, 52, 62));
 
-        borrowButton.setBackground(new java.awt.Color(49, 98, 103));
+        borrowButton.setBackground(new java.awt.Color(10, 29, 36));
         borrowButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         borrowButton.setForeground(new java.awt.Color(0, 255, 255));
         borrowButton.setText("Borrow");
@@ -857,7 +857,7 @@ public void getTextFromNameColumn() {
             }
         });
 
-        reserveButton.setBackground(new java.awt.Color(49, 98, 103));
+        reserveButton.setBackground(new java.awt.Color(10, 29, 36));
         reserveButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         reserveButton.setForeground(new java.awt.Color(0, 255, 255));
         reserveButton.setText("Reserve");
@@ -869,7 +869,7 @@ public void getTextFromNameColumn() {
             }
         });
 
-        updateButton.setBackground(new java.awt.Color(49, 98, 103));
+        updateButton.setBackground(new java.awt.Color(10, 29, 36));
         updateButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         updateButton.setForeground(new java.awt.Color(0, 255, 255));
         updateButton.setText("Update");
@@ -886,22 +886,23 @@ public void getTextFromNameColumn() {
         booksLayout.setHorizontalGroup(
             booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(booksLayout.createSequentialGroup()
+                .addGap(39, 39, 39)
                 .addGroup(booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(booksLayout.createSequentialGroup()
-                        .addGap(154, 154, 154)
-                        .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
-                        .addComponent(borrowButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(36, 36, 36)
-                        .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(booksLayout.createSequentialGroup()
-                        .addGap(39, 39, 39)
                         .addGroup(booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(searchBook, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(39, Short.MAX_VALUE))
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(39, Short.MAX_VALUE))
+                    .addGroup(booksLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(reserveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(borrowButton, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(40, 40, 40)
+                        .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(52, 52, 52))))
         );
         booksLayout.setVerticalGroup(
             booksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -960,7 +961,7 @@ public void getTextFromNameColumn() {
             borrowsTable.getColumnModel().getColumn(2).setPreferredWidth(100);
         }
 
-        returnButton.setBackground(new java.awt.Color(27, 137, 137));
+        returnButton.setBackground(new java.awt.Color(10, 29, 36));
         returnButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         returnButton.setForeground(new java.awt.Color(0, 255, 255));
         returnButton.setText("RETURN");
@@ -976,13 +977,14 @@ public void getTextFromNameColumn() {
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel12Layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel12Layout.createSequentialGroup()
+                        .addGap(215, 215, 215)
+                        .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(37, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(286, 286, 286))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1045,7 +1047,7 @@ public void getTextFromNameColumn() {
             reservationTable.getColumnModel().getColumn(2).setPreferredWidth(100);
         }
 
-        cancelButton.setBackground(new java.awt.Color(27, 137, 137));
+        cancelButton.setBackground(new java.awt.Color(10, 29, 36));
         cancelButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         cancelButton.setForeground(new java.awt.Color(0, 255, 255));
         cancelButton.setText("Cancel");
@@ -1064,11 +1066,11 @@ public void getTextFromNameColumn() {
                 .addContainerGap(38, Short.MAX_VALUE)
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
-                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(293, 293, 293))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(35, 35, 35))))
+                        .addGap(35, 35, 35))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
+                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(214, 214, 214))))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1174,7 +1176,7 @@ public void getTextFromNameColumn() {
         notifsTable.setShowGrid(true);
         jScrollPane4.setViewportView(notifsTable);
 
-        jButton1.setBackground(new java.awt.Color(0, 102, 102));
+        jButton1.setBackground(new java.awt.Color(10, 29, 36));
         jButton1.setForeground(new java.awt.Color(102, 255, 255));
         jButton1.setText("R E F R E S H");
         jButton1.setRequestFocusEnabled(false);
@@ -1191,14 +1193,13 @@ public void getTextFromNameColumn() {
         notificationsLayout.setHorizontalGroup(
             notificationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(notificationsLayout.createSequentialGroup()
-                .addGroup(notificationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(notificationsLayout.createSequentialGroup()
-                        .addGap(44, 44, 44)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(notificationsLayout.createSequentialGroup()
-                        .addGap(282, 282, 282)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(44, 44, 44)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(47, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, notificationsLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(204, 204, 204))
         );
         notificationsLayout.setVerticalGroup(
             notificationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1283,7 +1284,7 @@ public void getTextFromNameColumn() {
         setContact.setBackground(new java.awt.Color(204, 204, 204));
         setContact.setForeground(new java.awt.Color(0, 0, 0));
 
-        editButton.setBackground(new java.awt.Color(49, 98, 103));
+        editButton.setBackground(new java.awt.Color(10, 29, 36));
         editButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         editButton.setForeground(new java.awt.Color(0, 255, 255));
         editButton.setText("Edit");
@@ -1294,7 +1295,7 @@ public void getTextFromNameColumn() {
             }
         });
 
-        saveButton.setBackground(new java.awt.Color(49, 98, 103));
+        saveButton.setBackground(new java.awt.Color(10, 29, 36));
         saveButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         saveButton.setForeground(new java.awt.Color(0, 255, 255));
         saveButton.setText("Save");
@@ -1328,14 +1329,15 @@ public void getTextFromNameColumn() {
                             .addComponent(contact, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(editButton, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(setRole, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(setName, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(setId, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(setEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(setContact, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(saveButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                                .addComponent(editButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         settingsLayout.setVerticalGroup(
