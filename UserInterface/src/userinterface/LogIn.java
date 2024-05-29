@@ -1,11 +1,16 @@
 
 package userinterface;
 
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 
 public class LogIn extends javax.swing.JFrame {
@@ -15,6 +20,10 @@ public class LogIn extends javax.swing.JFrame {
                      
            initComponents();
           this.setVisible(true);
+          checkForOverdueFees();
+        updateUserInfoLoans();
+        checkAndCancelOverdueReservations();
+          
           
            
              
@@ -75,6 +84,8 @@ public class LogIn extends javax.swing.JFrame {
         passwordLogIn = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
@@ -129,8 +140,9 @@ public class LogIn extends javax.swing.JFrame {
                 logInButtonActionPerformed(evt);
             }
         });
-        panel2.add(logInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(251, 267, 112, 19));
+        panel2.add(logInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 240, 112, 19));
 
+        eyeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/eyenew.png"))); // NOI18N
         eyeButton.setBorderPainted(false);
         eyeButton.setContentAreaFilled(false);
         eyeButton.setFocusPainted(false);
@@ -140,7 +152,7 @@ public class LogIn extends javax.swing.JFrame {
                 eyeButtonActionPerformed(evt);
             }
         });
-        panel2.add(eyeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 190, 20, 20));
+        panel2.add(eyeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 190, 20, -1));
 
         passwordLogIn.setBackground(java.awt.Color.white);
         passwordLogIn.setForeground(new java.awt.Color(0, 0, 0));
@@ -155,19 +167,47 @@ public class LogIn extends javax.swing.JFrame {
         jLabel6.setForeground(new java.awt.Color(216, 208, 208));
         jLabel6.setText("TO INFINITE KNOWLEDGE");
         panel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, 150, -1));
+
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/libitz.png"))); // NOI18N
         panel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, -1));
 
+        jPanel1.setBackground(new java.awt.Color(28, 52, 62));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/minimize.png"))); // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setFocusPainted(false);
+        jButton2.setFocusable(false);
+        jButton2.setVerifyInputWhenFocusTarget(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 10, -1, 30));
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/Xbang.png"))); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
+        jButton1.setRequestFocusEnabled(false);
+        jButton1.setVerifyInputWhenFocusTarget(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        panel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 10, 40, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 10, 30, 30));
+
+        makePanelMovable(this, jPanel1);
+
+        panel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 440, 40));
 
         panel1.add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 0, 440, 400));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/libitnice2.gif"))); // NOI18N
         panel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 260, 400));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -294,101 +334,51 @@ public class LogIn extends javax.swing.JFrame {
     
     
     
-    
-    // Method to check for overdue borrows and update userinfo table
+  // Method to check for overdue borrows and update userinfo table
 private static void checkForOverdueAndUpdateUserInfo(String username) {
     try {
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
 
-        // Step 1: Count the number of overdue borrows
-        String countQuery = "SELECT COUNT(*) AS overdue_count FROM borrows WHERE name = ? AND dor < ?";
-        PreparedStatement countStatement = connection.prepareStatement(countQuery);
-        countStatement.setString(1, username);
-        countStatement.setDate(2, Date.valueOf(LocalDate.now()));
-        ResultSet countResult = countStatement.executeQuery();
+        // Check if the user has any loan amount greater than 0 in the userinfo table
+        String checkLoanQuery = "SELECT loan FROM userinfo WHERE name = ?";
+        PreparedStatement checkLoanStatement = connection.prepareStatement(checkLoanQuery);
+        checkLoanStatement.setString(1, username);
+        ResultSet loanResultSet = checkLoanStatement.executeQuery();
 
-        
-        
-        int overdueCount = 0;
-        if (countResult.next()) {
-            overdueCount = countResult.getInt("overdue_count");
-        }
+        if (loanResultSet.next()) {
+            int loanAmount = loanResultSet.getInt("loan");
 
-        // Step 2: Update userinfo table
-        String updateQuery = "UPDATE userinfo SET loan = ? WHERE name = ?";
-        PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-        updateStatement.setInt(1, overdueCount * 10);
-        updateStatement.setString(2, username);
-        updateStatement.executeUpdate();
+            if (loanAmount > 0) {
+                int choice = JOptionPane.showConfirmDialog(null, "You have an outstanding loan. Do you want to pay online now? If you do not have a gcash bank, you can proceed to the Library and pay to the Librarian", "Outstanding Loan", JOptionPane.YES_NO_OPTION);
 
-        // Step 3: Check for overdue borrows for the user
-        String borrowQuery = "SELECT dor FROM borrows WHERE name = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(borrowQuery);
-        preparedStatement.setString(1, username);
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        
-        
-        
-        
-        if (resultSet.next()) {
-            Date dueDate = resultSet.getDate("dor");
-            LocalDate currentDate = LocalDate.now();
-
-            if (dueDate.toLocalDate().isBefore(currentDate)) {
-                
-                int choice = JOptionPane.showConfirmDialog(null, "You have overdue borrows. Do you want to pay now?", "Overdue Borrows", JOptionPane.YES_NO_OPTION);
-               
-             
-                    
-                
-                
                 if (choice == JOptionPane.YES_OPTION) {
-                     
-                                 
                     new Payment().setVisible(true);
-                    
-                    
-                } 
-                
-                
-                else {
-                     
+                } else {
                     new LogIn().setVisible(true);
-        
                 }
-                
-                          
-                
-                
-            }
-            
-            else {
+            } else {
                 new userHome().setVisible(true);
-               
             }
-            
-              
-          
-            
+        } else {
+            new userHome().setVisible(true);
         }
-        
-          else {
-                new userHome().setVisible(true);
-            }
-            
-        
-        
-        
-        
+
+        // Close the statements and result set
+        loanResultSet.close();
+        checkLoanStatement.close();
+
+        // Close the connection
+        connection.close();
     } catch (SQLException e) {
         e.printStackTrace();
     }
 }
 
+
+
     
-    private static void checkForOverdueAndUpdateUserInfo() { //checks for all overdues and puts fines automatically
+    private static void checkForOverdueFees() { //checks for all overdues and puts fines automatically
     try {
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
@@ -608,8 +598,7 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
         
        
        
-        checkForOverdueAndUpdateUserInfo();
-        updateUserInfoLoans();
+        
         
      
         
@@ -643,12 +632,39 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
                  
     }//GEN-LAST:event_eyeButtonActionPerformed
 
-    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       setState(JFrame. ICONIFIED);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    public static void makePanelMovable(JFrame frame, JPanel jPanel1) { //not implemented yet, can't open payment design
+        final Point[] mousePoint = {null}; // Declare mousePoint as an array
+
+        jPanel1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
+            }
+        });
+
+        jPanel1.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (mousePoint[0] != null) {
+                    Point currentLocation = frame.getLocation();
+                    Point newLocation = e.getLocationOnScreen();
+                    int deltaX = newLocation.x - mousePoint[0].x - jPanel1.getLocationOnScreen().x;
+                    int deltaY = newLocation.y - mousePoint[0].y - jPanel1.getLocationOnScreen().y;
+                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
+                }
+            }
+        });
+    }
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton eyeButton;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -658,6 +674,7 @@ private static void checkForOverdueAndUpdateUserInfo(String username) {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton logInButton;
     private java.awt.Panel panel1;
     private java.awt.Panel panel2;

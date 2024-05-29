@@ -5,13 +5,18 @@ package userinterface;
 import java.awt.Color;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.CYAN;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
 import java.sql.*;
 import java.sql.PreparedStatement;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 
 
@@ -30,11 +35,24 @@ public class admins extends javax.swing.JFrame {
          dashBoard();
          earnings();
          totalEarnings();
+         users.setEditable(false);
+         students.setEditable(false);
+         faculties.setEditable(false);
+         books.setEditable(false);
+         scategory.setEditable(false);
+         ecategory.setEditable(false);
+         mcategory.setEditable(false);
+         librarians.setEditable(false);
+         earnings.setEditable(false);
+
+         
+         
         
         
     }
     
     
+   
     
     private void dashBoard() {
     try {
@@ -356,6 +374,7 @@ private void books() {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         librarianButton = new javax.swing.JPanel();
         dashButton = new javax.swing.JButton();
         uiButton = new javax.swing.JButton();
@@ -438,19 +457,19 @@ private void books() {
         earningsTable = new javax.swing.JTable();
         updateButton = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
-        earningsField = new javax.swing.JTextField();
+        earnings = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(900, 730));
         setUndecorated(true);
-        setPreferredSize(new java.awt.Dimension(900, 700));
+        setPreferredSize(new java.awt.Dimension(926, 708));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(10, 29, 36));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Untitled design (3).png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/Untitled design (3).png"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 100, 100));
 
         jLabel2.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 36)); // NOI18N
@@ -469,7 +488,7 @@ private void books() {
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 80, -1, -1));
 
         jButton1.setBackground(new java.awt.Color(51, 51, 51));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/Xbang.png"))); // NOI18N
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
@@ -483,14 +502,31 @@ private void books() {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 30, 70, 50));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 10, 40, 40));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 960, 120));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/minimize.png"))); // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setFocusPainted(false);
+        jButton2.setFocusable(false);
+        jButton2.setRequestFocusEnabled(false);
+        jButton2.setRolloverEnabled(false);
+        jButton2.setVerifyInputWhenFocusTarget(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 10, -1, -1));
+
+        makePanelMovable(this, jPanel1);
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 960, 90));
 
         librarianButton.setBackground(new java.awt.Color(10, 29, 36));
         librarianButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        dashButton.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
+        dashButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         dashButton.setForeground(new java.awt.Color(255, 255, 255));
         dashButton.setText("DASHBOARD");
         dashButton.setBorder(null);
@@ -507,7 +543,7 @@ private void books() {
         });
         librarianButton.add(dashButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 150, -1));
 
-        uiButton.setFont(new java.awt.Font("Stylus BT", 1, 19)); // NOI18N
+        uiButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         uiButton.setForeground(new java.awt.Color(255, 255, 255));
         uiButton.setText("USER INTERFACE");
         uiButton.setBorder(null);
@@ -525,7 +561,7 @@ private void books() {
         });
         librarianButton.add(uiButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 360, 200, -1));
 
-        userButton.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
+        userButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         userButton.setForeground(new java.awt.Color(255, 255, 255));
         userButton.setText("USER");
         userButton.setBorder(null);
@@ -543,7 +579,7 @@ private void books() {
         });
         librarianButton.add(userButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 150, -1));
 
-        libButton.setFont(new java.awt.Font("Stylus BT", 1, 22)); // NOI18N
+        libButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         libButton.setForeground(new java.awt.Color(255, 255, 255));
         libButton.setText("LIBRARIAN");
         libButton.setBorder(null);
@@ -572,7 +608,7 @@ private void books() {
         librarianButton.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 50, 70, 30));
         librarianButton.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 10));
 
-        liButton.setFont(new java.awt.Font("Stylus BT", 1, 17)); // NOI18N
+        liButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         liButton.setForeground(java.awt.Color.white);
         liButton.setText("LIBRARIAN INTERFACE");
         liButton.setBorderPainted(false);
@@ -589,7 +625,7 @@ private void books() {
         });
         librarianButton.add(liButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 410, 250, -1));
 
-        earningsButton.setFont(new java.awt.Font("Stylus BT", 1, 21)); // NOI18N
+        earningsButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         earningsButton.setForeground(java.awt.Color.white);
         earningsButton.setText("EARNINGS");
         earningsButton.setBorder(null);
@@ -605,18 +641,22 @@ private void books() {
                 earningsButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(earningsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 300, -1, -1));
+        librarianButton.add(earningsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
 
         jButton8.setBackground(new java.awt.Color(0, 73, 73));
         jButton8.setFont(new java.awt.Font("Stylus BT", 1, 24)); // NOI18N
         jButton8.setForeground(new java.awt.Color(0, 255, 255));
+        jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/log out.png"))); // NOI18N
         jButton8.setText("LOG OUT");
+        jButton8.setBorderPainted(false);
+        jButton8.setContentAreaFilled(false);
+        jButton8.setFocusPainted(false);
         jButton8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton8ActionPerformed(evt);
             }
         });
-        librarianButton.add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 540, -1, -1));
+        librarianButton.add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 550, -1, -1));
 
         getContentPane().add(librarianButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 650));
 
@@ -625,7 +665,7 @@ private void books() {
         jPanel5.setBackground(new java.awt.Color(28, 68, 74));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        remButton1.setBackground(new java.awt.Color(49, 98, 103));
+        remButton1.setBackground(new java.awt.Color(10, 36, 36));
         remButton1.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
         remButton1.setForeground(new java.awt.Color(0, 255, 255));
         remButton1.setText("REMOVE");
@@ -640,11 +680,11 @@ private void books() {
                 remButton1ActionPerformed(evt);
             }
         });
-        jPanel5.add(remButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 540, 200, 30));
+        jPanel5.add(remButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 560, 200, 30));
 
-        searchUserField.setBackground(new java.awt.Color(97, 137, 137));
+        searchUserField.setBackground(new java.awt.Color(207, 235, 235));
         searchUserField.setFont(new java.awt.Font("Stylus BT", 0, 14)); // NOI18N
-        searchUserField.setForeground(new java.awt.Color(0, 255, 255));
+        searchUserField.setForeground(new java.awt.Color(0, 51, 51));
         searchUserField.setText("Search");
         searchUserField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -659,7 +699,7 @@ private void books() {
                 searchUserFieldActionPerformed(evt);
             }
         });
-        jPanel5.add(searchUserField, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 740, 30));
+        jPanel5.add(searchUserField, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 20, 740, 30));
 
         searchUser.setBackground(new java.awt.Color(49, 98, 103));
         searchUser.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
@@ -674,7 +714,7 @@ private void books() {
                 searchUserActionPerformed(evt);
             }
         });
-        jPanel5.add(searchUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 50, 590, 30));
+        jPanel5.add(searchUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 70, 590, 30));
 
         userTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -686,9 +726,9 @@ private void books() {
         ));
         jScrollPane6.setViewportView(userTable);
 
-        jPanel5.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 740, 440));
+        jPanel5.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 740, 440));
 
-        addUser.setBackground(new java.awt.Color(49, 98, 103));
+        addUser.setBackground(new java.awt.Color(10, 36, 36));
         addUser.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 14)); // NOI18N
         addUser.setForeground(new java.awt.Color(0, 255, 255));
         addUser.setText("ADD");
@@ -704,7 +744,7 @@ private void books() {
                 addUserActionPerformed(evt);
             }
         });
-        jPanel5.add(addUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 540, 210, 30));
+        jPanel5.add(addUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 560, 210, 30));
 
         jTabbedPane1.addTab("tab3", jPanel5);
 
@@ -721,9 +761,9 @@ private void books() {
         ));
         jScrollPane3.setViewportView(librarianTable);
 
-        jPanel6.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 720, 440));
+        jPanel6.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 730, 440));
 
-        addLibrarian.setBackground(new java.awt.Color(49, 98, 103));
+        addLibrarian.setBackground(new java.awt.Color(10, 36, 36));
         addLibrarian.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
         addLibrarian.setForeground(new java.awt.Color(0, 255, 255));
         addLibrarian.setText("ADD");
@@ -733,9 +773,9 @@ private void books() {
                 addLibrarianActionPerformed(evt);
             }
         });
-        jPanel6.add(addLibrarian, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 539, 180, -1));
+        jPanel6.add(addLibrarian, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 550, 180, -1));
 
-        removeLibrarian.setBackground(new java.awt.Color(49, 98, 103));
+        removeLibrarian.setBackground(new java.awt.Color(10, 36, 36));
         removeLibrarian.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
         removeLibrarian.setForeground(new java.awt.Color(0, 255, 255));
         removeLibrarian.setText("REMOVE");
@@ -750,14 +790,14 @@ private void books() {
                 removeLibrarianActionPerformed(evt);
             }
         });
-        jPanel6.add(removeLibrarian, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 540, 180, 30));
+        jPanel6.add(removeLibrarian, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 550, 180, 30));
 
         jTextField29.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField29ActionPerformed(evt);
             }
         });
-        jPanel6.add(jTextField29, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 710, 30));
+        jPanel6.add(jTextField29, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 710, 30));
 
         jButton28.setBackground(new java.awt.Color(49, 98, 103));
         jButton28.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
@@ -769,7 +809,7 @@ private void books() {
                 jButton28ActionPerformed(evt);
             }
         });
-        jPanel6.add(jButton28, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 610, 20));
+        jPanel6.add(jButton28, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, 610, 20));
 
         jTabbedPane1.addTab("tab4", jPanel6);
 
@@ -1015,16 +1055,40 @@ private void books() {
         science.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         science.setText("Science category :");
         panel2.add(science, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 70, -1, 20));
+
+        users.setEditable(false);
+        users.setFocusable(false);
         panel2.add(users, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 70, -1));
+
+        students.setEditable(false);
+        students.setFocusable(false);
         panel2.add(students, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 50, 70, -1));
+
+        faculties.setEditable(false);
+        faculties.setFocusable(false);
         panel2.add(faculties, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 90, 70, -1));
+
+        books.setEditable(false);
+        books.setFocusable(false);
         panel2.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 10, 60, 20));
+
+        mcategory.setEditable(false);
+        mcategory.setFocusable(false);
         panel2.add(mcategory, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 40, 60, 20));
+
+        scategory.setEditable(false);
+        scategory.setFocusable(false);
         panel2.add(scategory, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 70, 60, 20));
+
+        ecategory.setEditable(false);
+        ecategory.setFocusable(false);
         panel2.add(ecategory, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 100, 60, 20));
+
+        librarians.setEditable(false);
+        librarians.setFocusable(false);
         panel2.add(librarians, new org.netbeans.lib.awtextra.AbsoluteConstraints(628, 60, 80, 30));
 
-        panel1.add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 750, 130));
+        panel1.add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 740, 130));
 
         booksTable.setBackground(new java.awt.Color(204, 204, 204));
         booksTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1040,7 +1104,7 @@ private void books() {
         booksTable.setSelectionForeground(new java.awt.Color(0, 0, 0));
         jScrollPane1.setViewportView(booksTable);
 
-        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 720, 410));
+        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 730, 410));
 
         jButton6.setBackground(new java.awt.Color(0, 51, 51));
         jButton6.setForeground(new java.awt.Color(102, 255, 255));
@@ -1053,7 +1117,7 @@ private void books() {
                 jButton6ActionPerformed(evt);
             }
         });
-        panel1.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 550, 270, -1));
+        panel1.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 570, 270, -1));
 
         jTabbedPane1.addTab("tab7", panel1);
 
@@ -1073,7 +1137,7 @@ private void books() {
             earningsTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         }
 
-        panel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 700, 490));
+        panel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 730, 490));
 
         updateButton.setBackground(new java.awt.Color(10, 36, 36));
         updateButton.setForeground(new java.awt.Color(0, 255, 255));
@@ -1083,19 +1147,21 @@ private void books() {
                 updateButtonActionPerformed(evt);
             }
         });
-        panel3.add(updateButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 560, 260, 30));
+        panel3.add(updateButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 580, 260, 30));
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(51, 255, 255));
         jLabel9.setText("TOTAL EARNINGS :");
-        panel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+        panel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
-        earningsField.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        panel3.add(earningsField, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 20, 220, -1));
+        earnings.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        earnings.setEditable(false);
+        earnings.setFocusable(false);
+        panel3.add(earnings, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 30, 540, -1));
 
         jTabbedPane1.addTab("tab6", panel3);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, 760, 650));
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, 760, 660));
         setJMenuBar(jMenuBar1);
 
         pack();
@@ -1121,7 +1187,7 @@ private void books() {
 
     private void uiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiButtonActionPerformed
                   
-        new LogIn().setVisible(true);
+        new userHome().setVisible(true);
                     userButton.setForeground(new Color(225,225,225));
                      libButton.setForeground(new Color(225,225,255));
                      dashButton.setForeground(new Color(225,225,255));                   
@@ -1564,7 +1630,7 @@ private void books() {
 
     private void liButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_liButtonActionPerformed
       
-        new LogIn().setVisible(true);
+        new Librarian().setVisible(true);
         userButton.setForeground(new Color(225,225,225));
                      libButton.setForeground(new Color(225,225,255));
                      dashButton.setForeground(new Color(225,225,255));                   
@@ -1645,7 +1711,7 @@ private void books() {
                         double totalEarnings = resultSet.getDouble("totalEarnings");
                         
                         // Display the total earnings in the JTextField
-                        earningsField.setText(String.valueOf(totalEarnings));
+                        earnings.setText(String.valueOf(totalEarnings));
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -1683,9 +1749,36 @@ private void books() {
         
     }//GEN-LAST:event_earningsButtonActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+          setState(JFrame. ICONIFIED);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     
     
-    
+    public static void makePanelMovable(JFrame frame, JPanel jPanel1) { //not implemented yet, can't open payment design
+        final Point[] mousePoint = {null}; // Declare mousePoint as an array
+
+        jPanel1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
+            }
+        });
+
+        jPanel1.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (mousePoint[0] != null) {
+                    Point currentLocation = frame.getLocation();
+                    Point newLocation = e.getLocationOnScreen();
+                    int deltaX = newLocation.x - mousePoint[0].x - jPanel1.getLocationOnScreen().x;
+                    int deltaY = newLocation.y - mousePoint[0].y - jPanel1.getLocationOnScreen().y;
+                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
+                }
+            }
+        });
+    }
+
     
     
 
@@ -1701,13 +1794,14 @@ private void books() {
     private javax.swing.JButton cancelLibrarian;
     private javax.swing.JButton cancelUser;
     private javax.swing.JButton dashButton;
+    private javax.swing.JTextField earnings;
     private javax.swing.JButton earningsButton;
-    private javax.swing.JTextField earningsField;
     private javax.swing.JTable earningsTable;
     private javax.swing.JTextField ecategory;
     private javax.swing.JLabel english;
     private javax.swing.JTextField faculties;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton8;

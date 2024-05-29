@@ -1,6 +1,9 @@
 package userinterface;
 
 
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,6 +11,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 
@@ -26,7 +30,29 @@ public class Payment extends javax.swing.JFrame {
            
     }
 
-    
+    public static void makePanelMovable(JFrame frame, JPanel jPanel3) { //not implemented yet, can't open payment design
+        final Point[] mousePoint = {null}; // Declare mousePoint as an array
+
+        jPanel3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
+            }
+        });
+
+        jPanel3.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (mousePoint[0] != null) {
+                    Point currentLocation = frame.getLocation();
+                    Point newLocation = e.getLocationOnScreen();
+                    int deltaX = newLocation.x - mousePoint[0].x - jPanel3.getLocationOnScreen().x;
+                    int deltaY = newLocation.y - mousePoint[0].y - jPanel3.getLocationOnScreen().y;
+                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
+                }
+            }
+        });
+    }
     
     
     // gets the amount Payable in the database table userinfo column loan and displays in the amountField
@@ -82,12 +108,7 @@ public class Payment extends javax.swing.JFrame {
     
     
 }
-    
-    
-    
-    
-    
-    
+
     
     
     @SuppressWarnings("unchecked")
@@ -116,7 +137,6 @@ public class Payment extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         amountField = new javax.swing.JTextField();
         payButton = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
 
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);
@@ -141,45 +161,42 @@ public class Payment extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(502, 300));
         setUndecorated(true);
+        setPreferredSize(new java.awt.Dimension(500, 310));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel3.setBackground(new java.awt.Color(10, 29, 36));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/Xbang.png"))); // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
+        jButton1.setRequestFocusEnabled(false);
+        jButton1.setVerifyInputWhenFocusTarget(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 0, 30, 30));
 
-        jButton2.setText("minimize");
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/minimize.png"))); // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setRequestFocusEnabled(false);
+        jButton2.setVerifyInputWhenFocusTarget(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
+        jPanel3.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 0, 30, 30));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(390, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addGap(93, 93, 93))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addComponent(jButton1)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        makePanelMovable(this, jPanel3);
 
-        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 40));
+        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 510, 50));
 
         panel2.setBackground(new java.awt.Color(38, 51, 60));
 
@@ -203,6 +220,7 @@ public class Payment extends javax.swing.JFrame {
         confirmButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         confirmButton.setForeground(new java.awt.Color(0, 0, 0));
         confirmButton.setText("Confirm");
+        confirmButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         confirmButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 confirmButtonActionPerformed(evt);
@@ -262,7 +280,7 @@ public class Payment extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel2Layout.createSequentialGroup()
                         .addGap(41, 41, 41)
                         .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(148, Short.MAX_VALUE))
+                .addContainerGap(114, Short.MAX_VALUE))
         );
         panel2Layout.setVerticalGroup(
             panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -283,32 +301,26 @@ public class Payment extends javax.swing.JFrame {
                     .addComponent(userField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(confirmButton)
-                .addContainerGap(164, Short.MAX_VALUE))
+                .addContainerGap(128, Short.MAX_VALUE))
         );
 
         tab.addTab("tab2", panel2);
 
         payment.setBackground(new java.awt.Color(38, 51, 60));
-        payment.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        payment.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(154, 0, 192, -1));
 
         amount.setBackground(new java.awt.Color(102, 255, 255));
         amount.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         amount.setForeground(new java.awt.Color(102, 255, 255));
         amount.setText("Loan Amount :");
-        payment.add(amount, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 130, -1, -1));
 
         userAccount.setBackground(new java.awt.Color(187, 226, 226));
-        payment.add(userAccount, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 90, 226, -1));
 
         jLabel4.setBackground(new java.awt.Color(102, 255, 255));
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(102, 255, 255));
         jLabel4.setText("User Account :");
-        payment.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 90, -1, -1));
 
         amountField.setBackground(new java.awt.Color(187, 226, 226));
-        payment.add(amountField, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 130, 226, -1));
 
         payButton.setBackground(new java.awt.Color(48, 173, 173));
         payButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -319,24 +331,47 @@ public class Payment extends javax.swing.JFrame {
                 payButtonActionPerformed(evt);
             }
         });
-        payment.add(payButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 170, 100, 30));
+
+        javax.swing.GroupLayout paymentLayout = new javax.swing.GroupLayout(payment);
+        payment.setLayout(paymentLayout);
+        paymentLayout.setHorizontalGroup(
+            paymentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paymentLayout.createSequentialGroup()
+                .addGap(154, 154, 154)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(paymentLayout.createSequentialGroup()
+                .addGap(80, 80, 80)
+                .addComponent(jLabel4)
+                .addGap(18, 18, 18)
+                .addComponent(userAccount, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(paymentLayout.createSequentialGroup()
+                .addGap(80, 80, 80)
+                .addComponent(amount)
+                .addGap(15, 15, 15)
+                .addComponent(amountField, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(paymentLayout.createSequentialGroup()
+                .addGap(340, 340, 340)
+                .addComponent(payButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        paymentLayout.setVerticalGroup(
+            paymentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paymentLayout.createSequentialGroup()
+                .addComponent(jLabel2)
+                .addGap(90, 90, 90)
+                .addGroup(paymentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(userAccount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
+                .addGroup(paymentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(amount)
+                    .addComponent(amountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
+                .addComponent(payButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         tab.addTab("tab2", payment);
 
-        getContentPane().add(tab, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 3, -1, 410));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(tab, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 3, 580, 390));
 
         pack();
         setLocationRelativeTo(null);
@@ -426,112 +461,123 @@ public class Payment extends javax.swing.JFrame {
 
     private void payButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payButtonActionPerformed
    // fix implementation wherein it will not simply divide the books and the fine when the amount paid is inserted into the history
-   //implement that each book will have its own fee depending on how many days it is due
-        try {
-        // Get the database connection
-        dbConnection conn = new dbConnection();
-        Connection connection = conn.getConnection();
-        
-        // Get the text from the userField and amountField
-        String userText = userField.getText();
-        String amountText = amountField.getText();
-        int totalAmount = Integer.parseInt(amountText); // Assuming amountField is for entering a numerical value
+   try {
+    // Get the database connection
+    dbConnection conn = new dbConnection();
+    Connection connection = conn.getConnection();
 
-        if (connection != null) {
-            // SQL query to count overdue books for the user
-            String countOverdueBooksQuery = "SELECT COUNT(*) AS count FROM borrows WHERE dor < CURDATE() AND name = ?";
-            PreparedStatement countStmt = connection.prepareStatement(countOverdueBooksQuery);
-            countStmt.setString(1, userText);
-            ResultSet countResultSet = countStmt.executeQuery();
-            
-            int overdueBooksCount = 0;
-            if (countResultSet.next()) {
-                overdueBooksCount = countResultSet.getInt("count");
-            }
+    // Get the text from the userField and amountField
+    String userText = userField.getText();
+    String amountText = amountField.getText();
+    String librarian = "Mikaela";
+    String admin = "Joanne";
+    int totalAmount = Integer.parseInt(amountText); // Assuming amountField is for entering a numerical value
 
-            if (overdueBooksCount > 0) {
-                int amountPerBook = totalAmount / overdueBooksCount;
+    if (connection != null) {
+        // SQL query to select overdue books for the user
+        String selectOverdueBooksQuery = "SELECT * FROM borrows WHERE dor < CURDATE() AND name = ?";
+        PreparedStatement selectStmt = connection.prepareStatement(selectOverdueBooksQuery);
+        selectStmt.setString(1, userText);
+        ResultSet overdueBooksResultSet = selectStmt.executeQuery();
 
-                // SQL query to select overdue books for the user
-                String selectOverdueBooksQuery = "SELECT title FROM borrows WHERE dor < CURDATE() AND name = ?";
-                PreparedStatement selectStmt = connection.prepareStatement(selectOverdueBooksQuery);
-                selectStmt.setString(1, userText);
-                ResultSet overdueBooksResultSet = selectStmt.executeQuery();
+        int overdueBooksCount = 0;
 
-                // Insert into history table
-                String insertHistoryQuery = "INSERT INTO history (title, date, status, name, amount) VALUES (?, CURDATE(), ?, ?, ?)";
-                PreparedStatement insertStmt = connection.prepareStatement(insertHistoryQuery);
+        // Prepare statements for later use
+        String insertHistoryQuery = "INSERT INTO history (title, date, status, name, amount) VALUES (?, CURDATE(), ?, ?, ?)";
+        PreparedStatement insertStmt = connection.prepareStatement(insertHistoryQuery);
 
-                while (overdueBooksResultSet.next()) {
-                    String title = overdueBooksResultSet.getString("title");
-                    String status = "Overdue Paid";
-                    
-                    insertStmt.setString(1, title);
-                    insertStmt.setString(2, status);
-                    insertStmt.setString(3, userText);
-                    insertStmt.setInt(4, amountPerBook);
-                    insertStmt.executeUpdate();
-                }
+        String updateBorrowsQuery = "UPDATE borrows SET last_updated = NULL, overdueDays = 0, dor = DATE_ADD(CURDATE(), INTERVAL 7 DAY) WHERE title = ? AND name = ?";
+        PreparedStatement updateBorrowsStmt = connection.prepareStatement(updateBorrowsQuery);
 
-                // Update earnings for librarian and admin
-                String updateEarningsQuery = "UPDATE librarian SET earnings = earnings + ?";
-                String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ?";
-                PreparedStatement updateEarningsStmt = connection.prepareStatement(updateEarningsQuery);
-                PreparedStatement updateAdminEarningsStmt = connection.prepareStatement(updateAdminEarningsQuery);
+        String deleteLoanQuery = "UPDATE borrows SET loan = 0 WHERE title = ? AND name = ?";
+        PreparedStatement deleteLoanStmt = connection.prepareStatement(deleteLoanQuery);
 
-                updateEarningsStmt.setInt(1, totalAmount);
-                updateEarningsStmt.executeUpdate();
+        while (overdueBooksResultSet.next()) {
+            overdueBooksCount++;
+            String title = overdueBooksResultSet.getString("title");
+            int amount = overdueBooksResultSet.getInt("loan");
+            String status = "Overdue Paid";
 
-                updateAdminEarningsStmt.setInt(1, totalAmount);
-                updateAdminEarningsStmt.executeUpdate();
+            // Insert into history table
+            insertStmt.setString(1, title);
+            insertStmt.setString(2, status);
+            insertStmt.setString(3, userText);
+            insertStmt.setInt(4, amount);
+            insertStmt.executeUpdate();
 
-                // Update the loan column in the userinfo table
-                String updateQueryUserInfo = "UPDATE userinfo SET loan = 0 WHERE name = ?";
-                PreparedStatement preparedStatementUserInfo = connection.prepareStatement(updateQueryUserInfo);
-                preparedStatementUserInfo.setString(1, userText);
-                int rowsAffectedUserInfo = preparedStatementUserInfo.executeUpdate();
+            // Update the borrows table
+            updateBorrowsStmt.setString(1, title);
+            updateBorrowsStmt.setString(2, userText);
+            updateBorrowsStmt.executeUpdate();
 
-                // Update the dor column in the borrows table by adding 7 days
-                String updateQueryBorrows = "UPDATE borrows SET dor = DATE_ADD(dor, INTERVAL 7 DAY) WHERE name = ?";
-                PreparedStatement preparedStatementBorrows = connection.prepareStatement(updateQueryBorrows);
-                preparedStatementBorrows.setString(1, userText);
-                int rowsAffectedBorrows = preparedStatementBorrows.executeUpdate();
-
-                // Show success messages
-                if (rowsAffectedUserInfo > 0) {
-                    JOptionPane.showMessageDialog(this, "Payment successful. Please log in to your account.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    new LogIn().setVisible(true);
-                } else {
-                    JOptionPane.showMessageDialog(this, "User not found or no changes made to userinfo.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-
-                if (rowsAffectedBorrows > 0) {
-                    JOptionPane.showMessageDialog(this, "Borrow date extended successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(this, "No borrows record found or no changes made to borrows.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(this, "No overdue books found for this user.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            }
-            
-            // Close the connection
-            connection.close();
-        } else {
-            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            // Remove the loan from borrows table
+            deleteLoanStmt.setString(1, title);
+            deleteLoanStmt.setString(2, userText);
+            deleteLoanStmt.executeUpdate();
         }
-    } catch (SQLException ex) {
-        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this, "Invalid amount entered. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
-    }
 
-    dispose();
+        if (overdueBooksCount > 0) {
+            // Remove the loan from userinfo table
+            String updateQueryUserInfo = "UPDATE userinfo SET loan = 0 WHERE name = ?";
+            PreparedStatement preparedStatementUserInfo = connection.prepareStatement(updateQueryUserInfo);
+            preparedStatementUserInfo.setString(1, userText);
+            int rowsAffectedUserInfo = preparedStatementUserInfo.executeUpdate();
+
+            // Update earnings for librarian and admin
+            String updateEarningsQuery = "UPDATE librarian SET earnings = earnings + ?";
+            String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ?";
+            PreparedStatement updateEarningsStmt = connection.prepareStatement(updateEarningsQuery);
+            PreparedStatement updateAdminEarningsStmt = connection.prepareStatement(updateAdminEarningsQuery);
+            
+            updateEarningsStmt.setInt(1, totalAmount);
+            updateEarningsStmt.executeUpdate();
+            updateEarningsStmt.close();
+
+            updateAdminEarningsStmt.setInt(1, totalAmount);
+            updateAdminEarningsStmt.executeUpdate();
+            updateAdminEarningsStmt.close();
+
+            if (rowsAffectedUserInfo > 0) {
+                JOptionPane.showMessageDialog(this, "Payment successful. Please log in to your account.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                new LogIn().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "User not found or no changes made to userinfo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            JOptionPane.showMessageDialog(this, "Borrow date extended successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No overdue books found for this user.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        // Close the statements and result set
+        insertStmt.close();
+        updateBorrowsStmt.close();
+        deleteLoanStmt.close();
+        overdueBooksResultSet.close();
+        selectStmt.close();
+
+        // Close the connection
+        connection.close();
+    } else {
+        JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+} catch (SQLException ex) {
+    Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+} catch (NumberFormatException ex) {
+    JOptionPane.showMessageDialog(this, "Invalid amount entered. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+}
+
+dispose();
+             
     }//GEN-LAST:event_payButtonActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         setState(JFrame. ICONIFIED);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     
     
@@ -549,7 +595,6 @@ public class Payment extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private java.awt.Panel panel1;
     private java.awt.Panel panel2;

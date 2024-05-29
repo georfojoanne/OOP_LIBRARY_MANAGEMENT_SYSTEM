@@ -485,6 +485,7 @@ public void getTextFromNameColumn() {
         jColorChooser1 = new javax.swing.JColorChooser();
         panel2 = new java.awt.Panel();
         xsuerButton = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         leftPanel = new java.awt.Panel();
         profile = new javax.swing.JLabel();
         borrowsButton = new javax.swing.JButton();
@@ -496,6 +497,7 @@ public void getTextFromNameColumn() {
         booksButton = new javax.swing.JButton();
         userName = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        logOutButton = new javax.swing.JButton();
         tabs = new javax.swing.JTabbedPane();
         books = new javax.swing.JPanel();
         borrowButton = new javax.swing.JButton();
@@ -523,7 +525,6 @@ public void getTextFromNameColumn() {
         notifsTable = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         settings = new javax.swing.JPanel();
-        logOutButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         name = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -608,7 +609,7 @@ public void getTextFromNameColumn() {
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         xsuerButton.setForeground(new java.awt.Color(225, 232, 242));
-        xsuerButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
+        xsuerButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/Xbang.png"))); // NOI18N
         xsuerButton.setToolTipText("");
         xsuerButton.setBorderPainted(false);
         xsuerButton.setContentAreaFilled(false);
@@ -623,9 +624,24 @@ public void getTextFromNameColumn() {
         });
         panel2.add(xsuerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 10, 50, -1));
 
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/minimize.png"))); // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setFocusPainted(false);
+        jButton2.setFocusable(false);
+        jButton2.setRequestFocusEnabled(false);
+        jButton2.setRolloverEnabled(false);
+        jButton2.setVerifyInputWhenFocusTarget(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        panel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 10, -1, -1));
+
         makePanelMovable(this, panel2);
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 30));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 60));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
@@ -646,7 +662,7 @@ public void getTextFromNameColumn() {
                 borrowsButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(borrowsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 330, 110, -1));
+        leftPanel.add(borrowsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 110, -1));
 
         reservationButton.setBackground(new java.awt.Color(26, 27, 27));
         reservationButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -661,7 +677,7 @@ public void getTextFromNameColumn() {
                 reservationButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(reservationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, -1, -1));
+        leftPanel.add(reservationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 370, -1, -1));
 
         settingsButton.setBackground(new java.awt.Color(26, 27, 27));
         settingsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -676,7 +692,7 @@ public void getTextFromNameColumn() {
                 settingsButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(settingsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 570, -1, -1));
+        leftPanel.add(settingsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 540, -1, -1));
 
         jSeparator1.setBackground(java.awt.Color.white);
         jSeparator1.setPreferredSize(new java.awt.Dimension(70, 10));
@@ -695,7 +711,7 @@ public void getTextFromNameColumn() {
                 historyButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(historyButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 450, -1, 20));
+        leftPanel.add(historyButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 430, -1, 20));
 
         notificationsButton.setBackground(new java.awt.Color(26, 27, 27));
         notificationsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -710,7 +726,7 @@ public void getTextFromNameColumn() {
                 notificationsButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(notificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 510, -1, -1));
+        leftPanel.add(notificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 490, -1, -1));
 
         booksButton.setBackground(new java.awt.Color(26, 27, 27));
         booksButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -730,15 +746,33 @@ public void getTextFromNameColumn() {
                 booksButtonActionPerformed(evt);
             }
         });
-        leftPanel.add(booksButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 260, -1, 30));
+        leftPanel.add(booksButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 250, -1, 30));
 
         userName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         userName.setForeground(java.awt.Color.white);
         userName.setText("User Name");
         leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 180, -1, -1));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/whiteIcon.png"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/whiteIcon.png"))); // NOI18N
         leftPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, -1, -1));
+
+        logOutButton.setBackground(new java.awt.Color(49, 98, 103));
+        logOutButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
+        logOutButton.setForeground(new java.awt.Color(0, 255, 255));
+        logOutButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/log out.png"))); // NOI18N
+        logOutButton.setText("Log Out");
+        logOutButton.setBorderPainted(false);
+        logOutButton.setContentAreaFilled(false);
+        logOutButton.setFocusPainted(false);
+        logOutButton.setRequestFocusEnabled(false);
+        logOutButton.setRolloverEnabled(false);
+        logOutButton.setVerifyInputWhenFocusTarget(false);
+        logOutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logOutButtonActionPerformed(evt);
+            }
+        });
+        leftPanel.add(logOutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 620, 180, -1));
 
         getContentPane().add(leftPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 800));
 
@@ -941,23 +975,23 @@ public void getTextFromNameColumn() {
         jPanel12.setLayout(jPanel12Layout);
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
-                .addContainerGap(299, Short.MAX_VALUE)
-                .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(287, 287, 287))
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addGap(27, 27, 27)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(returnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(286, 286, 286))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(returnButton)
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout borrowsLayout = new javax.swing.GroupLayout(borrows);
@@ -1040,8 +1074,8 @@ public void getTextFromNameColumn() {
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addGap(16, 16, 16)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 576, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 582, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(80, Short.MAX_VALUE))
         );
@@ -1116,7 +1150,7 @@ public void getTextFromNameColumn() {
         notifications.setBackground(new java.awt.Color(28, 52, 62));
 
         notifsTable.setBackground(new java.awt.Color(221, 221, 221));
-        notifsTable.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        notifsTable.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         notifsTable.setForeground(new java.awt.Color(0, 0, 0));
         notifsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1134,7 +1168,7 @@ public void getTextFromNameColumn() {
                 return canEdit [columnIndex];
             }
         });
-        notifsTable.setGridColor(new java.awt.Color(153, 51, 255));
+        notifsTable.setGridColor(new java.awt.Color(0, 153, 153));
         notifsTable.setRowHeight(45);
         notifsTable.setSelectionBackground(new java.awt.Color(255, 255, 204));
         notifsTable.setShowGrid(true);
@@ -1180,16 +1214,6 @@ public void getTextFromNameColumn() {
 
         settings.setBackground(new java.awt.Color(28, 52, 62));
         settings.setPreferredSize(new java.awt.Dimension(800, 1000));
-
-        logOutButton.setBackground(new java.awt.Color(49, 98, 103));
-        logOutButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        logOutButton.setForeground(new java.awt.Color(0, 255, 255));
-        logOutButton.setText("Log Out");
-        logOutButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                logOutButtonActionPerformed(evt);
-            }
-        });
 
         jLabel1.setBackground(new java.awt.Color(51, 51, 51));
         jLabel1.setFont(new java.awt.Font("Stylus BT", 1, 48)); // NOI18N
@@ -1290,9 +1314,7 @@ public void getTextFromNameColumn() {
                 .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(settingsLayout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(logOutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(85, 85, 85))
+                        .addGap(85, 260, Short.MAX_VALUE))
                     .addGroup(settingsLayout.createSequentialGroup()
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 498, Short.MAX_VALUE))
@@ -1319,15 +1341,9 @@ public void getTextFromNameColumn() {
         settingsLayout.setVerticalGroup(
             settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(settingsLayout.createSequentialGroup()
-                .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(settingsLayout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(logOutButton)
-                        .addGap(71, 71, 71))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settingsLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)))
+                .addGap(40, 40, 40)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
                 .addGroup(settingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(name, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(setName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -2449,6 +2465,10 @@ private void removeReservationSelectedRowsFromDatabase() {
         notifs();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+      setState(JFrame. ICONIFIED);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2467,6 +2487,7 @@ private void removeReservationSelectedRowsFromDatabase() {
     private javax.swing.JTable historyTable;
     private javax.swing.JLabel id;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JColorChooser jColorChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

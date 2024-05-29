@@ -41,10 +41,51 @@ public class Librarian extends javax.swing.JFrame {
        checkAndCancelOverdueReservations();
        populateLoansTable();
        populateLoansManagementTableForOverdueBooks();
+       totalEarnings();
        
               
           
     }
+    
+    
+    private void totalEarnings() {
+        try {
+            // Establish a database connection
+            dbConnection con = new dbConnection();
+            Connection connection = con.getConnection();
+            
+            if (connection != null) {
+                String sumQuery = "SELECT SUM(amount) AS totalEarnings FROM history WHERE status = 'Overdue Paid'";
+                
+                try (PreparedStatement sumStmt = connection.prepareStatement(sumQuery);
+                        ResultSet resultSet = sumStmt.executeQuery()) {
+                    
+                    if (resultSet.next()) {
+                        double totalEarnings = resultSet.getDouble("totalEarnings");
+                        
+                        // Display the total earnings in the JTextField
+                        earnings.setText(String.valueOf(totalEarnings));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (connection != null && !connection.isClosed()) {
+                            connection.close();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                System.out.println("Failed to establish a database connection.");
+            }   } catch (SQLException ex) {
+            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}
+    
+    
+    
     
       public static void makePanelMovable(JFrame frame, JPanel jPanel1) {
         final Point[] mousePoint = {null}; // Declare mousePoint as an array
@@ -573,14 +614,14 @@ try {
         jScrollPane2 = new javax.swing.JScrollPane();
         returnsTable = new javax.swing.JTable();
         borrowsSearch = new javax.swing.JTextField();
-        confirmButton1 = new javax.swing.JButton();
+        refreshReturnsButton = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         reservationPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         reservationTitleTable = new javax.swing.JTable();
         reserveButton = new javax.swing.JButton();
         reservationTitleSearch = new javax.swing.JTextField();
-        reserveButton1 = new javax.swing.JButton();
+        refreshReserveButton = new javax.swing.JButton();
         reservationTitleSearchButton = new javax.swing.JButton();
         addBookPanel = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
@@ -598,16 +639,18 @@ try {
         requestTable = new javax.swing.JTable();
         confirmBorrow = new javax.swing.JButton();
         requestSearch = new javax.swing.JTextField();
-        jButton22 = new javax.swing.JButton();
-        jButton29 = new javax.swing.JButton();
+        notifyButton = new javax.swing.JButton();
+        refreshBorrowButton = new javax.swing.JButton();
         reserveSearch = new javax.swing.JButton();
         loansPanel = new javax.swing.JPanel();
-        jButton27 = new javax.swing.JButton();
-        jButton28 = new javax.swing.JButton();
+        managePaymentsButton = new javax.swing.JButton();
+        refreshPaymentsButton = new javax.swing.JButton();
         loansSearch = new javax.swing.JTextField();
         jScrollPane7 = new javax.swing.JScrollPane();
         loansTable = new javax.swing.JTable();
         paymentSearch = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        earnings = new javax.swing.JTextField();
         loanManagementPanel = new javax.swing.JPanel();
         confirmPayment = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
@@ -643,8 +686,7 @@ try {
         jTextField2 = new javax.swing.JTextField();
         jTextField21 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jTextField15 = new javax.swing.JTextField();
-        holdsButton = new javax.swing.JButton();
+        reservationsButton = new javax.swing.JButton();
         jButton17 = new javax.swing.JButton();
         borrowsButton = new javax.swing.JButton();
 
@@ -656,19 +698,31 @@ try {
 
         jPanel1.setBackground(new java.awt.Color(10, 29, 36));
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/Xbang.png"))); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/Xbang.png"))); // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton1.setFocusPainted(false);
+        jButton1.setFocusable(false);
+        jButton1.setRequestFocusEnabled(false);
+        jButton1.setRolloverEnabled(false);
+        jButton1.setVerifyInputWhenFocusTarget(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/LIB.ITT.png"))); // NOI18N
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/LIB.ITT.png"))); // NOI18N
 
-        jButton6.setText("minimize");
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/minimize.png"))); // NOI18N
+        jButton6.setBorderPainted(false);
+        jButton6.setContentAreaFilled(false);
+        jButton6.setFocusPainted(false);
+        jButton6.setFocusable(false);
+        jButton6.setRequestFocusEnabled(false);
+        jButton6.setRolloverEnabled(false);
+        jButton6.setVerifyInputWhenFocusTarget(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
@@ -684,11 +738,11 @@ try {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 645, Short.MAX_VALUE)
-                .addComponent(jButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 684, Short.MAX_VALUE)
+                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -698,9 +752,9 @@ try {
                     .addComponent(jLabel3)
                     .addComponent(jLabel1)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         makePanelMovable(this, jPanel1);
@@ -716,40 +770,52 @@ try {
         booksPanel.setBackground(new java.awt.Color(28, 52, 62));
         booksPanel.setForeground(new java.awt.Color(159, 212, 179));
 
-        removeButton.setBackground(new java.awt.Color(49, 98, 103));
+        removeButton.setBackground(new java.awt.Color(10, 29, 36));
         removeButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         removeButton.setForeground(new java.awt.Color(0, 255, 255));
         removeButton.setText("REMOVE");
         removeButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        removeButton.setFocusPainted(false);
+        removeButton.setRequestFocusEnabled(false);
+        removeButton.setRolloverEnabled(false);
+        removeButton.setVerifyInputWhenFocusTarget(false);
         removeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeButtonActionPerformed(evt);
             }
         });
 
-        updateButton.setBackground(new java.awt.Color(49, 98, 103));
+        updateButton.setBackground(new java.awt.Color(10, 29, 36));
         updateButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         updateButton.setForeground(new java.awt.Color(0, 255, 255));
         updateButton.setText("UPDATE");
         updateButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        updateButton.setFocusPainted(false);
+        updateButton.setFocusable(false);
+        updateButton.setRequestFocusEnabled(false);
+        updateButton.setRolloverEnabled(false);
         updateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateButtonActionPerformed(evt);
             }
         });
 
-        refreshButton.setBackground(new java.awt.Color(49, 98, 103));
+        refreshButton.setBackground(new java.awt.Color(10, 29, 36));
         refreshButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         refreshButton.setForeground(new java.awt.Color(0, 255, 255));
         refreshButton.setText("REFRESH");
         refreshButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshButton.setFocusPainted(false);
+        refreshButton.setFocusable(false);
+        refreshButton.setRequestFocusEnabled(false);
+        refreshButton.setRolloverEnabled(false);
         refreshButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 refreshButtonActionPerformed(evt);
             }
         });
 
-        bookTable.setBackground(new java.awt.Color(220, 220, 250));
+        bookTable.setBackground(new java.awt.Color(221, 221, 221));
         bookTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -770,7 +836,7 @@ try {
         bookTable.setDefaultEditor(Object.class, null);
         jScrollPane5.setViewportView(bookTable);
 
-        searchButtonBooks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        searchButtonBooks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         searchButtonBooks.setBorderPainted(false);
         searchButtonBooks.setContentAreaFilled(false);
         searchButtonBooks.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -831,18 +897,22 @@ try {
         returnsPanel.setName("Book"); // NOI18N
         returnsPanel.setNextFocusableComponent(booksButton);
 
-        confirmButton.setBackground(new java.awt.Color(49, 98, 103));
+        confirmButton.setBackground(new java.awt.Color(10, 29, 36));
         confirmButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         confirmButton.setForeground(new java.awt.Color(0, 255, 255));
         confirmButton.setText("CONFIRM RETURN");
         confirmButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmButton.setFocusPainted(false);
+        confirmButton.setFocusable(false);
+        confirmButton.setRequestFocusEnabled(false);
+        confirmButton.setRolloverEnabled(false);
         confirmButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 confirmButtonActionPerformed(evt);
             }
         });
 
-        returnsTable.setBackground(new java.awt.Color(220, 220, 250));
+        returnsTable.setBackground(new java.awt.Color(221, 221, 221));
         returnsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -879,18 +949,22 @@ try {
             }
         });
 
-        confirmButton1.setBackground(new java.awt.Color(49, 98, 103));
-        confirmButton1.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        confirmButton1.setForeground(new java.awt.Color(0, 255, 255));
-        confirmButton1.setText("REFRESH");
-        confirmButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        confirmButton1.addActionListener(new java.awt.event.ActionListener() {
+        refreshReturnsButton.setBackground(new java.awt.Color(10, 29, 36));
+        refreshReturnsButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        refreshReturnsButton.setForeground(new java.awt.Color(0, 255, 255));
+        refreshReturnsButton.setText("REFRESH");
+        refreshReturnsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshReturnsButton.setFocusPainted(false);
+        refreshReturnsButton.setFocusable(false);
+        refreshReturnsButton.setRequestFocusEnabled(false);
+        refreshReturnsButton.setRolloverEnabled(false);
+        refreshReturnsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                confirmButton1ActionPerformed(evt);
+                refreshReturnsButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -910,7 +984,7 @@ try {
                         .addGap(37, 37, 37)
                         .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(33, 33, 33)
-                        .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(refreshReturnsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(returnsPanelLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
@@ -939,7 +1013,7 @@ try {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(returnsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(confirmButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(confirmButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(refreshReturnsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
 
@@ -948,7 +1022,7 @@ try {
         reservationPanel.setBackground(new java.awt.Color(28, 52, 62));
         reservationPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        reservationTitleTable.setBackground(new java.awt.Color(220, 220, 250));
+        reservationTitleTable.setBackground(new java.awt.Color(221, 221, 221));
         reservationTitleTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -978,11 +1052,15 @@ try {
 
         reservationPanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 54, 678, 510));
 
-        reserveButton.setBackground(new java.awt.Color(49, 98, 103));
+        reserveButton.setBackground(new java.awt.Color(10, 29, 36));
         reserveButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         reserveButton.setForeground(new java.awt.Color(0, 255, 255));
         reserveButton.setText("RESERVES");
-        reserveButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        reserveButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reserveButton.setFocusPainted(false);
+        reserveButton.setFocusable(false);
+        reserveButton.setRequestFocusEnabled(false);
+        reserveButton.setRolloverEnabled(false);
         reserveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reserveButtonActionPerformed(evt);
@@ -995,19 +1073,24 @@ try {
         reservationTitleSearch = new PlaceholderTextField("Search");
         reservationPanel.add(reservationTitleSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
-        reserveButton1.setBackground(new java.awt.Color(49, 98, 103));
-        reserveButton1.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        reserveButton1.setForeground(new java.awt.Color(0, 255, 255));
-        reserveButton1.setText("REFRESH");
-        reserveButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        reserveButton1.addActionListener(new java.awt.event.ActionListener() {
+        refreshReserveButton.setBackground(new java.awt.Color(10, 29, 36));
+        refreshReserveButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        refreshReserveButton.setForeground(new java.awt.Color(0, 255, 255));
+        refreshReserveButton.setText("REFRESH");
+        refreshReserveButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshReserveButton.setFocusPainted(false);
+        refreshReserveButton.setFocusable(false);
+        refreshReserveButton.setRequestFocusEnabled(false);
+        refreshReserveButton.setRolloverEnabled(false);
+        refreshReserveButton.setVerifyInputWhenFocusTarget(false);
+        refreshReserveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reserveButton1ActionPerformed(evt);
+                refreshReserveButtonActionPerformed(evt);
             }
         });
-        reservationPanel.add(reserveButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(365, 582, 287, 42));
+        reservationPanel.add(refreshReserveButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(365, 582, 287, 42));
 
-        reservationTitleSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        reservationTitleSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         reservationTitleSearchButton.setBorderPainted(false);
         reservationTitleSearchButton.setContentAreaFilled(false);
         reservationTitleSearchButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1024,7 +1107,7 @@ try {
         jTextField5.setEditable(false);
         jTextField5.setBackground(new java.awt.Color(131, 157, 167));
         jTextField5.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField5.setForeground(new java.awt.Color(54, 61, 155));
+        jTextField5.setForeground(new java.awt.Color(10, 29, 36));
         jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField5.setText("TITLE");
         jTextField5.setAutoscrolls(false);
@@ -1033,11 +1116,16 @@ try {
         jTextField5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
         jTextField5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        addButton.setBackground(new java.awt.Color(49, 98, 103));
+        addButton.setBackground(new java.awt.Color(10, 29, 36));
         addButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         addButton.setForeground(new java.awt.Color(0, 255, 255));
         addButton.setText("ADD");
         addButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        addButton.setFocusPainted(false);
+        addButton.setFocusable(false);
+        addButton.setRequestFocusEnabled(false);
+        addButton.setRolloverEnabled(false);
+        addButton.setVerifyInputWhenFocusTarget(false);
         addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addButtonActionPerformed(evt);
@@ -1047,7 +1135,7 @@ try {
         jTextField6.setEditable(false);
         jTextField6.setBackground(new java.awt.Color(131, 157, 167));
         jTextField6.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField6.setForeground(new java.awt.Color(54, 61, 155));
+        jTextField6.setForeground(new java.awt.Color(10, 29, 36));
         jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField6.setText("AUTHOR");
         jTextField6.setAutoscrolls(false);
@@ -1059,7 +1147,7 @@ try {
         jTextField7.setEditable(false);
         jTextField7.setBackground(new java.awt.Color(131, 157, 167));
         jTextField7.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField7.setForeground(new java.awt.Color(54, 61, 155));
+        jTextField7.setForeground(new java.awt.Color(10, 29, 36));
         jTextField7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField7.setText("ISBN");
         jTextField7.setAutoscrolls(false);
@@ -1076,7 +1164,7 @@ try {
         jTextField8.setEditable(false);
         jTextField8.setBackground(new java.awt.Color(131, 157, 167));
         jTextField8.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField8.setForeground(new java.awt.Color(54, 61, 155));
+        jTextField8.setForeground(new java.awt.Color(10, 29, 36));
         jTextField8.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField8.setText("CATEGORY");
         jTextField8.setAutoscrolls(false);
@@ -1100,7 +1188,7 @@ try {
         jTextField10.setEditable(false);
         jTextField10.setBackground(new java.awt.Color(131, 157, 167));
         jTextField10.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField10.setForeground(new java.awt.Color(54, 61, 155));
+        jTextField10.setForeground(new java.awt.Color(10, 29, 36));
         jTextField10.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField10.setText("ADD BOOKS");
         jTextField10.setAutoscrolls(false);
@@ -1182,7 +1270,7 @@ try {
         reservePanel.setBackground(new java.awt.Color(28, 52, 62));
         reservePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        requestTable.setBackground(new java.awt.Color(220, 220, 250));
+        requestTable.setBackground(new java.awt.Color(221, 221, 221));
         requestTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -1205,11 +1293,16 @@ try {
 
         reservePanel.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 55, 678, 500));
 
-        confirmBorrow.setBackground(new java.awt.Color(49, 98, 103));
+        confirmBorrow.setBackground(new java.awt.Color(10, 29, 36));
         confirmBorrow.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         confirmBorrow.setForeground(new java.awt.Color(0, 255, 255));
         confirmBorrow.setText("CONFIRM BORROW");
         confirmBorrow.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmBorrow.setFocusPainted(false);
+        confirmBorrow.setFocusable(false);
+        confirmBorrow.setRequestFocusEnabled(false);
+        confirmBorrow.setRolloverEnabled(false);
+        confirmBorrow.setVerifyInputWhenFocusTarget(false);
         confirmBorrow.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 confirmBorrowActionPerformed(evt);
@@ -1222,31 +1315,41 @@ try {
         requestSearch = new PlaceholderTextField("Search");
         reservePanel.add(requestSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 634, -1));
 
-        jButton22.setBackground(new java.awt.Color(49, 98, 103));
-        jButton22.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton22.setForeground(new java.awt.Color(0, 255, 255));
-        jButton22.setText("NOTIFY");
-        jButton22.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton22.addActionListener(new java.awt.event.ActionListener() {
+        notifyButton.setBackground(new java.awt.Color(10, 29, 36));
+        notifyButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        notifyButton.setForeground(new java.awt.Color(0, 255, 255));
+        notifyButton.setText("NOTIFY");
+        notifyButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        notifyButton.setFocusPainted(false);
+        notifyButton.setFocusable(false);
+        notifyButton.setRequestFocusEnabled(false);
+        notifyButton.setRolloverEnabled(false);
+        notifyButton.setVerifyInputWhenFocusTarget(false);
+        notifyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton22ActionPerformed(evt);
+                notifyButtonActionPerformed(evt);
             }
         });
-        reservePanel.add(jButton22, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 573, 162, 48));
+        reservePanel.add(notifyButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 573, 162, 48));
 
-        jButton29.setBackground(new java.awt.Color(49, 98, 103));
-        jButton29.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton29.setForeground(new java.awt.Color(0, 255, 255));
-        jButton29.setText("REFRESH");
-        jButton29.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton29.addActionListener(new java.awt.event.ActionListener() {
+        refreshBorrowButton.setBackground(new java.awt.Color(10, 29, 36));
+        refreshBorrowButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        refreshBorrowButton.setForeground(new java.awt.Color(0, 255, 255));
+        refreshBorrowButton.setText("REFRESH");
+        refreshBorrowButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshBorrowButton.setFocusPainted(false);
+        refreshBorrowButton.setFocusable(false);
+        refreshBorrowButton.setRequestFocusEnabled(false);
+        refreshBorrowButton.setRolloverEnabled(false);
+        refreshBorrowButton.setVerifyInputWhenFocusTarget(false);
+        refreshBorrowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton29ActionPerformed(evt);
+                refreshBorrowButtonActionPerformed(evt);
             }
         });
-        reservePanel.add(jButton29, new org.netbeans.lib.awtextra.AbsoluteConstraints(522, 573, 162, 48));
+        reservePanel.add(refreshBorrowButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 570, 162, 48));
 
-        reserveSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        reserveSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         reserveSearch.setBorderPainted(false);
         reserveSearch.setContentAreaFilled(false);
         reserveSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -1261,36 +1364,46 @@ try {
         loansPanel.setBackground(new java.awt.Color(28, 52, 62));
         loansPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton27.setBackground(new java.awt.Color(49, 98, 103));
-        jButton27.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton27.setForeground(new java.awt.Color(0, 255, 255));
-        jButton27.setText("MANAGE PAYMENTS");
-        jButton27.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton27.addActionListener(new java.awt.event.ActionListener() {
+        managePaymentsButton.setBackground(new java.awt.Color(10, 29, 36));
+        managePaymentsButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        managePaymentsButton.setForeground(new java.awt.Color(0, 255, 255));
+        managePaymentsButton.setText("MANAGE PAYMENTS");
+        managePaymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        managePaymentsButton.setFocusPainted(false);
+        managePaymentsButton.setFocusable(false);
+        managePaymentsButton.setRequestFocusEnabled(false);
+        managePaymentsButton.setRolloverEnabled(false);
+        managePaymentsButton.setVerifyInputWhenFocusTarget(false);
+        managePaymentsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton27ActionPerformed(evt);
+                managePaymentsButtonActionPerformed(evt);
             }
         });
-        loansPanel.add(jButton27, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 575, 406, 48));
+        loansPanel.add(managePaymentsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 575, 406, 48));
 
-        jButton28.setBackground(new java.awt.Color(49, 98, 103));
-        jButton28.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jButton28.setForeground(new java.awt.Color(0, 255, 255));
-        jButton28.setText("REFRESH");
-        jButton28.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton28.addActionListener(new java.awt.event.ActionListener() {
+        refreshPaymentsButton.setBackground(new java.awt.Color(10, 29, 36));
+        refreshPaymentsButton.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
+        refreshPaymentsButton.setForeground(new java.awt.Color(0, 255, 255));
+        refreshPaymentsButton.setText("REFRESH");
+        refreshPaymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshPaymentsButton.setFocusPainted(false);
+        refreshPaymentsButton.setFocusable(false);
+        refreshPaymentsButton.setRequestFocusEnabled(false);
+        refreshPaymentsButton.setRolloverEnabled(false);
+        refreshPaymentsButton.setVerifyInputWhenFocusTarget(false);
+        refreshPaymentsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton28ActionPerformed(evt);
+                refreshPaymentsButtonActionPerformed(evt);
             }
         });
-        loansPanel.add(jButton28, new org.netbeans.lib.awtextra.AbsoluteConstraints(424, 575, 260, 48));
+        loansPanel.add(refreshPaymentsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(424, 575, 260, 48));
 
         loansSearch.setBackground(new java.awt.Color(255, 255, 255));
         loansSearch.setText("Search");
         loansSearch = new PlaceholderTextField("Search");
         loansPanel.add(loansSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
-        loansTable.setBackground(new java.awt.Color(220, 220, 250));
+        loansTable.setBackground(new java.awt.Color(221, 221, 221));
         loansTable.setForeground(new java.awt.Color(0, 0, 0));
         loansTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1315,15 +1428,17 @@ try {
                 return canEdit [columnIndex];
             }
         });
+        loansTable.setFocusable(false);
         jScrollPane7.setViewportView(loansTable);
         loansTable.getTableHeader().setReorderingAllowed(false);
         loansTable.setDefaultEditor(Object.class, null);
 
-        loansPanel.add(jScrollPane7, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 51, 678, 512));
+        loansPanel.add(jScrollPane7, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 51, 678, 470));
 
-        paymentSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        paymentSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         paymentSearch.setBorderPainted(false);
         paymentSearch.setContentAreaFilled(false);
+        paymentSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         paymentSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 paymentSearchActionPerformed(evt);
@@ -1331,16 +1446,39 @@ try {
         });
         loansPanel.add(paymentSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 10, -1, -1));
 
+        jTextField1.setBackground(new java.awt.Color(221, 221, 221));
+        jTextField1.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
+        jTextField1.setForeground(new java.awt.Color(28, 52, 62));
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setText("EARNINGS:");
+        jTextField1.setFocusable(false);
+        jTextField1.setRequestFocusEnabled(false);
+        jTextField1.setEditable(false);
+        jTextField1.setFocusable(false);
+        loansPanel.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 536, 180, 30));
+
+        earnings.setBackground(new java.awt.Color(49, 98, 103));
+        earnings.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        earnings.setForeground(new java.awt.Color(255, 255, 255));
+        earnings.setEditable(false);
+        earnings.setFocusable(false);
+        loansPanel.add(earnings, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 536, 480, 30));
+
         jTabbedPane1.addTab("tab7", loansPanel);
 
         loanManagementPanel.setBackground(new java.awt.Color(28, 52, 62));
         loanManagementPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        confirmPayment.setBackground(new java.awt.Color(49, 98, 103));
+        confirmPayment.setBackground(new java.awt.Color(10, 29, 36));
         confirmPayment.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         confirmPayment.setForeground(new java.awt.Color(0, 255, 255));
         confirmPayment.setText("CONFIRM PAYMENT");
         confirmPayment.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        confirmPayment.setFocusPainted(false);
+        confirmPayment.setFocusable(false);
+        confirmPayment.setRequestFocusEnabled(false);
+        confirmPayment.setRolloverEnabled(false);
+        confirmPayment.setVerifyInputWhenFocusTarget(false);
         confirmPayment.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 confirmPaymentActionPerformed(evt);
@@ -1348,11 +1486,15 @@ try {
         });
         loanManagementPanel.add(confirmPayment, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 583, 260, 48));
 
-        jButton26.setBackground(new java.awt.Color(49, 98, 103));
+        jButton26.setBackground(new java.awt.Color(10, 29, 36));
         jButton26.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton26.setForeground(new java.awt.Color(0, 255, 255));
         jButton26.setText("REFRESH");
         jButton26.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton26.setFocusPainted(false);
+        jButton26.setFocusable(false);
+        jButton26.setRequestFocusEnabled(false);
+        jButton26.setRolloverEnabled(false);
         jButton26.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton26ActionPerformed(evt);
@@ -1360,7 +1502,7 @@ try {
         });
         loanManagementPanel.add(jButton26, new org.netbeans.lib.awtextra.AbsoluteConstraints(424, 583, 260, 48));
 
-        loansManagementTable.setBackground(new java.awt.Color(220, 220, 250));
+        loansManagementTable.setBackground(new java.awt.Color(221, 221, 221));
         loansManagementTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -1395,9 +1537,10 @@ try {
         loanManagement = new PlaceholderTextField("Search");
         loanManagementPanel.add(loanManagement, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 630, -1));
 
-        loanManagementSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        loanManagementSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         loanManagementSearchButton.setBorderPainted(false);
         loanManagementSearchButton.setContentAreaFilled(false);
+        loanManagementSearchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         loanManagementSearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loanManagementSearchButtonActionPerformed(evt);
@@ -1412,7 +1555,7 @@ try {
         jTextField13.setEditable(false);
         jTextField13.setBackground(new java.awt.Color(131, 157, 167));
         jTextField13.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField13.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField13.setForeground(new java.awt.Color(10, 29, 36));
         jTextField13.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField13.setText("UPDATE BOOK");
         jTextField13.setAutoscrolls(false);
@@ -1428,7 +1571,7 @@ try {
         jTextField14.setEditable(false);
         jTextField14.setBackground(new java.awt.Color(131, 157, 167));
         jTextField14.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField14.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField14.setForeground(new java.awt.Color(10, 29, 36));
         jTextField14.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField14.setText("TITLE");
         jTextField14.setAutoscrolls(false);
@@ -1439,7 +1582,7 @@ try {
         jTextField16.setEditable(false);
         jTextField16.setBackground(new java.awt.Color(131, 157, 167));
         jTextField16.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField16.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField16.setForeground(new java.awt.Color(10, 29, 36));
         jTextField16.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField16.setText("AUTHOR");
         jTextField16.setAutoscrolls(false);
@@ -1461,7 +1604,7 @@ try {
         jTextField18.setEditable(false);
         jTextField18.setBackground(new java.awt.Color(131, 157, 167));
         jTextField18.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField18.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField18.setForeground(new java.awt.Color(10, 29, 36));
         jTextField18.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField18.setText("ISBN");
         jTextField18.setAutoscrolls(false);
@@ -1483,7 +1626,7 @@ try {
         jTextField20.setEditable(false);
         jTextField20.setBackground(new java.awt.Color(131, 157, 167));
         jTextField20.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
-        jTextField20.setForeground(new java.awt.Color(71, 54, 155));
+        jTextField20.setForeground(new java.awt.Color(10, 29, 36));
         jTextField20.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField20.setText("CATEGORY");
         jTextField20.setAutoscrolls(false);
@@ -1496,9 +1639,9 @@ try {
         });
         jTextField20.setFocusable(false);
 
-        categoryUpdate.setBackground(new java.awt.Color(156, 153, 255));
+        categoryUpdate.setBackground(new java.awt.Color(10, 29, 36));
         categoryUpdate.setFont(new java.awt.Font("Microsoft JhengHei UI", 0, 14)); // NOI18N
-        categoryUpdate.setForeground(new java.awt.Color(0, 0, 0));
+        categoryUpdate.setForeground(new java.awt.Color(0, 255, 255));
         categoryUpdate.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "English", "Science", "Math" }));
         categoryUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1510,7 +1653,7 @@ try {
         categoryUpdate.setEnabled(false);
         categoryUpdate.setForeground(Color.CYAN);
 
-        jButton21.setBackground(new java.awt.Color(49, 98, 103));
+        jButton21.setBackground(new java.awt.Color(10, 29, 36));
         jButton21.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton21.setForeground(new java.awt.Color(0, 255, 255));
         jButton21.setText("UPDATE");
@@ -1532,7 +1675,7 @@ try {
             }
         });
 
-        jButton23.setBackground(new java.awt.Color(49, 98, 103));
+        jButton23.setBackground(new java.awt.Color(10, 29, 36));
         jButton23.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton23.setForeground(new java.awt.Color(0, 255, 255));
         jButton23.setText("EDIT");
@@ -1543,7 +1686,7 @@ try {
             }
         });
 
-        jButton24.setBackground(new java.awt.Color(49, 98, 103));
+        jButton24.setBackground(new java.awt.Color(10, 29, 36));
         jButton24.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton24.setForeground(new java.awt.Color(0, 255, 255));
         jButton24.setText("SAVE");
@@ -1626,6 +1769,7 @@ try {
         borrowsPanel.setBackground(new java.awt.Color(28, 52, 62));
         borrowsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        borrowsTable.setBackground(new java.awt.Color(221, 221, 221));
         borrowsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1641,11 +1785,16 @@ try {
 
         borrowsPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 61, 660, 497));
 
-        jButton30.setBackground(new java.awt.Color(49, 98, 103));
+        jButton30.setBackground(new java.awt.Color(10, 29, 36));
         jButton30.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton30.setForeground(new java.awt.Color(0, 255, 255));
         jButton30.setText("REFRESH");
         jButton30.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton30.setFocusPainted(false);
+        jButton30.setFocusable(false);
+        jButton30.setRequestFocusEnabled(false);
+        jButton30.setRolloverEnabled(false);
+        jButton30.setVerifyInputWhenFocusTarget(false);
         jButton30.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton30ActionPerformed(evt);
@@ -1653,11 +1802,16 @@ try {
         });
         borrowsPanel.add(jButton30, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 576, 162, 48));
 
-        jButton31.setBackground(new java.awt.Color(49, 98, 103));
+        jButton31.setBackground(new java.awt.Color(10, 29, 36));
         jButton31.setFont(new java.awt.Font("Microsoft JhengHei UI", 1, 18)); // NOI18N
         jButton31.setForeground(new java.awt.Color(0, 255, 255));
         jButton31.setText("OVERDUES");
         jButton31.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton31.setFocusPainted(false);
+        jButton31.setFocusable(false);
+        jButton31.setRequestFocusEnabled(false);
+        jButton31.setRolloverEnabled(false);
+        jButton31.setVerifyInputWhenFocusTarget(false);
         jButton31.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton31ActionPerformed(evt);
@@ -1665,9 +1819,10 @@ try {
         });
         borrowsPanel.add(jButton31, new org.netbeans.lib.awtextra.AbsoluteConstraints(124, 576, 162, 48));
 
-        borrowsSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/userinterface/icons8-search-32.png"))); // NOI18N
+        borrowsSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         borrowsSearchButton.setBorderPainted(false);
         borrowsSearchButton.setContentAreaFilled(false);
+        borrowsSearchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         borrowsSearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 borrowsSearchButtonActionPerformed(evt);
@@ -1697,7 +1852,11 @@ try {
         returnsButton.setBorder(null);
         returnsButton.setBorderPainted(false);
         returnsButton.setContentAreaFilled(false);
-        returnsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        returnsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        returnsButton.setFocusPainted(false);
+        returnsButton.setFocusable(false);
+        returnsButton.setRequestFocusEnabled(false);
+        returnsButton.setRolloverEnabled(false);
         returnsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 returnsButtonActionPerformed(evt);
@@ -1710,7 +1869,11 @@ try {
         addBooksButton.setBorder(null);
         addBooksButton.setBorderPainted(false);
         addBooksButton.setContentAreaFilled(false);
-        addBooksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        addBooksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        addBooksButton.setFocusPainted(false);
+        addBooksButton.setFocusable(false);
+        addBooksButton.setRequestFocusEnabled(false);
+        addBooksButton.setRolloverEnabled(false);
         addBooksButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addBooksButtonActionPerformed(evt);
@@ -1724,7 +1887,11 @@ try {
         booksButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         booksButton.setBorderPainted(false);
         booksButton.setContentAreaFilled(false);
-        booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        booksButton.setFocusable(false);
+        booksButton.setRequestFocusEnabled(false);
+        booksButton.setRolloverEnabled(false);
+        booksButton.setVerifyInputWhenFocusTarget(false);
         booksButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 booksButtonActionPerformed(evt);
@@ -1737,7 +1904,11 @@ try {
         paymentsButton.setBorder(null);
         paymentsButton.setBorderPainted(false);
         paymentsButton.setContentAreaFilled(false);
-        paymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        paymentsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        paymentsButton.setFocusPainted(false);
+        paymentsButton.setFocusable(false);
+        paymentsButton.setRequestFocusEnabled(false);
+        paymentsButton.setRolloverEnabled(false);
         paymentsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 paymentsButtonActionPerformed(evt);
@@ -1770,36 +1941,26 @@ try {
         jTextField21.setEditable(false);
         jTextField21.setFocusable(false);
 
-        jTextField15.setBackground(new java.awt.Color(10, 29, 36));
-        jTextField15.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
-        jTextField15.setForeground(new java.awt.Color(255, 255, 255));
-        jTextField15.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField15.setText("USERNAME");
-        jTextField15.setBorder(null);
-        jTextField15.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTextField15.addActionListener(new java.awt.event.ActionListener() {
+        reservationsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
+        reservationsButton.setForeground(new java.awt.Color(255, 255, 255));
+        reservationsButton.setText("Reservations");
+        reservationsButton.setBorder(null);
+        reservationsButton.setBorderPainted(false);
+        reservationsButton.setContentAreaFilled(false);
+        reservationsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reservationsButton.setFocusPainted(false);
+        reservationsButton.setFocusable(false);
+        reservationsButton.setRequestFocusEnabled(false);
+        reservationsButton.setRolloverEnabled(false);
+        reservationsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField15ActionPerformed(evt);
-            }
-        });
-        jTextField15.setEditable(false);
-        jTextField15.setFocusable(false);
-
-        holdsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
-        holdsButton.setForeground(new java.awt.Color(255, 255, 255));
-        holdsButton.setText("Reservations");
-        holdsButton.setBorder(null);
-        holdsButton.setBorderPainted(false);
-        holdsButton.setContentAreaFilled(false);
-        holdsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        holdsButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                holdsButtonActionPerformed(evt);
+                reservationsButtonActionPerformed(evt);
             }
         });
 
         jButton17.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         jButton17.setForeground(new java.awt.Color(0, 255, 255));
+        jButton17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/log out.png"))); // NOI18N
         jButton17.setText("LOG OUT");
         jButton17.setBorderPainted(false);
         jButton17.setContentAreaFilled(false);
@@ -1816,7 +1977,11 @@ try {
         borrowsButton.setBorder(null);
         borrowsButton.setBorderPainted(false);
         borrowsButton.setContentAreaFilled(false);
-        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        borrowsButton.setFocusPainted(false);
+        borrowsButton.setFocusable(false);
+        borrowsButton.setRequestFocusEnabled(false);
+        borrowsButton.setRolloverEnabled(false);
         borrowsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 borrowsButtonActionPerformed(evt);
@@ -1840,20 +2005,17 @@ try {
                                 .addComponent(jLabel2)))
                         .addGap(75, 75, 75))
                     .addGroup(rightmostPanelLayout.createSequentialGroup()
-                        .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(50, Short.MAX_VALUE))
                     .addGroup(rightmostPanelLayout.createSequentialGroup()
                         .addGap(9, 9, 9)
                         .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(holdsButton, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                            .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(paymentsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(addBooksButton, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                                .addComponent(borrowsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(returnsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(booksButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(reservationsButton, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(paymentsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(addBooksButton, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(borrowsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(returnsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(booksButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         rightmostPanelLayout.setVerticalGroup(
@@ -1865,9 +2027,7 @@ try {
                 .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(39, 39, 39)
+                .addGap(63, 63, 63)
                 .addComponent(booksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(returnsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1878,7 +2038,7 @@ try {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(paymentsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(holdsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(reservationsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(161, 161, 161)
                 .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(60, 60, 60))
@@ -1892,24 +2052,55 @@ try {
 
     private void returnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(1);
+        
+        returnsButton.setForeground(new Color(0,225,225));
+                     booksButton.setForeground(new Color(225,225,255));
+                     borrowsButton.setForeground(new Color(225,225,255));                   
+                     addBooksButton.setForeground(new Color(225,225,255));
+                     paymentsButton.setForeground(new Color(225,225,255));
+                     reservationsButton.setForeground(new Color(225,225,255));
     }//GEN-LAST:event_returnsButtonActionPerformed
 
     private void addBooksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBooksButtonActionPerformed
         jTabbedPane1.setSelectedIndex(3);
+        
+        addBooksButton.setForeground(new Color(0,225,225));
+                     booksButton.setForeground(new Color(225,225,255));
+                     returnsButton.setForeground(new Color(225,225,255));                   
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     paymentsButton.setForeground(new Color(225,225,255));
+                     reservationsButton.setForeground(new Color(225,225,255));
     }//GEN-LAST:event_addBooksButtonActionPerformed
 
     
     private void booksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_booksButtonActionPerformed
         jTabbedPane1.setSelectedIndex(0);
         
+        booksButton.setForeground(new Color(0,225,225));
+                     returnsButton.setForeground(new Color(225,225,255));
+                     borrowsButton.setForeground(new Color(225,225,255));                   
+                     addBooksButton.setForeground(new Color(225,225,255));
+                     paymentsButton.setForeground(new Color(225,225,255));
+                     reservationsButton.setForeground(new Color(225,225,255));
     }//GEN-LAST:event_booksButtonActionPerformed
 
             
     private void paymentsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(5);
+        
+        paymentsButton.setForeground(new Color(0,225,225));
+                     booksButton.setForeground(new Color(225,225,255));
+                     returnsButton.setForeground(new Color(225,225,255));                   
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     addBooksButton.setForeground(new Color(225,225,255));
+                     reservationsButton.setForeground(new Color(225,225,255));
     }//GEN-LAST:event_paymentsButtonActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+    removeButton.setForeground(new Color(0, 225, 255));
+    updateButton.setForeground(new Color(225, 225, 225));
+    refreshButton.setForeground(new Color(0, 225, 255));
+
         jTabbedPane1.setSelectedIndex(7);
            int selectedRow = bookTable.getSelectedRow();
         if (selectedRow != -1) {
@@ -1952,9 +2143,12 @@ try {
         dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton27ActionPerformed
+    private void managePaymentsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_managePaymentsButtonActionPerformed
+    refreshPaymentsButton.setForeground(new Color(0, 225, 255));
+    managePaymentsButton.setForeground(new Color(225, 225, 225));   
+
         jTabbedPane1.setSelectedIndex(6);
-    }//GEN-LAST:event_jButton27ActionPerformed
+    }//GEN-LAST:event_managePaymentsButtonActionPerformed
 
     private void authorUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_authorUpdateActionPerformed
         // TODO add your handling code here:
@@ -1966,14 +2160,19 @@ try {
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         populateBooksTableFromDatabase();
+        
+    removeButton.setForeground(new Color(0, 225, 255));
+    refreshButton.setForeground(new Color(225, 225, 225));
+    updateButton.setForeground(new Color(0, 225, 255));
     }//GEN-LAST:event_refreshButtonActionPerformed
 
-    private void jTextField15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField15ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField15ActionPerformed
-
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-try {
+
+    refreshButton.setForeground(new Color(0, 225, 255));
+    removeButton.setForeground(new Color(225, 225, 225));
+    updateButton.setForeground(new Color(0, 225, 255));
+        
+        try {
     // Get selected rows
     int[] selectedRows = bookTable.getSelectedRows();
 
@@ -2035,11 +2234,12 @@ try {
     }//GEN-LAST:event_removeButtonActionPerformed
 
     private void titleFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleFieldActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_titleFieldActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
 
+        
                 String title = titleField.getText();
                 String author = authorAdd.getText();
                 String isbn = isbnAdd.getText();
@@ -2067,9 +2267,16 @@ if ("Enter title here".equals(title) || "Enter author here".equals(author) || "E
                 isbnAdd.setText("Enter ISBN here");
     }//GEN-LAST:event_addButtonActionPerformed
 
-    private void holdsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_holdsButtonActionPerformed
+    private void reservationsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservationsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(2);
-    }//GEN-LAST:event_holdsButtonActionPerformed
+        
+        reservationsButton.setForeground(new Color(0,225,225));
+                     booksButton.setForeground(new Color(225,225,255));
+                     returnsButton.setForeground(new Color(225,225,255));                   
+                     borrowsButton.setForeground(new Color(225,225,255));
+                     addBooksButton.setForeground(new Color(225,225,255));
+                     paymentsButton.setForeground(new Color(225,225,255));
+    }//GEN-LAST:event_reservationsButtonActionPerformed
 
     private void categoryComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryComboBoxActionPerformed
         String selectedCategory = (String) categoryComboBox.getSelectedItem();
@@ -2148,7 +2355,10 @@ if ("Enter title here".equals(title) || "Enter author here".equals(author) || "E
     }//GEN-LAST:event_jButton24ActionPerformed
 
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
-       try {
+    refreshReturnsButton.setForeground(new Color(0, 225, 255));
+    confirmButton.setForeground(new Color(225, 225, 225));
+        
+        try {
         // Establish a database connection
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
@@ -2236,6 +2446,9 @@ if ("Enter title here".equals(title) || "Enter author here".equals(author) || "E
     }//GEN-LAST:event_confirmButtonActionPerformed
 
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
+    refreshReserveButton.setForeground(new Color(0, 225, 255));
+    reserveButton.setForeground(new Color(225, 225, 225));
+
         jTabbedPane1.setSelectedIndex(4);
         
         showReservationDetails();
@@ -2243,10 +2456,21 @@ if ("Enter title here".equals(title) || "Enter author here".equals(author) || "E
 
     private void borrowsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowsButtonActionPerformed
         jTabbedPane1.setSelectedIndex(8);
+        
+        borrowsButton.setForeground(new Color(0,225,225));
+                     booksButton.setForeground(new Color(225,225,255));
+                     returnsButton.setForeground(new Color(225,225,255));                   
+                     addBooksButton.setForeground(new Color(225,225,255));
+                     paymentsButton.setForeground(new Color(225,225,255));
+                     reservationsButton.setForeground(new Color(225,225,255));
     }//GEN-LAST:event_borrowsButtonActionPerformed
 
-    private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
-try {
+    private void notifyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notifyButtonActionPerformed
+    confirmBorrow.setForeground(new Color(0, 225, 255));
+    notifyButton.setForeground(new Color(225, 225, 225));
+    refreshBorrowButton.setForeground(new Color(0, 225, 255));
+        
+        try {
     // Get the selected row index from reservationTitleTable
     int selectedRow = reservationTitleTable.getSelectedRow();
 
@@ -2353,7 +2577,7 @@ try {
     JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
 }
 
-    }//GEN-LAST:event_jButton22ActionPerformed
+    }//GEN-LAST:event_notifyButtonActionPerformed
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
         dispose();
@@ -2361,7 +2585,11 @@ try {
     }//GEN-LAST:event_jButton17ActionPerformed
 
     private void confirmBorrowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmBorrowActionPerformed
-try {                                              
+notifyButton.setForeground(new Color(0, 225, 255));
+    confirmBorrow.setForeground(new Color(225, 225, 225));
+    refreshBorrowButton.setForeground(new Color(0, 225, 255));
+        
+        try {                                              
     // Database connection variables
     dbConnection con = new dbConnection();
     Connection conn = con.getConnection();
@@ -2482,20 +2710,33 @@ try {
 }
     }//GEN-LAST:event_confirmBorrowActionPerformed
 
-    private void confirmButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButton1ActionPerformed
+    private void refreshReturnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshReturnsButtonActionPerformed
+    confirmButton.setForeground(new Color(0, 225, 255));
+    refreshReturnsButton.setForeground(new Color(225, 225, 225));
+
         populateReturns();
-    }//GEN-LAST:event_confirmButton1ActionPerformed
+    }//GEN-LAST:event_refreshReturnsButtonActionPerformed
 
-    private void reserveButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButton1ActionPerformed
+    private void refreshReserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshReserveButtonActionPerformed
+    reserveButton.setForeground(new Color(0, 225, 255));
+    refreshReserveButton.setForeground(new Color(225, 225, 225));
+
         populateReservationTitleTableFromDatabase();
-    }//GEN-LAST:event_reserveButton1ActionPerformed
+    }//GEN-LAST:event_refreshReserveButtonActionPerformed
 
-    private void jButton29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton29ActionPerformed
+    private void refreshBorrowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshBorrowButtonActionPerformed
+    notifyButton.setForeground(new Color(0, 225, 255));
+    refreshBorrowButton.setForeground(new Color(225, 225, 225));
+    confirmBorrow.setForeground(new Color(0, 225, 255));
+
         showReservationDetails();
         checkAndCancelOverdueReservations();
-    }//GEN-LAST:event_jButton29ActionPerformed
+    }//GEN-LAST:event_refreshBorrowButtonActionPerformed
 
     private void jButton30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton30ActionPerformed
+jButton31.setForeground(new Color(0, 225, 255));
+    jButton30.setForeground(new Color(225, 225, 225)); 
+
         populateBorrowsTableFromDatabase();
     }//GEN-LAST:event_jButton30ActionPerformed
 
@@ -2578,6 +2819,9 @@ try {
     }//GEN-LAST:event_borrowsSearchActionPerformed
 
     private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
+jButton30.setForeground(new Color(0, 225, 255));
+    jButton31.setForeground(new Color(225, 225, 225)); 
+
         try {
         // Establish a database connection
         dbConnection con = new dbConnection();
@@ -2615,11 +2859,17 @@ try {
     }//GEN-LAST:event_jButton31ActionPerformed
 
     private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
+confirmPayment.setForeground(new Color(0, 225, 255));
+    jButton26.setForeground(new Color(225, 225, 225));  
+
         populateLoansManagementTableForOverdueBooks();
     }//GEN-LAST:event_jButton26ActionPerformed
 //i have issue with the userinfo again huhu
     private void confirmPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPaymentActionPerformed
-    int selectedRow = loansManagementTable.getSelectedRow();
+    jButton26.setForeground(new Color(0, 225, 255));
+    confirmPayment.setForeground(new Color(225, 225, 225));  
+        
+        int selectedRow = loansManagementTable.getSelectedRow();
     if (selectedRow != -1) {
         String title = (String) loansManagementTable.getValueAt(selectedRow, 1);
         String name = (String) loansManagementTable.getValueAt(selectedRow, 0);
@@ -2760,9 +3010,12 @@ try {
         setState(JFrame. ICONIFIED);
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void jButton28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton28ActionPerformed
+    private void refreshPaymentsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshPaymentsButtonActionPerformed
+    managePaymentsButton.setForeground(new Color(0, 225, 255));
+    refreshPaymentsButton.setForeground(new Color(225, 225, 225));  
+
         populateLoansTable();
-    }//GEN-LAST:event_jButton28ActionPerformed
+    }//GEN-LAST:event_refreshPaymentsButtonActionPerformed
 
     private void bSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSearchActionPerformed
         // TODO add your handling code here:
@@ -3066,22 +3319,17 @@ try {
     private javax.swing.JComboBox<String> categoryUpdate;
     private javax.swing.JButton confirmBorrow;
     private javax.swing.JButton confirmButton;
-    private javax.swing.JButton confirmButton1;
     private javax.swing.JButton confirmPayment;
-    private javax.swing.JButton holdsButton;
+    private javax.swing.JTextField earnings;
     private javax.swing.JTextField isbnAdd;
     private javax.swing.JTextField isbnUpdate;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton21;
-    private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton26;
-    private javax.swing.JButton jButton27;
-    private javax.swing.JButton jButton28;
-    private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton30;
     private javax.swing.JButton jButton31;
     private javax.swing.JButton jButton6;
@@ -3098,10 +3346,10 @@ try {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField13;
     private javax.swing.JTextField jTextField14;
-    private javax.swing.JTextField jTextField15;
     private javax.swing.JTextField jTextField16;
     private javax.swing.JTextField jTextField18;
     private javax.swing.JTextField jTextField2;
@@ -3118,9 +3366,15 @@ try {
     private javax.swing.JPanel loansPanel;
     private javax.swing.JTextField loansSearch;
     private javax.swing.JTable loansTable;
+    private javax.swing.JButton managePaymentsButton;
+    private javax.swing.JButton notifyButton;
     private javax.swing.JButton paymentSearch;
     private javax.swing.JButton paymentsButton;
+    private javax.swing.JButton refreshBorrowButton;
     private javax.swing.JButton refreshButton;
+    private javax.swing.JButton refreshPaymentsButton;
+    private javax.swing.JButton refreshReserveButton;
+    private javax.swing.JButton refreshReturnsButton;
     private javax.swing.JButton removeButton;
     private javax.swing.JTextField requestSearch;
     private javax.swing.JTable requestTable;
@@ -3128,8 +3382,8 @@ try {
     private javax.swing.JTextField reservationTitleSearch;
     private javax.swing.JButton reservationTitleSearchButton;
     private javax.swing.JTable reservationTitleTable;
+    private javax.swing.JButton reservationsButton;
     private javax.swing.JButton reserveButton;
-    private javax.swing.JButton reserveButton1;
     private javax.swing.JPanel reservePanel;
     private javax.swing.JButton reserveSearch;
     private javax.swing.JButton returnsButton;
