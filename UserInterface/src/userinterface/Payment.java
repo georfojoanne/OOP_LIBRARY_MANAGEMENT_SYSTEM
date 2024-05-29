@@ -1,10 +1,6 @@
 package userinterface;
 
 
-import java.awt.Panel;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,30 +28,7 @@ public class Payment extends javax.swing.JFrame {
 
     
     
-        public static void makePanelMovable(JFrame frame, Panel panel2) { //not implemented yet, can't open payment design
-        final Point[] mousePoint = {null}; // Declare mousePoint as an array
-
-        panel2.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
-            }
-        });
-
-        panel2.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (mousePoint[0] != null) {
-                    Point currentLocation = frame.getLocation();
-                    Point newLocation = e.getLocationOnScreen();
-                    int deltaX = newLocation.x - mousePoint[0].x - panel2.getLocationOnScreen().x;
-                    int deltaY = newLocation.y - mousePoint[0].y - panel2.getLocationOnScreen().y;
-                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
-                }
-            }
-        });
-    }
-        
+    
     // gets the amount Payable in the database table userinfo column loan and displays in the amountField
     
     public void retrieveLoanAmount(String name, JTextField amountField) {
@@ -452,115 +425,106 @@ public class Payment extends javax.swing.JFrame {
     }//GEN-LAST:event_userFieldActionPerformed
 
     private void payButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payButtonActionPerformed
-try {
-    // Get the database connection
-    dbConnection conn = new dbConnection();
-    Connection connection = conn.getConnection();
+   // fix implementation wherein it will not simply divide the books and the fine when the amount paid is inserted into the history
+   //implement that each book will have its own fee depending on how many days it is due
+        try {
+        // Get the database connection
+        dbConnection conn = new dbConnection();
+        Connection connection = conn.getConnection();
+        
+        // Get the text from the userField and amountField
+        String userText = userField.getText();
+        String amountText = amountField.getText();
+        int totalAmount = Integer.parseInt(amountText); // Assuming amountField is for entering a numerical value
 
-    // Get the text from the userField and amountField
-    String userText = userField.getText();
-    String amountText = amountField.getText();
-    String librarian = "Mikaela";
-    String admin = "Joanne";
-    int totalAmount = Integer.parseInt(amountText); // Assuming amountField is for entering a numerical value
-
-    if (connection != null) {
-        // SQL query to select overdue books for the user
-        String selectOverdueBooksQuery = "SELECT * FROM borrows WHERE dor < CURDATE() AND name = ?";
-        PreparedStatement selectStmt = connection.prepareStatement(selectOverdueBooksQuery);
-        selectStmt.setString(1, userText);
-        ResultSet overdueBooksResultSet = selectStmt.executeQuery();
-
-        int overdueBooksCount = 0;
-
-        // Prepare statements for later use
-        String insertHistoryQuery = "INSERT INTO history (title, date, status, name, amount) VALUES (?, CURDATE(), ?, ?, ?)";
-        PreparedStatement insertStmt = connection.prepareStatement(insertHistoryQuery);
-
-        String updateBorrowsQuery = "UPDATE borrows SET last_updated = NULL, overdueDays = 0, dor = DATE_ADD(CURDATE(), INTERVAL 7 DAY) WHERE title = ? AND name = ?";
-        PreparedStatement updateBorrowsStmt = connection.prepareStatement(updateBorrowsQuery);
-
-        String deleteLoanQuery = "UPDATE borrows SET loan = 0 WHERE title = ? AND name = ?";
-        PreparedStatement deleteLoanStmt = connection.prepareStatement(deleteLoanQuery);
-
-        while (overdueBooksResultSet.next()) {
-            overdueBooksCount++;
-            String title = overdueBooksResultSet.getString("title");
-            int amount = overdueBooksResultSet.getInt("loan");
-            String status = "Overdue Paid";
-
-            // Insert into history table
-            insertStmt.setString(1, title);
-            insertStmt.setString(2, status);
-            insertStmt.setString(3, userText);
-            insertStmt.setInt(4, amount);
-            insertStmt.executeUpdate();
-
-            // Update the borrows table
-            updateBorrowsStmt.setString(1, title);
-            updateBorrowsStmt.setString(2, userText);
-            updateBorrowsStmt.executeUpdate();
-
-            // Remove the loan from borrows table
-            deleteLoanStmt.setString(1, title);
-            deleteLoanStmt.setString(2, userText);
-            deleteLoanStmt.executeUpdate();
-        }
-
-        if (overdueBooksCount > 0) {
-            // Remove the loan from userinfo table
-            String updateQueryUserInfo = "UPDATE userinfo SET loan = 0 WHERE name = ?";
-            PreparedStatement preparedStatementUserInfo = connection.prepareStatement(updateQueryUserInfo);
-            preparedStatementUserInfo.setString(1, userText);
-            int rowsAffectedUserInfo = preparedStatementUserInfo.executeUpdate();
-
-            // Update the librarian earnings
-            String updateLibrarianEarningsQuery = "UPDATE librarian SET earnings = earnings + ? WHERE User = ?";
-            PreparedStatement updateLibrarianEarningsStmt = connection.prepareStatement(updateLibrarianEarningsQuery);
-            updateLibrarianEarningsStmt.setInt(1, totalAmount);
-            updateLibrarianEarningsStmt.setString(2, librarian); 
-
-            int librarianRowsAffected = updateLibrarianEarningsStmt.executeUpdate();
-            updateLibrarianEarningsStmt.close();
-
-            // Update the admin earnings
-            String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ? WHERE name = ?";
-            PreparedStatement updateAdminEarningsStmt = connection.prepareStatement(updateAdminEarningsQuery);
-            updateAdminEarningsStmt.setInt(1, totalAmount);
-            updateAdminEarningsStmt.setString(2, admin); 
-
-            int adminRowsAffected = updateAdminEarningsStmt.executeUpdate();
-            updateAdminEarningsStmt.close();
-
-            if (rowsAffectedUserInfo > 0) {
-                JOptionPane.showMessageDialog(this, "Payment successful. Please log in to your account.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                new LogIn().setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "User not found or no changes made to userinfo.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (connection != null) {
+            // SQL query to count overdue books for the user
+            String countOverdueBooksQuery = "SELECT COUNT(*) AS count FROM borrows WHERE dor < CURDATE() AND name = ?";
+            PreparedStatement countStmt = connection.prepareStatement(countOverdueBooksQuery);
+            countStmt.setString(1, userText);
+            ResultSet countResultSet = countStmt.executeQuery();
+            
+            int overdueBooksCount = 0;
+            if (countResultSet.next()) {
+                overdueBooksCount = countResultSet.getInt("count");
             }
 
-            JOptionPane.showMessageDialog(this, "Borrow date extended successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            if (overdueBooksCount > 0) {
+                int amountPerBook = totalAmount / overdueBooksCount;
+
+                // SQL query to select overdue books for the user
+                String selectOverdueBooksQuery = "SELECT title FROM borrows WHERE dor < CURDATE() AND name = ?";
+                PreparedStatement selectStmt = connection.prepareStatement(selectOverdueBooksQuery);
+                selectStmt.setString(1, userText);
+                ResultSet overdueBooksResultSet = selectStmt.executeQuery();
+
+                // Insert into history table
+                String insertHistoryQuery = "INSERT INTO history (title, date, status, name, amount) VALUES (?, CURDATE(), ?, ?, ?)";
+                PreparedStatement insertStmt = connection.prepareStatement(insertHistoryQuery);
+
+                while (overdueBooksResultSet.next()) {
+                    String title = overdueBooksResultSet.getString("title");
+                    String status = "Overdue Paid";
+                    
+                    insertStmt.setString(1, title);
+                    insertStmt.setString(2, status);
+                    insertStmt.setString(3, userText);
+                    insertStmt.setInt(4, amountPerBook);
+                    insertStmt.executeUpdate();
+                }
+
+                // Update earnings for librarian and admin
+                String updateEarningsQuery = "UPDATE librarian SET earnings = earnings + ?";
+                String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ?";
+                PreparedStatement updateEarningsStmt = connection.prepareStatement(updateEarningsQuery);
+                PreparedStatement updateAdminEarningsStmt = connection.prepareStatement(updateAdminEarningsQuery);
+
+                updateEarningsStmt.setInt(1, totalAmount);
+                updateEarningsStmt.executeUpdate();
+
+                updateAdminEarningsStmt.setInt(1, totalAmount);
+                updateAdminEarningsStmt.executeUpdate();
+
+                // Update the loan column in the userinfo table
+                String updateQueryUserInfo = "UPDATE userinfo SET loan = 0 WHERE name = ?";
+                PreparedStatement preparedStatementUserInfo = connection.prepareStatement(updateQueryUserInfo);
+                preparedStatementUserInfo.setString(1, userText);
+                int rowsAffectedUserInfo = preparedStatementUserInfo.executeUpdate();
+
+                // Update the dor column in the borrows table by adding 7 days
+                String updateQueryBorrows = "UPDATE borrows SET dor = DATE_ADD(dor, INTERVAL 7 DAY) WHERE name = ?";
+                PreparedStatement preparedStatementBorrows = connection.prepareStatement(updateQueryBorrows);
+                preparedStatementBorrows.setString(1, userText);
+                int rowsAffectedBorrows = preparedStatementBorrows.executeUpdate();
+
+                // Show success messages
+                if (rowsAffectedUserInfo > 0) {
+                    JOptionPane.showMessageDialog(this, "Payment successful. Please log in to your account.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new LogIn().setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "User not found or no changes made to userinfo.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+                if (rowsAffectedBorrows > 0) {
+                    JOptionPane.showMessageDialog(this, "Borrow date extended successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No borrows record found or no changes made to borrows.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(this, "No overdue books found for this user.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            // Close the connection
+            connection.close();
         } else {
-            JOptionPane.showMessageDialog(this, "No overdue books found for this user.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-        // Close the statements and result set
-        insertStmt.close();
-        updateBorrowsStmt.close();
-        deleteLoanStmt.close();
-        overdueBooksResultSet.close();
-        selectStmt.close();
-
-        // Close the connection
-        connection.close();
-    } else {
-        JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (SQLException ex) {
+        Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Invalid amount entered. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
     }
-} catch (SQLException ex) {
-    Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
-} catch (NumberFormatException ex) {
-    JOptionPane.showMessageDialog(this, "Invalid amount entered. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
-}
 
     dispose();
     }//GEN-LAST:event_payButtonActionPerformed
