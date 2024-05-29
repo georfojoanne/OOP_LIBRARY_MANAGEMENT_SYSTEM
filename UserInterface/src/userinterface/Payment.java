@@ -1,6 +1,10 @@
 package userinterface;
 
 
+import java.awt.Panel;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -28,7 +32,30 @@ public class Payment extends javax.swing.JFrame {
 
     
     
-    
+        public static void makePanelMovable(JFrame frame, Panel panel2) { //not implemented yet, can't open payment design
+        final Point[] mousePoint = {null}; // Declare mousePoint as an array
+
+        panel2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePoint[0] = e.getPoint(); // Get the point relative to jPanel1
+            }
+        });
+
+        panel2.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (mousePoint[0] != null) {
+                    Point currentLocation = frame.getLocation();
+                    Point newLocation = e.getLocationOnScreen();
+                    int deltaX = newLocation.x - mousePoint[0].x - panel2.getLocationOnScreen().x;
+                    int deltaY = newLocation.y - mousePoint[0].y - panel2.getLocationOnScreen().y;
+                    frame.setLocation(currentLocation.x + deltaX, currentLocation.y + deltaY);
+                }
+            }
+        });
+    }
+        
     // gets the amount Payable in the database table userinfo column loan and displays in the amountField
     
     public void retrieveLoanAmount(String name, JTextField amountField) {

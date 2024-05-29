@@ -1830,17 +1830,6 @@ try {
             .addGroup(rightmostPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(rightmostPanelLayout.createSequentialGroup()
-                        .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jTextField15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                            .addComponent(jButton17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(booksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(returnsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(borrowsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(addBooksButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(paymentsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(holdsButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rightmostPanelLayout.createSequentialGroup()
                         .addGap(0, 42, Short.MAX_VALUE)
                         .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1849,7 +1838,23 @@ try {
                                 .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel2)))
-                        .addGap(75, 75, 75))))
+                        .addGap(75, 75, 75))
+                    .addGroup(rightmostPanelLayout.createSequentialGroup()
+                        .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jTextField15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(rightmostPanelLayout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(holdsButton, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addGroup(rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(paymentsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(addBooksButton, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                                .addComponent(borrowsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(returnsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(booksButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         rightmostPanelLayout.setVerticalGroup(
             rightmostPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2301,8 +2306,8 @@ try {
 
                         // Send notification to the user
                         String notificationMessage = "Hello, " + name + ", the book \"" + title + "\" is already available for you to borrow. "
-                                + "Please come to the library as soon as possible. Your schedule to claim the book is tomorrow. "
-                                + "If you fail to come, your reservation will be cancelled. Thank you and more power. - Librarian";
+                                + "Please come to the library as soon as possible. Your schedule to claim the book is on \"" + tomorrow
+                                + "\". If you fail to come, your reservation will be cancelled. Thank you and more power. - Librarian";
 
                         // Insert the notification into the database
                         String insertNotificationQuery = "INSERT INTO notifs (name, notif) VALUES (?, ?)";
@@ -2616,16 +2621,16 @@ try {
     private void confirmPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPaymentActionPerformed
     int selectedRow = loansManagementTable.getSelectedRow();
     if (selectedRow != -1) {
-        String title = (String) loansManagementTable.getValueAt(selectedRow, 1); // Assuming title is at index 1
-        String name = (String) loansManagementTable.getValueAt(selectedRow, 0); // Assuming name is at index 0
-        int feePaid = (int) loansManagementTable.getValueAt(selectedRow, 3); // Assuming fee is at index 3
+        String title = (String) loansManagementTable.getValueAt(selectedRow, 1);
+        String name = (String) loansManagementTable.getValueAt(selectedRow, 0);
+        int feePaid = (int) loansManagementTable.getValueAt(selectedRow, 3); 
 
         try {
             dbConnection con = new dbConnection();
             Connection connection = con.getConnection();
 
-            // Clear loan, overdueDays, and last_updated, and extend dor by 7 days
-            String updateBorrowsQuery = "UPDATE borrows SET loan = 0, overdueDays = 0, last_updated = NULL, dor = DATE_ADD(dor, INTERVAL 7 DAY) WHERE title = ? AND name = ?";
+            // Clear loan, overdueDays, and last_updated, and set dor to 7 days from the current date
+            String updateBorrowsQuery = "UPDATE borrows SET loan = 0, overdueDays = 0, last_updated = NULL, dor = DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY) WHERE title = ? AND name = ?";
             PreparedStatement updateBorrowsStatement = connection.prepareStatement(updateBorrowsQuery);
             updateBorrowsStatement.setString(1, title);
             updateBorrowsStatement.setString(2, name);
@@ -2647,6 +2652,18 @@ try {
             updateUserInfoStatement.setString(2, name);
             updateUserInfoStatement.executeUpdate();
 
+            // Increment earnings for the admin (Joanne)
+            String updateAdminEarningsQuery = "UPDATE admin SET earnings = earnings + ? WHERE name = 'Joanne'";
+            PreparedStatement updateAdminEarningsStatement = connection.prepareStatement(updateAdminEarningsQuery);
+            updateAdminEarningsStatement.setInt(1, feePaid);
+            updateAdminEarningsStatement.executeUpdate();
+
+            // Increment earnings for the librarian (Mikaela)
+            String updateLibrarianEarningsQuery = "UPDATE librarian SET earnings = earnings + ? WHERE User = 'Mikaela'";
+            PreparedStatement updateLibrarianEarningsStatement = connection.prepareStatement(updateLibrarianEarningsQuery);
+            updateLibrarianEarningsStatement.setInt(1, feePaid);
+            updateLibrarianEarningsStatement.executeUpdate();
+
             JOptionPane.showMessageDialog(null, "Payment confirmed successfully!");
 
             // Refresh loansManagementTable
@@ -2656,6 +2673,8 @@ try {
             updateBorrowsStatement.close();
             insertHistoryStatement.close();
             updateUserInfoStatement.close();
+            updateAdminEarningsStatement.close();
+            updateLibrarianEarningsStatement.close();
             connection.close();
 
         } catch (SQLException e) {
@@ -2663,7 +2682,7 @@ try {
         }
     } else {
         JOptionPane.showMessageDialog(null, "Please select a row from the table first.");
-    }        
+    }            
     }//GEN-LAST:event_confirmPaymentActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
