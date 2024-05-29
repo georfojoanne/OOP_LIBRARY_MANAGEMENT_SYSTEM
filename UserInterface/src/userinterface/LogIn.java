@@ -1,14 +1,18 @@
 
 package userinterface;
 
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -29,7 +33,19 @@ public class LogIn extends javax.swing.JFrame {
              
        }
        
-        
+            private void setFrameIcon(String imageName) {
+        try {
+            // Load the icon image from resources within the same package
+            URL imageUrl = getClass().getResource(imageName);
+            if (imageUrl == null) {
+                throw new IOException("Resource not found: " + imageName);
+            }
+            Image icon = ImageIO.read(imageUrl);
+            setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
        
        
        
@@ -103,6 +119,9 @@ public class LogIn extends javax.swing.JFrame {
         panel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         panel2.setBackground(new java.awt.Color(28, 52, 62));
+        setFrameIcon("libIcon.png");
+
+        setTitle("Lib.IT");
         panel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         userLogin.setBackground(java.awt.Color.white);

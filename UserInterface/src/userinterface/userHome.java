@@ -9,10 +9,13 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Panel;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
@@ -20,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -59,6 +63,25 @@ public class userHome extends javax.swing.JFrame  {
            
           
     }
+    
+    
+    private void setFrameIcon(String imageName) {
+        try {
+            // Load the icon image from resources within the same package
+            URL imageUrl = getClass().getResource(imageName);
+            if (imageUrl == null) {
+                throw new IOException("Resource not found: " + imageName);
+            }
+            Image icon = ImageIO.read(imageUrl);
+            setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
+    
     
     public static void makePanelMovable(JFrame frame, Panel panel2) {
         final Point[] mousePoint = {null}; // Declare mousePoint as an array
@@ -641,11 +664,14 @@ public void getTextFromNameColumn() {
 
         makePanelMovable(this, panel2);
 
-        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 40));
+        getContentPane().add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 690, 60));
 
         leftPanel.setBackground(new java.awt.Color(10, 29, 36));
         leftPanel.setPreferredSize(new java.awt.Dimension(100, 1000));
         leftPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setFrameIcon("libIcon.png");
+
+        setTitle("Lib.IT");
         leftPanel.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 66, -1, 90));
 
         borrowsButton.setBackground(new java.awt.Color(26, 27, 27));
@@ -656,6 +682,7 @@ public void getTextFromNameColumn() {
         borrowsButton.setBorder(null);
         borrowsButton.setBorderPainted(false);
         borrowsButton.setContentAreaFilled(false);
+        borrowsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         borrowsButton.setFocusPainted(false);
         borrowsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -671,6 +698,7 @@ public void getTextFromNameColumn() {
         reservationButton.setBorder(null);
         reservationButton.setBorderPainted(false);
         reservationButton.setContentAreaFilled(false);
+        reservationButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         reservationButton.setFocusPainted(false);
         reservationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -685,6 +713,7 @@ public void getTextFromNameColumn() {
         settingsButton.setText("Settings");
         settingsButton.setBorder(null);
         settingsButton.setContentAreaFilled(false);
+        settingsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         settingsButton.setFocusPainted(false);
         settingsButton.setMinimumSize(new java.awt.Dimension(68, 22));
         settingsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -704,6 +733,7 @@ public void getTextFromNameColumn() {
         historyButton.setText("History");
         historyButton.setBorderPainted(false);
         historyButton.setContentAreaFilled(false);
+        historyButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         historyButton.setFocusPainted(false);
         historyButton.setPreferredSize(new java.awt.Dimension(95, 22));
         historyButton.addActionListener(new java.awt.event.ActionListener() {
@@ -720,6 +750,7 @@ public void getTextFromNameColumn() {
         notificationsButton.setBorder(null);
         notificationsButton.setBorderPainted(false);
         notificationsButton.setContentAreaFilled(false);
+        notificationsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         notificationsButton.setFocusPainted(false);
         notificationsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -736,7 +767,7 @@ public void getTextFromNameColumn() {
         booksButton.setBorder(null);
         booksButton.setBorderPainted(false);
         booksButton.setContentAreaFilled(false);
-        booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        booksButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         booksButton.setFocusPainted(false);
         booksButton.setMaximumSize(null);
         booksButton.setMinimumSize(null);
@@ -763,6 +794,7 @@ public void getTextFromNameColumn() {
         logOutButton.setText("Log Out");
         logOutButton.setBorderPainted(false);
         logOutButton.setContentAreaFilled(false);
+        logOutButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         logOutButton.setFocusPainted(false);
         logOutButton.setRequestFocusEnabled(false);
         logOutButton.setRolloverEnabled(false);

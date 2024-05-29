@@ -2,21 +2,38 @@
 package userinterface;
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.CYAN;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
 import java.sql.*;
 import java.sql.PreparedStatement;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 
 
@@ -44,6 +61,8 @@ public class admins extends javax.swing.JFrame {
          mcategory.setEditable(false);
          librarians.setEditable(false);
          earnings.setEditable(false);
+         
+         dashBoardChartStudentFaculty();
 
          
          
@@ -51,6 +70,127 @@ public class admins extends javax.swing.JFrame {
         
     }
     
+    private void setFrameIcon(String imageName) {
+        try {
+            // Load the icon image from resources within the same package
+            URL imageUrl = getClass().getResource(imageName);
+            if (imageUrl == null) {
+                throw new IOException("Resource not found: " + imageName);
+            }
+            Image icon = ImageIO.read(imageUrl);
+            setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+private void dashBoardChartStudentFaculty() {
+    int studentCount = 0;
+    int facultyCount = 0;
+
+    try {
+        // Use the database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            // Count the number of students
+            String studentQuery = "SELECT COUNT(*) AS count FROM userinfo WHERE role = 'Student'";
+            ps = connection.prepareStatement(studentQuery);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                studentCount = rs.getInt("count");
+            }
+            rs.close();
+            ps.close();
+
+            // Count the number of faculties
+            String facultyQuery = "SELECT COUNT(*) AS count FROM userinfo WHERE role = 'Faculty'";
+            ps = connection.prepareStatement(facultyQuery);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                facultyCount = rs.getInt("count");
+            }
+            rs.close();
+            ps.close();
+
+            // Additional counts (books, categories, librarians)...
+            // ...
+
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                // Close ResultSet and PreparedStatement
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                // Close Connection
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    // Call createBarChart and pass the chart label as a parameter
+    createBarChart(chartLabel, studentCount, facultyCount);
+
+    // Add the chart label to your UI where you want it to be displayed
+    // For example, assuming you have a mainPanel:
+    // mainPanel.add(chartLabel);
+
+}
+
+    private void createBarChart(JLabel label, int studentCount, int facultyCount) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(studentCount, "Students", "Students"); // Adding students data
+        dataset.addValue(facultyCount, "Faculties", "Faculties"); // Adding faculties data
+
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Students vs Faculties",
+                "Category",
+                "Count",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+
+        // Customize the plot
+        CategoryPlot plot = barChart.getCategoryPlot();
+
+        // Set the background color of the plot
+        plot.setBackgroundPaint(new Color(94, 130, 130));
+
+        // Set the range axis to display whole numbers only
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+        // Customize the renderer to set bar colors
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, Color.GREEN); // Set the color for the first series (Students)
+        renderer.setSeriesPaint(1, Color.BLUE);  // Set the color for the second series (Faculties)
+
+        // Set the font color of the plot
+        barChart.getTitle().setPaint(new Color(0,0,0));
+        plot.getDomainAxis().setTickLabelPaint(new Color(0,0,0));
+        plot.getRangeAxis().setTickLabelPaint(new Color(0,0,0));
+
+        // Convert the chart to an image
+        BufferedImage chartImage = barChart.createBufferedImage(500, 300);
+
+        // Set the image to the label
+        label.setIcon(new ImageIcon(chartImage));
+    }
     
    
     
@@ -203,7 +343,7 @@ private void books() {
                 String category = rs1.getString("Category");
 
                 // Count the number of times the book has been borrowed from the history table
-                String query2 = "SELECT COUNT(*) AS borrowCount FROM history WHERE Title = ? AND Status = 'Borrowed'";
+                String query2 = "SELECT COUNT(*) AS borrowCount FROM history WHERE title = ? AND status = 'Borrowed'";
                 ps2 = connection.prepareStatement(query2);
                 ps2.setString(1, title);
                 rs2 = ps2.executeQuery();
@@ -214,7 +354,7 @@ private void books() {
                 }
 
                 // Update the borrows column in the books table
-                String query3 = "UPDATE books SET borrows = ? WHERE Title = ?";
+                String query3 = "UPDATE books SET borrows = ? WHERE title = ?";
                 ps3 = connection.prepareStatement(query3);
                 ps3.setString(1, String.valueOf(borrowCount));
                 ps3.setString(2, title);
@@ -449,6 +589,7 @@ private void books() {
         scategory = new javax.swing.JTextField();
         ecategory = new javax.swing.JTextField();
         librarians = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         booksTable = new javax.swing.JTable();
         jButton6 = new javax.swing.JButton();
@@ -458,6 +599,8 @@ private void books() {
         updateButton = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         earnings = new javax.swing.JTextField();
+        chartPanel = new javax.swing.JPanel();
+        chartLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -521,10 +664,13 @@ private void books() {
 
         makePanelMovable(this, jPanel1);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 960, 90));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 960, 110));
 
         librarianButton.setBackground(new java.awt.Color(10, 29, 36));
         librarianButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setFrameIcon("libIcon.png");
+
+        setTitle("Lib.IT - Admin");
 
         dashButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         dashButton.setForeground(new java.awt.Color(255, 255, 255));
@@ -1038,7 +1184,7 @@ private void books() {
 
         numLibrarians.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         numLibrarians.setText("Number of Librarians :");
-        panel2.add(numLibrarians, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 30, 180, 30));
+        panel2.add(numLibrarians, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 20, 180, 30));
 
         numBooks.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         numBooks.setText("Number of  books  :");
@@ -1058,6 +1204,11 @@ private void books() {
 
         users.setEditable(false);
         users.setFocusable(false);
+        users.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usersActionPerformed(evt);
+            }
+        });
         panel2.add(users, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 70, -1));
 
         students.setEditable(false);
@@ -1086,7 +1237,18 @@ private void books() {
 
         librarians.setEditable(false);
         librarians.setFocusable(false);
-        panel2.add(librarians, new org.netbeans.lib.awtextra.AbsoluteConstraints(628, 60, 80, 30));
+        panel2.add(librarians, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 50, 80, 30));
+
+        jButton3.setBackground(new java.awt.Color(10, 29, 36));
+        jButton3.setFont(new java.awt.Font("Stylus BT", 0, 18)); // NOI18N
+        jButton3.setForeground(new java.awt.Color(0, 255, 255));
+        jButton3.setText("Graphs");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        panel2.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 90, 120, -1));
 
         panel1.add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 740, 130));
 
@@ -1161,7 +1323,15 @@ private void books() {
 
         jTabbedPane1.addTab("tab6", panel3);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, 760, 660));
+        chartPanel.setBackground(new java.awt.Color(28, 68, 74));
+        chartPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        chartLabel.setBackground(new java.awt.Color(10, 29, 36));
+        chartPanel.add(chartLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 20, 500, 370));
+
+        jTabbedPane1.addTab("tab7", chartPanel);
+
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 60, 760, 670));
         setJMenuBar(jMenuBar1);
 
         pack();
@@ -1753,6 +1923,14 @@ private void books() {
           setState(JFrame. ICONIFIED);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void usersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usersActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_usersActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+                          jTabbedPane1.setSelectedIndex(6); 
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     
     
     public static void makePanelMovable(JFrame frame, JPanel jPanel1) { //not implemented yet, can't open payment design
@@ -1793,6 +1971,8 @@ private void books() {
     private javax.swing.JTable booksTable;
     private javax.swing.JButton cancelLibrarian;
     private javax.swing.JButton cancelUser;
+    private javax.swing.JLabel chartLabel;
+    private javax.swing.JPanel chartPanel;
     private javax.swing.JButton dashButton;
     private javax.swing.JTextField earnings;
     private javax.swing.JButton earningsButton;
@@ -1803,6 +1983,7 @@ private void books() {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton28;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;

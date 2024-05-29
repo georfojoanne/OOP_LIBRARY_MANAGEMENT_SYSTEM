@@ -2,9 +2,12 @@ package userinterface;
 
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
@@ -17,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,6 +49,20 @@ public class Librarian extends javax.swing.JFrame {
        
               
           
+    }
+    
+    private void setFrameIcon(String imageName) {
+        try {
+            // Load the icon image from resources within the same package
+            URL imageUrl = getClass().getResource(imageName);
+            if (imageUrl == null) {
+                throw new IOException("Resource not found: " + imageName);
+            }
+            Image icon = ImageIO.read(imageUrl);
+            setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     
@@ -840,6 +858,11 @@ try {
         searchButtonBooks.setBorderPainted(false);
         searchButtonBooks.setContentAreaFilled(false);
         searchButtonBooks.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        searchButtonBooks.setFocusPainted(false);
+        searchButtonBooks.setFocusable(false);
+        searchButtonBooks.setRequestFocusEnabled(false);
+        searchButtonBooks.setRolloverEnabled(false);
+        searchButtonBooks.setVerifyInputWhenFocusTarget(false);
         searchButtonBooks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchButtonBooksActionPerformed(evt);
@@ -967,6 +990,12 @@ try {
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setFocusPainted(false);
+        jButton2.setFocusable(false);
+        jButton2.setRequestFocusEnabled(false);
+        jButton2.setRolloverEnabled(false);
+        jButton2.setVerifyInputWhenFocusTarget(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -1093,6 +1122,12 @@ try {
         reservationTitleSearchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         reservationTitleSearchButton.setBorderPainted(false);
         reservationTitleSearchButton.setContentAreaFilled(false);
+        reservationTitleSearchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reservationTitleSearchButton.setFocusPainted(false);
+        reservationTitleSearchButton.setFocusable(false);
+        reservationTitleSearchButton.setRequestFocusEnabled(false);
+        reservationTitleSearchButton.setRolloverEnabled(false);
+        reservationTitleSearchButton.setVerifyInputWhenFocusTarget(false);
         reservationTitleSearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reservationTitleSearchButtonActionPerformed(evt);
@@ -1352,6 +1387,11 @@ try {
         reserveSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
         reserveSearch.setBorderPainted(false);
         reserveSearch.setContentAreaFilled(false);
+        reserveSearch.setFocusPainted(false);
+        reserveSearch.setFocusable(false);
+        reserveSearch.setRequestFocusEnabled(false);
+        reserveSearch.setRolloverEnabled(false);
+        reserveSearch.setVerifyInputWhenFocusTarget(false);
         reserveSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reserveSearchActionPerformed(evt);
@@ -1439,6 +1479,11 @@ try {
         paymentSearch.setBorderPainted(false);
         paymentSearch.setContentAreaFilled(false);
         paymentSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        paymentSearch.setFocusPainted(false);
+        paymentSearch.setFocusable(false);
+        paymentSearch.setRequestFocusEnabled(false);
+        paymentSearch.setRolloverEnabled(false);
+        paymentSearch.setVerifyInputWhenFocusTarget(false);
         paymentSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 paymentSearchActionPerformed(evt);
@@ -1541,6 +1586,11 @@ try {
         loanManagementSearchButton.setBorderPainted(false);
         loanManagementSearchButton.setContentAreaFilled(false);
         loanManagementSearchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        loanManagementSearchButton.setFocusPainted(false);
+        loanManagementSearchButton.setFocusable(false);
+        loanManagementSearchButton.setRequestFocusEnabled(false);
+        loanManagementSearchButton.setRolloverEnabled(false);
+        loanManagementSearchButton.setVerifyInputWhenFocusTarget(false);
         loanManagementSearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loanManagementSearchButtonActionPerformed(evt);
@@ -1823,6 +1873,11 @@ try {
         borrowsSearchButton.setBorderPainted(false);
         borrowsSearchButton.setContentAreaFilled(false);
         borrowsSearchButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        borrowsSearchButton.setFocusPainted(false);
+        borrowsSearchButton.setFocusable(false);
+        borrowsSearchButton.setRequestFocusEnabled(false);
+        borrowsSearchButton.setRolloverEnabled(false);
+        borrowsSearchButton.setVerifyInputWhenFocusTarget(false);
         borrowsSearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 borrowsSearchButtonActionPerformed(evt);
@@ -1845,6 +1900,9 @@ try {
         getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, 690, 680));
 
         rightmostPanel.setBackground(new java.awt.Color(10, 29, 36));
+        setFrameIcon("libIcon.png");
+
+        setTitle("Lib.IT - Librarian");
 
         returnsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
         returnsButton.setForeground(new java.awt.Color(255, 255, 255));

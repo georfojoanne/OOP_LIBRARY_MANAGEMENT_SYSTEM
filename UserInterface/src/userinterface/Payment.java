@@ -1,15 +1,19 @@
 package userinterface;
 
 
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URL;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -28,6 +32,20 @@ public class Payment extends javax.swing.JFrame {
           
            
            
+    }
+    
+    private void setFrameIcon(String imageName) {
+        try {
+            // Load the icon image from resources within the same package
+            URL imageUrl = getClass().getResource(imageName);
+            if (imageUrl == null) {
+                throw new IOException("Resource not found: " + imageName);
+            }
+            Image icon = ImageIO.read(imageUrl);
+            setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void makePanelMovable(JFrame frame, JPanel jPanel3) { //not implemented yet, can't open payment design
@@ -198,6 +216,9 @@ public class Payment extends javax.swing.JFrame {
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 510, 50));
 
+        setFrameIcon("libIcon.png");
+
+        setTitle("Lib.IT - Payment");
         panel2.setBackground(new java.awt.Color(38, 51, 60));
 
         gcashNumber.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
