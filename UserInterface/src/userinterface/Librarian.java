@@ -852,6 +852,7 @@ try {
         });
         bookTable.getTableHeader().setReorderingAllowed(false);
         bookTable.setDefaultEditor(Object.class, null);
+        bookTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         jScrollPane5.setViewportView(bookTable);
 
         searchButtonBooks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/searchIcon.png"))); // NOI18N
@@ -959,6 +960,7 @@ try {
                 return canEdit [columnIndex];
             }
         });
+        returnsTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         returnsTable.getTableHeader().setReorderingAllowed(false);
         returnsTable.setDefaultEditor(Object.class, null);
         jScrollPane2.setViewportView(returnsTable);
@@ -1075,6 +1077,7 @@ try {
                 return canEdit [columnIndex];
             }
         });
+        reservationTitleTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         reservationTitleTable.getTableHeader().setReorderingAllowed(false);
         reservationTitleTable.setDefaultEditor(Object.class, null);
         jScrollPane3.setViewportView(reservationTitleTable);
@@ -1322,6 +1325,7 @@ try {
                 return types [columnIndex];
             }
         });
+        requestTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         jScrollPane4.setViewportView(requestTable);
         requestTable.getTableHeader().setReorderingAllowed(false);
         requestTable.setDefaultEditor(Object.class, null);
@@ -1469,6 +1473,7 @@ try {
             }
         });
         loansTable.setFocusable(false);
+        loansTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         jScrollPane7.setViewportView(loansTable);
         loansTable.getTableHeader().setReorderingAllowed(false);
         loansTable.setDefaultEditor(Object.class, null);
@@ -1571,6 +1576,7 @@ try {
                 return canEdit [columnIndex];
             }
         });
+        loansManagementTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         loansManagementTable.getTableHeader().setReorderingAllowed(false);
         loansManagementTable.setDefaultEditor(Object.class, null);
         jScrollPane6.setViewportView(loansManagementTable);
@@ -1831,6 +1837,9 @@ try {
                 "Title", "Date of Borrow", "Date of Return", "User Name"
             }
         ));
+        borrowsTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
+        borrowsTable.getTableHeader().setReorderingAllowed(false);
+        borrowsTable.setDefaultEditor(Object.class, null);
         jScrollPane1.setViewportView(borrowsTable);
 
         borrowsPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 61, 660, 497));

@@ -34,6 +34,10 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import java.util.HashMap;
+import java.util.Map;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
 
 
 
@@ -63,6 +67,7 @@ public class admins extends javax.swing.JFrame {
          earnings.setEditable(false);
          
          dashBoardChartStudentFaculty();
+         dashBoardPieChartBooksByCategory();
 
          
          
@@ -84,9 +89,101 @@ public class admins extends javax.swing.JFrame {
         }
     }
     
-private void dashBoardChartStudentFaculty() {
+private void dashBoardPieChartBooksByCategory() { //counter and initialization for the creation of the pie chart
+    HashMap<String, Integer> categoryCounts = new HashMap<>();
+
+    try {
+        // Use the database connection
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            // Count the number of books per category
+            String categoryQuery = "SELECT Category, COUNT(*) AS count FROM books GROUP BY Category";
+            ps = connection.prepareStatement(categoryQuery);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                categoryCounts.put(rs.getString("Category"), rs.getInt("count"));
+            }
+            rs.close();
+            ps.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                // Close ResultSet and PreparedStatement
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                // Close Connection
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    // Call createPieChart and pass the chart label as a parameter
+    createPieChart(pieChart, categoryCounts);
+
+    // Add the chart label to your UI where you want it to be displayed
+    // For example, assuming you have a mainPanel:
+    // mainPanel.add(chartLabel);
+}
+
+private void createPieChart(JLabel label, HashMap<String, Integer> categoryCounts) { //method to create the pie chart
+    DefaultPieDataset dataset = new DefaultPieDataset();
+    for (Map.Entry<String, Integer> entry : categoryCounts.entrySet()) {
+        dataset.setValue(entry.getKey(), entry.getValue());
+    }
+
+    JFreeChart pieChart = ChartFactory.createPieChart(
+            "Book Count by Category",
+            dataset,
+            true, // legend
+            true, // tooltips
+            false // URLs
+    );
+
+    // Customize the plot
+    PiePlot plot = (PiePlot) pieChart.getPlot();
+
+    // Set custom colors for specific categories
+    plot.setSectionPaint("English", new Color(255, 0, 0)); // Red
+    plot.setSectionPaint("Science", new Color(0, 255, 0)); // Green
+    plot.setSectionPaint("Mathematics", new Color(0,255,255)); // Blue
+
+    // Set the font color of the plot
+    pieChart.getTitle().setPaint(new Color(0, 0, 0));
+    plot.setLabelPaint(new Color(0, 0, 0));
+    plot.setBackgroundPaint(new Color(10,29,36));
+
+    // Convert the chart to an image
+    BufferedImage chartImage = pieChart.createBufferedImage(630, 300);
+
+    // Set the image to the label
+    label.setIcon(new ImageIcon(chartImage));
+}
+    
+    
+    
+    
+    
+private void dashBoardChartStudentFaculty() { //method to count and initialize the creation of pie chart
     int studentCount = 0;
     int facultyCount = 0;
+    int librarianCount = 0;
 
     try {
         // Use the database connection
@@ -117,8 +214,15 @@ private void dashBoardChartStudentFaculty() {
             rs.close();
             ps.close();
 
-            // Additional counts (books, categories, librarians)...
-            // ...
+            // Count the number of librarians
+            String librarianQuery = "SELECT COUNT(*) AS count FROM librarian";
+            ps = connection.prepareStatement(librarianQuery);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                librarianCount = rs.getInt("count");
+            }
+            rs.close();
+            ps.close();
 
         } catch (SQLException ex) {
             Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
@@ -144,53 +248,52 @@ private void dashBoardChartStudentFaculty() {
     }
 
     // Call createBarChart and pass the chart label as a parameter
-    createBarChart(chartLabel, studentCount, facultyCount);
+    createBarChart(chartLabel, studentCount, facultyCount, librarianCount);
 
-    // Add the chart label to your UI where you want it to be displayed
-    // For example, assuming you have a mainPanel:
-    // mainPanel.add(chartLabel);
 
 }
 
-    private void createBarChart(JLabel label, int studentCount, int facultyCount) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(studentCount, "Students", "Students"); // Adding students data
-        dataset.addValue(facultyCount, "Faculties", "Faculties"); // Adding faculties data
+private void createBarChart(JLabel label, int studentCount, int facultyCount, int librarianCount) { //method to create the pie chart
+    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    dataset.addValue(studentCount, "Students", "Students"); // Adding students data
+    dataset.addValue(facultyCount, "Faculties", "Faculties"); // Adding faculties data
+    dataset.addValue(librarianCount, "Librarians", "Librarians"); // Adding librarians data
 
-        JFreeChart barChart = ChartFactory.createBarChart(
-                "Students vs Faculties",
-                "Category",
-                "Count",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true, true, false);
+    JFreeChart barChart = ChartFactory.createBarChart(
+            "Students vs Faculties vs Librarians",
+            "Category",
+            "Count",
+            dataset,
+            PlotOrientation.VERTICAL,
+            true, true, false);
 
-        // Customize the plot
-        CategoryPlot plot = barChart.getCategoryPlot();
+    // Customize the plot
+    CategoryPlot plot = barChart.getCategoryPlot();
 
-        // Set the background color of the plot
-        plot.setBackgroundPaint(new Color(94, 130, 130));
+    // Set the background color of the plot
+    plot.setBackgroundPaint(new Color(10,29,36));
 
-        // Set the range axis to display whole numbers only
-        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+    // Set the range axis to display whole numbers only
+    NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+    rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
-        // Customize the renderer to set bar colors
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, Color.GREEN); // Set the color for the first series (Students)
-        renderer.setSeriesPaint(1, Color.BLUE);  // Set the color for the second series (Faculties)
+    // Customize the renderer to set bar colors
+    BarRenderer renderer = (BarRenderer) plot.getRenderer();
+    renderer.setSeriesPaint(0, new Color(255,102,0)); // Set the color for the first series (Students)
+    renderer.setSeriesPaint(1, Color.BLUE);  // Set the color for the second series (Faculties)
+    renderer.setSeriesPaint(2, Color.ORANGE);  // Set the color for the third series (Librarians)
 
-        // Set the font color of the plot
-        barChart.getTitle().setPaint(new Color(0,0,0));
-        plot.getDomainAxis().setTickLabelPaint(new Color(0,0,0));
-        plot.getRangeAxis().setTickLabelPaint(new Color(0,0,0));
+    // Set the font color of the plot
+    barChart.getTitle().setPaint(new Color(0, 0, 0));
+    plot.getDomainAxis().setTickLabelPaint(new Color(0, 0, 0));
+    plot.getRangeAxis().setTickLabelPaint(new Color(0, 0, 0));
 
-        // Convert the chart to an image
-        BufferedImage chartImage = barChart.createBufferedImage(500, 300);
+    // Convert the chart to an image
+    BufferedImage chartImage = barChart.createBufferedImage(630, 300);
 
-        // Set the image to the label
-        label.setIcon(new ImageIcon(chartImage));
-    }
+    // Set the image to the label
+    label.setIcon(new ImageIcon(chartImage));
+}
     
    
     
@@ -601,6 +704,7 @@ private void books() {
         earnings = new javax.swing.JTextField();
         chartPanel = new javax.swing.JPanel();
         chartLabel = new javax.swing.JLabel();
+        pieChart = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -870,6 +974,9 @@ private void books() {
                 "User Name", "ID #", "Email", "Password", "Role", "Contact#"
             }
         ));
+        userTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
+        userTable.getTableHeader().setReorderingAllowed(false);
+        userTable.setDefaultEditor(Object.class, null);
         jScrollPane6.setViewportView(userTable);
 
         jPanel5.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 740, 440));
@@ -905,6 +1012,9 @@ private void books() {
                 "Librarian User Name", "ID #", "Email", "Password", "Contact#"
             }
         ));
+        librarianTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
+        librarianTable.getTableHeader().setReorderingAllowed(false);
+        librarianTable.setDefaultEditor(Object.class, null);
         jScrollPane3.setViewportView(librarianTable);
 
         jPanel6.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 730, 440));
@@ -1243,6 +1353,11 @@ private void books() {
         jButton3.setFont(new java.awt.Font("Stylus BT", 0, 18)); // NOI18N
         jButton3.setForeground(new java.awt.Color(0, 255, 255));
         jButton3.setText("Graphs");
+        jButton3.setFocusPainted(false);
+        jButton3.setFocusable(false);
+        jButton3.setRequestFocusEnabled(false);
+        jButton3.setRolloverEnabled(false);
+        jButton3.setVerifyInputWhenFocusTarget(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -1262,8 +1377,10 @@ private void books() {
             }
         ));
         booksTable.setGridColor(new java.awt.Color(51, 255, 255));
+        booksTable.setDefaultEditor(Object.class, null);
         booksTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
         booksTable.setSelectionForeground(new java.awt.Color(0, 0, 0));
+        booksTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(booksTable);
 
         panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 730, 410));
@@ -1294,6 +1411,9 @@ private void books() {
                 "Book Title", "Date", "Name", "Amount Paid"
             }
         ));
+        earningsTable.setDefaultEditor(Object.class, null);
+        earningsTable.setSelectionBackground(new java.awt.Color(204, 255, 255));
+        earningsTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(earningsTable);
         if (earningsTable.getColumnModel().getColumnCount() > 0) {
             earningsTable.getColumnModel().getColumn(0).setPreferredWidth(200);
@@ -1327,7 +1447,8 @@ private void books() {
         chartPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         chartLabel.setBackground(new java.awt.Color(10, 29, 36));
-        chartPanel.add(chartLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 20, 500, 370));
+        chartPanel.add(chartLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 10, 670, 350));
+        chartPanel.add(pieChart, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 330, 670, 300));
 
         jTabbedPane1.addTab("tab7", chartPanel);
 
@@ -1499,20 +1620,22 @@ private void books() {
         String password = Password.getText();
         String role = (String) roleCb.getSelectedItem();
         String contact = Contact.getText();
+        String number = "1";
         
         // Use dbConnection to establish a database connection
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
         
         // Execute SQL statement to insert data into the librarian table
-        String query = "INSERT INTO userinfo (name, role, email, Password, id, Contact) VALUES (?, ?, ?, ?, ?,?)";
+        String query = "INSERT INTO userinfo (name, role, email, Password, id, Contact, number) VALUES (?, ?, ?, ?, ?,?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, name);
-            pstmt.setString(2, id);
+            pstmt.setString(2, role);
             pstmt.setString(3, email);
             pstmt.setString(4, password);
-            pstmt.setString(5, role);
+            pstmt.setString(5, id);
              pstmt.setString(6, contact);
+             pstmt.setString(7, number);
             
             // Execute the update
             pstmt.executeUpdate();
@@ -1928,7 +2051,8 @@ private void books() {
     }//GEN-LAST:event_usersActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-                          jTabbedPane1.setSelectedIndex(6); 
+        dashBoardChartStudentFaculty();
+        jTabbedPane1.setSelectedIndex(6); 
     }//GEN-LAST:event_jButton3ActionPerformed
 
     
@@ -2040,6 +2164,7 @@ private void books() {
     private java.awt.Panel panel1;
     private java.awt.Panel panel2;
     private java.awt.Panel panel3;
+    private javax.swing.JLabel pieChart;
     private javax.swing.JButton remButton1;
     private javax.swing.JButton removeLibrarian;
     private javax.swing.JComboBox<String> roleCb;
