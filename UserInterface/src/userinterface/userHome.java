@@ -464,8 +464,9 @@ public void getTextFromNameColumn() {
             String Category = rs.getString("Category");
                String Status = rs.getString("Status");
                 String nr = rs.getString("nr");
+                 String nb = rs.getString("nb");
 
-            String[] bookData = {Title, Author, ISBN, Category,Status,nr };
+            String[] bookData = {Title, Author, ISBN, Category,Status,nr,nb };
             tblModel.addRow(bookData);
         }
     } finally {
@@ -849,12 +850,19 @@ public void getTextFromNameColumn() {
 
             },
             new String [] {
-                "Title", "Author", "ISBN", "Category", "Status", "#of Reservations"
+                "Title", "Author", "ISBN", "Category", "Status", "#of Reservations", "#ofBooks"
             }
         ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -874,6 +882,7 @@ public void getTextFromNameColumn() {
             searchBookTable.getColumnModel().getColumn(3).setPreferredWidth(40);
             searchBookTable.getColumnModel().getColumn(4).setPreferredWidth(50);
             searchBookTable.getColumnModel().getColumn(5).setPreferredWidth(30);
+            searchBookTable.getColumnModel().getColumn(6).setPreferredWidth(40);
         }
 
         searchButton.setBackground(new java.awt.Color(49, 98, 103));
@@ -2217,7 +2226,7 @@ private void removeReservationSelectedRowsFromDatabase() {
     
     private void borrowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowButtonActionPerformed
 
-        updateButton.setForeground(new Color(0, 225, 255));
+       updateButton.setForeground(new Color(0, 225, 255));
     borrowButton.setForeground(new Color(225, 225, 255));
     reserveButton.setForeground(new Color(0, 225, 225));
     searchButton.setForeground(new Color(0, 225, 225));
@@ -2250,29 +2259,39 @@ private void removeReservationSelectedRowsFromDatabase() {
                             continue; // Skip to the next selected book
                         }
 
-                        // Check the status of the book
+                        // Check the status and nb of the book
                         PreparedStatement statusStatement = connection.prepareStatement(
-                            "SELECT status FROM books WHERE Title = ?"
+                            "SELECT status, nb FROM books WHERE Title = ?"
                         );
                         statusStatement.setString(1, title);
                         ResultSet statusResult = statusStatement.executeQuery();
 
                         if (statusResult.next()) {
                             String status = statusResult.getString("status");
+                            int nb = statusResult.getInt("nb");
 
                             if (status.equals("Borrowed")) {
                                 JOptionPane.showMessageDialog(this, "The book \"" + title + "\" is already borrowed. We recommend you to reserve it.", "Error", JOptionPane.ERROR_MESSAGE);
                             } else if (status.equals("Reserved")) {
                                 JOptionPane.showMessageDialog(this, "The book \"" + title + "\" is already reserved. We recommend you to reserve it.", "Error", JOptionPane.ERROR_MESSAGE);
                             } else if (status.equals("Available")) {
-                                // Update the status of the book to 'Borrowed'
-                                PreparedStatement updateStatement = connection.prepareStatement(
-                                    "UPDATE books SET status = 'Borrowed' WHERE Title = ?"
-                                );
-                                updateStatement.setString(1, title);
-                                updateStatement.executeUpdate();
-
-                                
+                                // Decrement the value of 'nb' by 1
+                                if (nb > 1) {
+                                    PreparedStatement decrementStmt = connection.prepareStatement(
+                                        "UPDATE books SET nb = ? WHERE Title = ?"
+                                    );
+                                    decrementStmt.setInt(1, nb - 1);
+                                    decrementStmt.setString(2, title);
+                                    decrementStmt.executeUpdate();
+                                } else if (nb == 1) {
+                                    // Decrement 'nb' and update the status of the book to 'Borrowed'
+                                    PreparedStatement updateStatement = connection.prepareStatement(
+                                        "UPDATE books SET nb = ?, status = 'Borrowed' WHERE Title = ?"
+                                    );
+                                    updateStatement.setInt(1, nb - 1);
+                                    updateStatement.setString(2, title);
+                                    updateStatement.executeUpdate();
+                                }
 
                                 // Insert into 'borrows' table
                                 PreparedStatement insertBorrowStmt = connection.prepareStatement(
@@ -2329,7 +2348,6 @@ private void removeReservationSelectedRowsFromDatabase() {
     populateBorrowsTableFromDatabase();
     fillHistoryTableFromDatabase(userName.getText());
     dbData(); // to update table in real-time
-
         
     }//GEN-LAST:event_borrowButtonActionPerformed
 

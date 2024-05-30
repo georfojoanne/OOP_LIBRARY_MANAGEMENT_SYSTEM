@@ -35,7 +35,9 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 
@@ -68,6 +70,7 @@ public class admins extends javax.swing.JFrame {
          
          dashBoardChartStudentFaculty();
          dashBoardPieChartBooksByCategory();
+         dashBoardChartTopBooksByCopies(top5Books);
 
          
          
@@ -88,6 +91,95 @@ public class admins extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+    
+    private void dashBoardChartTopBooksByCopies(JLabel top5Books) {
+    HashMap<String, Integer> bookCopies = new HashMap<>();
+
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT Title, nb FROM books ORDER BY nb DESC LIMIT 5";
+            ps = connection.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                bookCopies.put(rs.getString("Title"), rs.getInt("nb"));
+            }
+            rs.close();
+            ps.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    createBarChart(top5Books, sortByCopiesDescending(bookCopies));
+}
+
+private Map<String, Integer> sortByCopiesDescending(Map<String, Integer> map) {
+    // Sort the map by values in descending order
+    return map.entrySet()
+              .stream()
+              .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+              .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+}
+
+private void createBarChart(JLabel label, Map<String, Integer> bookCopies) {
+    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    Color[] colors = new Color[]{Color.ORANGE, Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA};
+    int colorIndex = 0;
+    for (Map.Entry<String, Integer> entry : bookCopies.entrySet()) {
+        dataset.addValue(entry.getValue(), "Number of Copies", entry.getKey());
+        colorIndex++;
+    }
+
+    JFreeChart barChart = ChartFactory.createBarChart(
+            "Top 5 Books by Number of Copies",
+            "Book Title",
+            "Number of Copies",
+            dataset,
+            PlotOrientation.VERTICAL,
+            true, true, false);
+
+    CategoryPlot plot = barChart.getCategoryPlot();
+    plot.setBackgroundPaint(new Color(94, 130, 130));
+
+    BarRenderer renderer = (BarRenderer) plot.getRenderer();
+    for (int i = 0; i < dataset.getRowCount(); i++) {
+        renderer.setSeriesPaint(i, colors[i % colors.length]);
+    }
+
+    barChart.getTitle().setPaint(new Color(0, 0, 0));
+    plot.getDomainAxis().setTickLabelPaint(new Color(0, 0, 0));
+    plot.getRangeAxis().setTickLabelPaint(new Color(0, 0, 0));
+    
+    // Set the range axis to display whole numbers only
+    NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+    rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+    BufferedImage chartImage = barChart.createBufferedImage(600, 400);
+    label.setIcon(new ImageIcon(chartImage));
+}
     
 private void dashBoardPieChartBooksByCategory() { //counter and initialization for the creation of the pie chart
     HashMap<String, Integer> categoryCounts = new HashMap<>();
@@ -620,7 +712,6 @@ private void books() {
         jButton2 = new javax.swing.JButton();
         librarianButton = new javax.swing.JPanel();
         dashButton = new javax.swing.JButton();
-        uiButton = new javax.swing.JButton();
         userButton = new javax.swing.JButton();
         libButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
@@ -696,6 +787,7 @@ private void books() {
         jScrollPane1 = new javax.swing.JScrollPane();
         booksTable = new javax.swing.JTable();
         jButton6 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         panel3 = new java.awt.Panel();
         jScrollPane2 = new javax.swing.JScrollPane();
         earningsTable = new javax.swing.JTable();
@@ -705,6 +797,8 @@ private void books() {
         chartPanel = new javax.swing.JPanel();
         chartLabel = new javax.swing.JLabel();
         pieChart = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        top5Books = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -782,6 +876,7 @@ private void books() {
         dashButton.setBorder(null);
         dashButton.setBorderPainted(false);
         dashButton.setContentAreaFilled(false);
+        dashButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         dashButton.setDefaultCapable(false);
         dashButton.setFocusPainted(false);
         dashButton.setRequestFocusEnabled(false);
@@ -793,30 +888,13 @@ private void books() {
         });
         librarianButton.add(dashButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 150, -1));
 
-        uiButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
-        uiButton.setForeground(new java.awt.Color(255, 255, 255));
-        uiButton.setText("USER INTERFACE");
-        uiButton.setBorder(null);
-        uiButton.setBorderPainted(false);
-        uiButton.setContentAreaFilled(false);
-        uiButton.setFocusPainted(false);
-        uiButton.setFocusable(false);
-        uiButton.setRequestFocusEnabled(false);
-        uiButton.setRolloverEnabled(false);
-        uiButton.setVerifyInputWhenFocusTarget(false);
-        uiButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                uiButtonActionPerformed(evt);
-            }
-        });
-        librarianButton.add(uiButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 360, 200, -1));
-
         userButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         userButton.setForeground(new java.awt.Color(255, 255, 255));
         userButton.setText("USER");
         userButton.setBorder(null);
         userButton.setBorderPainted(false);
         userButton.setContentAreaFilled(false);
+        userButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         userButton.setFocusPainted(false);
         userButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         userButton.setRequestFocusEnabled(false);
@@ -835,6 +913,7 @@ private void books() {
         libButton.setBorder(null);
         libButton.setBorderPainted(false);
         libButton.setContentAreaFilled(false);
+        libButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         libButton.setFocusPainted(false);
         libButton.setFocusable(false);
         libButton.setRequestFocusEnabled(false);
@@ -863,6 +942,7 @@ private void books() {
         liButton.setText("LIBRARIAN INTERFACE");
         liButton.setBorderPainted(false);
         liButton.setContentAreaFilled(false);
+        liButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         liButton.setFocusPainted(false);
         liButton.setFocusable(false);
         liButton.setRequestFocusEnabled(false);
@@ -873,7 +953,7 @@ private void books() {
                 liButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(liButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 410, 250, -1));
+        librarianButton.add(liButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, 350, 250, -1));
 
         earningsButton.setFont(new java.awt.Font("Stylus BT", 1, 14)); // NOI18N
         earningsButton.setForeground(java.awt.Color.white);
@@ -881,6 +961,7 @@ private void books() {
         earningsButton.setBorder(null);
         earningsButton.setBorderPainted(false);
         earningsButton.setContentAreaFilled(false);
+        earningsButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         earningsButton.setFocusPainted(false);
         earningsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         earningsButton.setRequestFocusEnabled(false);
@@ -891,7 +972,7 @@ private void books() {
                 earningsButtonActionPerformed(evt);
             }
         });
-        librarianButton.add(earningsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
+        librarianButton.add(earningsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, -1, -1));
 
         jButton8.setBackground(new java.awt.Color(0, 73, 73));
         jButton8.setFont(new java.awt.Font("Stylus BT", 1, 24)); // NOI18N
@@ -1396,7 +1477,22 @@ private void books() {
                 jButton6ActionPerformed(evt);
             }
         });
-        panel1.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 570, 270, -1));
+        panel1.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 570, 270, 30));
+
+        jButton4.setBackground(new java.awt.Color(0, 51, 51));
+        jButton4.setForeground(new java.awt.Color(102, 255, 255));
+        jButton4.setText("BOOK COPIES GRAPH");
+        jButton4.setActionCommand("BOOK COPIES GRAPH");
+        jButton4.setFocusPainted(false);
+        jButton4.setFocusable(false);
+        jButton4.setRequestFocusEnabled(false);
+        jButton4.setRolloverEnabled(false);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        panel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 570, 270, 30));
 
         jTabbedPane1.addTab("tab7", panel1);
 
@@ -1452,6 +1548,12 @@ private void books() {
 
         jTabbedPane1.addTab("tab7", chartPanel);
 
+        jPanel2.setBackground(new java.awt.Color(28, 68, 74));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel2.add(top5Books, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 580, 500));
+
+        jTabbedPane1.addTab("tab8", jPanel2);
+
         getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 60, 760, 670));
         setJMenuBar(jMenuBar1);
 
@@ -1470,24 +1572,11 @@ private void books() {
                      libButton.setForeground(new Color(225,225,255));
                      dashButton.setForeground(new Color(0,225,255));                   
                      earningsButton.setForeground(new Color(225,225,255));
-                     uiButton.setForeground(new Color(225,225,255));
+                     
                      liButton.setForeground(new Color(225,225,255));
                    
         
     }//GEN-LAST:event_dashButtonActionPerformed
-
-    private void uiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiButtonActionPerformed
-                  
-        new userHome().setVisible(true);
-                    userButton.setForeground(new Color(225,225,225));
-                     libButton.setForeground(new Color(225,225,255));
-                     dashButton.setForeground(new Color(225,225,255));                   
-                     earningsButton.setForeground(new Color(225,225,255));
-                     uiButton.setForeground(new Color(0,225,255));
-                     liButton.setForeground(new Color(225,225,255));
-                
-        
-    }//GEN-LAST:event_uiButtonActionPerformed
 
     private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
         jTabbedPane1.setSelectedIndex(0);
@@ -1496,8 +1585,7 @@ private void books() {
                      libButton.setForeground(new Color(225,225,255));
                      dashButton.setForeground(new Color(225,225,255));                   
                      earningsButton.setForeground(new Color(225,225,255));
-                     uiButton.setForeground(new Color(225,225,255));
-                     liButton.setForeground(new Color(225,225,255));
+                                         liButton.setForeground(new Color(225,225,255));
                    
         
      
@@ -1510,7 +1598,7 @@ private void books() {
                      libButton.setForeground(new Color(0,225,255));
                      dashButton.setForeground(new Color(225,225,255));                   
                      earningsButton.setForeground(new Color(225,225,255));
-                     uiButton.setForeground(new Color(225,225,255));
+                    
                      liButton.setForeground(new Color(225,225,255));
                    
         
@@ -1533,9 +1621,9 @@ private void books() {
     }//GEN-LAST:event_libNameActionPerformed
 
     
-    private void addLibririan() {                                          
+    
+    private void addLibrarian() {                                          
     try {                                          
-      
         // Retrieve data from text fields
         String name = libName.getText();
         String id = libId.getText();
@@ -1546,6 +1634,21 @@ private void books() {
         // Use dbConnection to establish a database connection
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
+        
+        // Check if a librarian with the same ID, email, password, or contact already exists
+        String checkQuery = "SELECT COUNT(*) FROM librarian WHERE Id = ? OR Email = ? OR Password = ? OR Contact = ?";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+            checkStmt.setString(1, id);
+            checkStmt.setString(2, email);
+            checkStmt.setString(3, password);
+            checkStmt.setString(4, contact);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                // If count is greater than 0, data already exists
+                JOptionPane.showMessageDialog(null, "Similar data already exists.", "Duplicate Entry", JOptionPane.WARNING_MESSAGE);
+                return; // Exit the method without adding the librarian
+            }
+        }
         
         // Execute SQL statement to insert data into the librarian table
         String query = "INSERT INTO librarian (User, Id, Email, Password, Contact) VALUES (?, ?, ?, ?, ?)";
@@ -1578,9 +1681,9 @@ private void books() {
             }
         }
     } catch (SQLException ex) {
-            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
     }
-} 
+}
 
     
     
@@ -1589,7 +1692,7 @@ private void books() {
     private void updateLibrarianActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateLibrarianActionPerformed
        
         
-        addLibririan();
+        addLibrarian();
         
     }//GEN-LAST:event_updateLibrarianActionPerformed
 
@@ -1612,7 +1715,6 @@ private void books() {
     
     private void addUser() {                                          
     try {                                          
-      
         // Retrieve data from text fields
         String name = user.getText();
         String id = ID.getText();
@@ -1626,22 +1728,38 @@ private void books() {
         dbConnection con = new dbConnection();
         Connection connection = con.getConnection();
         
-        // Execute SQL statement to insert data into the librarian table
-        String query = "INSERT INTO userinfo (name, role, email, Password, id, Contact, number) VALUES (?, ?, ?, ?, ?,?, ?)";
+        // Check if a user with the same ID, email, password, contact, or number already exists
+        String checkQuery = "SELECT COUNT(*) FROM userinfo WHERE id = ? OR email = ? OR password = ? OR contact = ? OR number = ?";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+            checkStmt.setString(1, id);
+            checkStmt.setString(2, email);
+            checkStmt.setString(3, password);
+            checkStmt.setString(4, contact);
+            checkStmt.setString(5, number);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                // If count is greater than 0, data already exists
+                JOptionPane.showMessageDialog(null, "Similar data already exists.", "Duplicate Entry", JOptionPane.WARNING_MESSAGE);
+                return; // Exit the method without adding the user
+            }
+        }
+        
+        // Execute SQL statement to insert data into the userinfo table
+        String query = "INSERT INTO userinfo (name, role, email, password, id, contact, number) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, name);
             pstmt.setString(2, role);
             pstmt.setString(3, email);
             pstmt.setString(4, password);
             pstmt.setString(5, id);
-             pstmt.setString(6, contact);
-             pstmt.setString(7, number);
+            pstmt.setString(6, contact);
+            pstmt.setString(7, number);
             
             // Execute the update
             pstmt.executeUpdate();
             JOptionPane.showMessageDialog(null, "User added successfully.", "User Added", JOptionPane.INFORMATION_MESSAGE);
             
-            // Once data is inserted, refresh the librarianTable
+            // Once data is inserted, refresh the userTable
             userTable();
             
         } catch (SQLException ex) {
@@ -1659,9 +1777,9 @@ private void books() {
             }
         }
     } catch (SQLException ex) {
-            Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(admins.class.getName()).log(Level.SEVERE, null, ex);
     }
-} 
+}
 
     
     
@@ -1928,7 +2046,7 @@ private void books() {
                      libButton.setForeground(new Color(225,225,255));
                      dashButton.setForeground(new Color(225,225,255));                   
                      earningsButton.setForeground(new Color(225,225,255));
-                     uiButton.setForeground(new Color(225,225,255));
+                    
                      liButton.setForeground(new Color(0,225,255));
         
     }//GEN-LAST:event_liButtonActionPerformed
@@ -2036,7 +2154,7 @@ private void books() {
                      libButton.setForeground(new Color(225,225,255));
                      dashButton.setForeground(new Color(225,225,255));                   
                      earningsButton.setForeground(new Color(0,225,255));
-                     uiButton.setForeground(new Color(225,225,255));
+                    
                      liButton.setForeground(new Color(225,225,255));
                    
         
@@ -2054,6 +2172,10 @@ private void books() {
         dashBoardChartStudentFaculty();
         jTabbedPane1.setSelectedIndex(6); 
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        jTabbedPane1.setSelectedIndex(7); 
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     
     
@@ -2108,6 +2230,7 @@ private void books() {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;
@@ -2134,6 +2257,7 @@ private void books() {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
@@ -2173,7 +2297,7 @@ private void books() {
     private javax.swing.JButton searchUser;
     private javax.swing.JTextField searchUserField;
     private javax.swing.JTextField students;
-    private javax.swing.JButton uiButton;
+    private javax.swing.JLabel top5Books;
     private javax.swing.JButton updateButton;
     private javax.swing.JButton updateLibrarian;
     private javax.swing.JButton updateUser;
