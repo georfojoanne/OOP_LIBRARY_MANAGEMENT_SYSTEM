@@ -92,6 +92,8 @@ public class admins extends javax.swing.JFrame {
         }
     }
     
+    
+    
     private void dashBoardChartTopBooksByCopies(JLabel top5Books) {
     HashMap<String, Integer> bookCopies = new HashMap<>();
 
@@ -144,6 +146,9 @@ private Map<String, Integer> sortByCopiesDescending(Map<String, Integer> map) {
               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 }
 
+
+
+
 private void createBarChart(JLabel label, Map<String, Integer> bookCopies) {
     DefaultCategoryDataset dataset = new DefaultCategoryDataset();
     Color[] colors = new Color[]{Color.ORANGE, Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA};
@@ -180,6 +185,8 @@ private void createBarChart(JLabel label, Map<String, Integer> bookCopies) {
     BufferedImage chartImage = barChart.createBufferedImage(600, 400);
     label.setIcon(new ImageIcon(chartImage));
 }
+
+
     
 private void dashBoardPieChartBooksByCategory() { //counter and initialization for the creation of the pie chart
     HashMap<String, Integer> categoryCounts = new HashMap<>();
@@ -1482,7 +1489,6 @@ private void books() {
         jButton4.setBackground(new java.awt.Color(0, 51, 51));
         jButton4.setForeground(new java.awt.Color(102, 255, 255));
         jButton4.setText("BOOK COPIES GRAPH");
-        jButton4.setActionCommand("BOOK COPIES GRAPH");
         jButton4.setFocusPainted(false);
         jButton4.setFocusable(false);
         jButton4.setRequestFocusEnabled(false);

@@ -65,6 +65,8 @@ public class userHome extends javax.swing.JFrame  {
     }
     
     
+    
+    
     private void setFrameIcon(String imageName) {
         try {
             // Load the icon image from resources within the same package
@@ -106,6 +108,8 @@ public class userHome extends javax.swing.JFrame  {
             }
         });
     }
+    
+    
     
     
     public static void enableWordWrapForAllColumns(JTable table) {
