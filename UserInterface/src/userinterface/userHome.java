@@ -14,7 +14,12 @@ import java.awt.Panel;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,6 +29,8 @@ import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -57,6 +64,7 @@ public class userHome extends javax.swing.JFrame  {
                 notifs();
                 enableWordWrapForAllColumns(notifsTable);
                
+                setProfile();
              
                 
             
@@ -64,6 +72,56 @@ public class userHome extends javax.swing.JFrame  {
           
     }
     
+    
+    
+    
+      private void setProfile() {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        String user = userName.getText(); // Assuming userName is a JTextField
+        
+        if (connection != null) {
+            try {
+                // Retrieve the image from the database
+                String getImageQuery = "SELECT images FROM userinfo WHERE name = ?";
+                PreparedStatement getImageStatement = connection.prepareStatement(getImageQuery);
+                getImageStatement.setString(1, user);
+                ResultSet resultSet = getImageStatement.executeQuery();
+                
+                if (resultSet.next()) {
+                    // Check if the image value is null
+                    Blob imageBlob = resultSet.getBlob("images");
+                    if (imageBlob != null) {
+                        // Get the image data from the result set
+                        InputStream inputStream = imageBlob.getBinaryStream();
+                        
+                        // Convert the image data to a BufferedImage
+                        BufferedImage image = ImageIO.read(inputStream);
+                        
+                        // Set the image to the JLabel
+                        profile.setIcon(new ImageIcon(image));
+                    } 
+                } 
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error setting profile picture: " + e.getMessage());
+            } finally {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Failed to connect to the database.");
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+
     
     
     
@@ -515,8 +573,9 @@ public void getTextFromNameColumn() {
         xsuerButton = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         leftPanel = new java.awt.Panel();
-        profile = new javax.swing.JLabel();
         borrowsButton = new javax.swing.JButton();
+        editProfile = new javax.swing.JButton();
+        profile = new javax.swing.JLabel();
         reservationButton = new javax.swing.JButton();
         settingsButton = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
@@ -524,7 +583,6 @@ public void getTextFromNameColumn() {
         notificationsButton = new javax.swing.JButton();
         booksButton = new javax.swing.JButton();
         userName = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         logOutButton = new javax.swing.JButton();
         tabs = new javax.swing.JTabbedPane();
         books = new javax.swing.JPanel();
@@ -677,7 +735,6 @@ public void getTextFromNameColumn() {
         setFrameIcon("libIcon.png");
 
         setTitle("Lib.IT");
-        leftPanel.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 66, -1, 90));
 
         borrowsButton.setBackground(new java.awt.Color(26, 27, 27));
         borrowsButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -695,6 +752,25 @@ public void getTextFromNameColumn() {
             }
         });
         leftPanel.add(borrowsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 110, -1));
+
+        editProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/edit.png"))); // NOI18N
+        editProfile.setBorderPainted(false);
+        editProfile.setContentAreaFilled(false);
+        editProfile.setFocusPainted(false);
+        editProfile.setFocusable(false);
+        editProfile.setRequestFocusEnabled(false);
+        editProfile.setRolloverEnabled(false);
+        editProfile.setVerifyInputWhenFocusTarget(false);
+        editProfile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editProfileActionPerformed(evt);
+            }
+        });
+        leftPanel.add(editProfile, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 140, 110, 70));
+
+        profile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/whiteIcon.png"))); // NOI18N
+        profile.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(51, 255, 255), 3, true));
+        leftPanel.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 66, 110, 110));
 
         reservationButton.setBackground(new java.awt.Color(26, 27, 27));
         reservationButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -730,7 +806,7 @@ public void getTextFromNameColumn() {
 
         jSeparator1.setBackground(java.awt.Color.white);
         jSeparator1.setPreferredSize(new java.awt.Dimension(70, 10));
-        leftPanel.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 220, 90, -1));
+        leftPanel.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 220, 90, 10));
 
         historyButton.setBackground(new java.awt.Color(26, 27, 27));
         historyButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -787,10 +863,7 @@ public void getTextFromNameColumn() {
         userName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         userName.setForeground(java.awt.Color.white);
         userName.setText("User Name");
-        leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 180, -1, -1));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/whiteIcon.png"))); // NOI18N
-        leftPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, -1, -1));
+        leftPanel.add(userName, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 190, -1, -1));
 
         logOutButton.setBackground(new java.awt.Color(49, 98, 103));
         logOutButton.setFont(new java.awt.Font("Stylus BT", 1, 18)); // NOI18N
@@ -2525,6 +2598,89 @@ private void removeReservationSelectedRowsFromDatabase() {
       setState(JFrame. ICONIFIED);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+     
+    private void saveImageToDatabase(BufferedImage image) {
+    try {
+        dbConnection con = new dbConnection();
+        Connection connection = con.getConnection();
+        String user = userName.getText(); // Assuming userName is a JTextField
+
+        if (connection != null) {
+            try {
+                // Check if the user exists in the database
+                String checkUserQuery = "SELECT * FROM userinfo WHERE name = ?";
+                PreparedStatement checkUserStatement = connection.prepareStatement(checkUserQuery);
+                checkUserStatement.setString(1, user);
+                ResultSet resultSet = checkUserStatement.executeQuery();
+                
+                if (resultSet.next()) {
+                    // Insert the image into the database
+                    String updateImageQuery = "UPDATE userinfo SET images = ? WHERE name = ?";
+                    PreparedStatement updateImageStatement = connection.prepareStatement(updateImageQuery);
+                    
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(image, "png", baos);
+                    InputStream is = new ByteArrayInputStream(baos.toByteArray());
+                    
+                    updateImageStatement.setBlob(1, is);
+                    updateImageStatement.setString(2, user);
+                    
+                    updateImageStatement.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(null, "Image saved to database for user: " + user);
+                } else {
+                    JOptionPane.showMessageDialog(null, "User does not exist: " + user);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error saving image to database: " + e.getMessage());
+            } finally {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Failed to connect to the database.");
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(userHome.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+
+    
+    
+    private void editProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProfileActionPerformed
+         JFileChooser fileChooser = new JFileChooser();
+    int result = fileChooser.showOpenDialog(null); // Replace 'null' with your JFrame or JPanel instance
+
+    if (result == JFileChooser.APPROVE_OPTION) {
+        File selectedFile = fileChooser.getSelectedFile();
+        try {
+            // Read the selected image file
+            BufferedImage originalImage = ImageIO.read(selectedFile);
+
+            // Resize the image to fit the JLabel
+            int labelWidth = profile.getWidth();
+            int labelHeight = profile.getHeight();
+            int diameter = Math.min(labelWidth, labelHeight);
+            BufferedImage resizedImage = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
+            resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(diameter, diameter, BufferedImage.SCALE_SMOOTH), 0, 0, null);
+
+            // Save the resized image to the database
+            saveImageToDatabase(resizedImage);
+
+            // Set the resized image to the JLabel
+            profile.setIcon(new ImageIcon(resizedImage));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error uploading image: " + ex.getMessage());
+        }
+    }
+     
+    }//GEN-LAST:event_editProfileActionPerformed
+
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2537,6 +2693,7 @@ private void removeReservationSelectedRowsFromDatabase() {
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel contact;
     private javax.swing.JButton editButton;
+    private javax.swing.JButton editProfile;
     private javax.swing.JLabel email;
     private javax.swing.JPanel history;
     private javax.swing.JButton historyButton;
@@ -2546,7 +2703,6 @@ private void removeReservationSelectedRowsFromDatabase() {
     private javax.swing.JButton jButton2;
     private javax.swing.JColorChooser jColorChooser1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
