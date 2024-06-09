@@ -97,7 +97,7 @@ Select "Database" and then "phpMyAdmin."
 Step 3: Opening the Project and Utilizing the Database
 ---
 
-- Open the system in your preferred development environment most preferrably Apache Netbeans.
+- Open the system in your preferred development environment most preferably Apache Netbeans.
 
 - Locate the project file directory and update the database configuration/connection string to match the database created in phpMyAdmin. The connection string should include the hostname, port number, database name, username, and password.
 
