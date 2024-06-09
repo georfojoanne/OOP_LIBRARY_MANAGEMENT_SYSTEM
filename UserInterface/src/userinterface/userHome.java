@@ -584,6 +584,7 @@ public void getTextFromNameColumn() {
         booksButton = new javax.swing.JButton();
         userName = new javax.swing.JLabel();
         logOutButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         tabs = new javax.swing.JTabbedPane();
         books = new javax.swing.JPanel();
         borrowButton = new javax.swing.JButton();
@@ -883,6 +884,9 @@ public void getTextFromNameColumn() {
             }
         });
         leftPanel.add(logOutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 620, 180, -1));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_files/LIB.ITT.png"))); // NOI18N
+        leftPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 170, 60));
 
         getContentPane().add(leftPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 800));
 
@@ -2703,6 +2707,7 @@ private void removeReservationSelectedRowsFromDatabase() {
     private javax.swing.JButton jButton2;
     private javax.swing.JColorChooser jColorChooser1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
