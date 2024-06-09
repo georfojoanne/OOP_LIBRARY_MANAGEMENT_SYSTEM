@@ -1,23 +1,13 @@
-This repository presents the group output of Group 4, a Library Management System.
+#Lib.IT
 
-The group consists of members:
+###Library Management System
 
-Belotindos, Cryzza Nel
+**Description: A library management system created in Java that manages a physical library. A final requirement for Object Oriented Programming.**
 
-Bohol, Jonna
+Developers:
 
-Cortuna, Christine Joy
+Technologies Used:
+Java
+Laragon
+Canva
 
-Igot, Barbie Kyle
-
-Georfo, Joanne
-
-Molina, Mikaela Vianca
-
-The Library Management uses Laragon local host for the database.
-
-The roles in the system are: Users (consisting of Students and Faculty), Librarian, and Admin.
-
-This Library Management System uses java for the GUI and function implementations.
-
-Please open file UserInterface and run on Apache Netbeans.
